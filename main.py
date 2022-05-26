@@ -1,14 +1,12 @@
 import os
 from abc import ABC
-from typing import Optional, Awaitable
-
 import tornado.ioloop
 import tornado.web
 from tornado.web import RequestHandler
 from tornado.web import authenticated as authed
 from dbLocal import userAuthList, ifList
 import json
-from tornado.escape import json_encode, json_decode
+from tornado.escape import json_encode
 
 
 class VYreq(RequestHandler):
