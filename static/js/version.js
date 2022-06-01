@@ -1,4 +1,5 @@
-const currentVersion = {
+function get
+let cvs = {
     "fastip001": 1,
     "fastip002": 1,
     "sdwan001": 1,
