@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" type="image/x-icon" href="static/img/favicon.ico"/>
+    <title>{{ title }}</title>
+    {% module xsrf_form_html() %}
+</head>
+<body>
+    <a href="/">[ Home ]</a>
+    <a href="/user">[ {{ uname }} ]</a>
+    <input id="user_input" disabled value="{{ uname }}">
+    <button type="button" onclick="logout('/login')">退出(Logout)</button><br>
+    <textarea id="config_textarea" rows="8" cols="48" placeholder="输入NOC分配的配置信息"></textarea><br>
+    <select id="service_select" onchange="getTempJS(this.value)">
+            <option value="">请下拉选中一个服务模板[ 默认为空 ]</option>
+            <option value="fastip001">FastIP 单运营商[ fnetos ]</option>
+            <option value="fastip002">FastIP 双运营商[ fnetos ]</option>
+            <option value="fastip101">FastIP 假组网 单运营商[ fnetos ]</option>
+            <option value="fastip102">FastIP 假组网 双运营商[ fnetos ]</option>
+            <option value="fastip006">FastIP 假组网模式[ centos gre over openvpn]</option>
+            <option value="sdwan001">华为SD-WAN子接口自环 单运营商[huawei]</option>
+            <option value="sdwan002">华为SD-WAN子接口自环 双运营商[huawei]</option>
+            <option value="mpls001">组网 旁挂模式[ fnetos ]</option>
+            <option value="mpls002">组网 + FastIP 旁挂模式[ fnetos ]</option>
+    </select>
+
+    <div id="info_dev">
+        <form id="service_dev"></form>
+    </div>
+</body>
+<script type="text/javascript" src="/static/js/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="/static/js/autoScript.js"></script>
+</html>

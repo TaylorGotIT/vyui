@@ -1,59 +1,70 @@
-/* FastIP 假组网 单运营商 */
-const fastip001html = `<table border="1">
-<tr><td><input id="cname_input" placeholder="CompanyName[eg:Huawei]"></td>
-<td><input id="area_input" placeholder="Area[GZ,SZ,SH,etc...]"></td></tr>
+/* FastIP 假组网 双运营商 */
+const fastip102html = `<table border="1">
 <tr><td><select id="wan1_select">
-<option value="eth0" selected="selected">WAN-ETH0</option>
-<option value="eth1">WAN-ETH1</option>
-<option value="br0">WAN-BR0</option>
-<option value="br1">WAN-BR1</option></select>
+<option value="eth0" selected="selected">WAN1-ETH0</option>
+<option value="eth1">WAN1-ETH1</option>
+<option value="br0">WAN1-BR0</option>
+<option value="br1">WAN1-BR1</option></select>
 <select id="wan1_provider_select">
 <option value="CT" selected="selected">电信[CT]</option>
 <option value="CU">联通[CU]</option>
 <option value="CM">移动[CM]</option></select></td>
-<td><select id="wan1_type_select" onchange=fastip001setWan(this.value)>
+<td><select id="wan1_type_select" onchange=fastip102setWan(this.id,this.value)>
 <option value="dhcp" selected="selected">WAN Type[ DHCP ]</option>
 <option value="static">WAN Type[ Static ]</option>
 <option value="pppoe">WAN Type[ PPPoE ]</option></select></td></tr>
 <tr id="wan1_input_tr"></tr>
-<tr><td></td>
-<td id="lineid_td"></td></tr>
-  <tr><td id="ac1_td"></td><td id="ac2_td"></td></tr>
-  <tr><td id="ac1_if_td"></td><td id="ac2_if_td"></td></tr>
-  <tr><td id="ac1_ip_td"></td><td id="ac2_ip_td"></td></tr>
-  <tr><td id="ac1_pub_td"></td><td id="ac2_pub_td"></td></tr>
-  <tr><td id="ac1_oversea_td"></td><td id="ac2_oversea_td"></td></tr>
-  <tr><td id="ac1_bgp_td"></td><td id="ac2_bgp_td"></td></tr>
+<tr><td><select id="wan2_select">
+<option value="eth0" selected="selected">WAN1-ETH0</option>
+<option value="eth1">WAN1-ETH1</option>
+<option value="br0">WAN1-BR0</option>
+<option value="br1">WAN1-BR1</option></select>
+<select id="wan2_provider_select">
+<option value="CT" selected="selected">电信[CT]</option>
+<option value="CU">联通[CU]</option>
+<option value="CM">移动[CM]</option></select></td>
+<td><select id="wan2_type_select" onchange=fastip102setWan(this.id,this.value)>
+<option value="dhcp" selected="selected">WAN Type[ DHCP ]</option>
+<option value="static">WAN Type[ Static ]</option>
+<option value="pppoe">WAN Type[ PPPoE ]</option></select></td></tr>
+<tr id="wan2_input_tr"></tr>
+<tr><td><input id="bgp_server1_input" value="10.10.99.200"></td>
+<td><input id="bgp_server2_input" value="10.10.99.202"></td></tr>
+<tr><td><input id="bgp_server3_input" value="10.10.99.201"></td>
+<td><input id="bgp_server4_input" value="10.10.99.203"></td></tr>
+<tr><td id="line1_id_td"></td><td id="line2_id_td"></td></tr>
+<tr><td id="pe1_td"></td><td id="pe2_td"></td></tr>
+<tr><td id="pe1_if_td"></td><td id="pe2_if_td"></td></tr>
+<tr><td id="pe1_ip_td"></td><td id="pe2_ip_td"></td></tr>
+<tr><td id="pe1_lo_td"></td><td id="pe2_lo_td"></td></tr>
+<tr><td id="ce1_lo_td"></td><td id="ce2_lo_td"></td></tr>
+<tr><td id="pe1_as_td"></td><td id="pe2_as_td"></td></tr>
+<tr><td id="pe1_oversea_td"></td><td id="pe2_oversea_td"></td></tr>
+<tr><td id="ac1_td"></td><td id="ac2_td"></td></tr>
+<tr><td id="ac1_if_td"></td><td id="ac2_if_td"></td></tr>
+<tr><td id="ac1_ip_td"></td><td id="ac2_ip_td"></td></tr>
+<tr><td id="ac1_pub_td"></td><td id="ac2_pub_td"></td></tr>
 </table>
-<button type="button" onclick="fastip001sub('/config')">提交配置信息(Submit Config Info)</button>
+<button type="button" onclick="fastip102sub('/config')">提交配置信息(Submit Config Info)</button>
 `;
 
-function fastip001getList() {
+function fastip102getList() {
 //空格全角分号去除
     let str = $("#config_textarea").val().replaceAll(' ','').replaceAll('：',':');
     if(str.length>32){
     let lines = str.split(/\r?\n/);
-    let id_html ="";
-    let pe_html ="";
-    let ip_html ="";
-    let pe_ip_html ="";
-    let pub_ip_html ="";
-    let ce_ip_html ="";
-    let if_html ="";
-    let as_html ="";
-    let psk_html ="";
-    let info_html ="";
     let info_json = {
-                "id":[],
-                "pe":[],
-                "if":[],
-                "ip":[],
-                "lo":[],
-                "pub":[],
-                "bgp":[],
-                "oversea":[],
-                "other":[],
-            };
+        "id":[],
+        "ac":[],
+        "pe":[],
+        "if":[],
+        "ip":[],
+        "lo":[],
+        "pub":[],
+        "as":[],
+        "oversea":[],
+        "other":[],
+    };
     for(let i = 0; i < lines.length; i++) {
         let line = lines[i]
         if(line.length>8){
@@ -66,78 +77,102 @@ function fastip001getList() {
                     info_json.id.push(l1);
                     break;
                 case 'pe':
-                    info_json.pe.push(l1);
-                    break;
-                case '主pe':
-                    info_json.pe.push(l1);
-                    break;
-                case 'wanip':
-                    info_json.ip.push(l1);
+                    if(l1.search('ac')!=-1){
+                        info_json.ac.push(l1);
+                    }else{
+                        info_json.pe.push(l1);
+                    };
+
                     break;
                 case 'tunnel':
                     info_json.if.push(l1);
                     break;
-                case 'docking':
-                    info_json.pub.push(l1);
+                case 'wanip':
+                    info_json.ip.push(l1);
                     break;
-                case 'celoip':
+                case 'pe对接':
+                    let a = l1.split('.')[0]
+                    if(a!=10&&a!=172&&a!=192){
+                        info_json.pub.push(l1);
+                    }else{
+                        info_json.lo.push(l1);
+                    };
+                    break;
+                case 'ce对接':
                     info_json.lo.push(l1);
                     break;
-                case 'hkip':
-                    info_json.oversea.push(l1);
-                    break;
-                case 'bgpserverip':
-                    info_json.bgp.push(l1);
+                case 'peas号':
+                    info_json.as.push(l1);
                     break;
                 default:
-                    info_json.other.push(l1);
+                    if(l1.search('.')!=-1){
+                        info_json.oversea.push(l1);
+                    }else{
+                        info_json.other.push(l1);
+                    }
+
             };
         }
     };
     console.log(info_json);
-    $("#lineid_td").append(info_json.id[0].substr(0,7));
-    $("#ac1_td").append(info_json.pe[0]);
-    $("#ac1_if_td").append(info_json.if[0]);
-    $("#ac1_ip_td").append(info_json.ip[0]);
+    $("#lineid_td").append(info_json.id[0]);
+    $("#line1_id_td").append(info_json.id[0]);
+    $("#line2_id_td").append(info_json.id[1]);
+    $("#pe1_td").append(info_json.pe[0]);
+    $("#pe1_if_td").append(info_json.if[0]);
+    $("#pe1_ip_td").append(info_json.ip[0]);
+    $("#pe1_lo_td").append(info_json.lo[0]);
+    $("#ce1_lo_td").append(info_json.lo[1]);
+    $("#pe1_oversea_td").append(info_json.oversea[1]);
+    $("#pe1_as_td").append(info_json.as[1]);
+    $("#ac1_td").append(info_json.ac[0]);
+    $("#ac1_if_td").append(info_json.if[1]);
+    $("#ac1_ip_td").append(info_json.ip[1]);
     $("#ac1_pub_td").append(info_json.pub[0]);
     $("#ac1_oversea_td").append(info_json.oversea[0]);
-    $("#ac1_bgp_td").append(info_json.bgp[0]);
 
-    $("#ac2_td").append(info_json.pe[1]);
-    $("#ac2_if_td").append(info_json.if[1]);
-    $("#ac2_ip_td").append(info_json.ip[1]);
+    $("#pe2_td").append(info_json.pe[1]);
+    $("#pe2_if_td").append(info_json.if[2]);
+    $("#pe2_ip_td").append(info_json.ip[2]);
+    $("#pe2_lo_td").append(info_json.lo[2]);
+    $("#ce2_lo_td").append(info_json.lo[3]);
+    $("#pe2_oversea_td").append(info_json.oversea[1]);
+    $("#pe2_as_td").append(info_json.as[1]);
+    $("#ac2_td").append(info_json.ac[1]);
+    $("#ac2_if_td").append(info_json.if[3]);
+    $("#ac2_ip_td").append(info_json.ip[3]);
     $("#ac2_pub_td").append(info_json.pub[1]);
-    $("#ac2_oversea_td").append(info_json.oversea[1]);
-    $("#ac2_bgp_td").append(info_json.bgp[1]);
+
   };
 };
 
-$("#service_dev").append(fastip001html);
+$("#service_dev").append(fastip102html);
 //加载测试资源的解析数据
-fastip001getList();
+fastip102getList();
 
-function fastip001setWan(value){
+function fastip102setWan(id,value){
     let html='';
-    console.log(value);
+    wan_input_id = '#'+id.split('_')[0] + '_input_tr';
+    console.log(wan_input_id);
     switch(value){
         case "dhcp":
-            $("#wan1_input_tr").empty();
+            $(wan_input_id).empty();
         break;
         case "static":
-            $("#wan1_input_tr").empty();
-            $("#wan1_input_tr").append(`<td><input id="wan1_ip_input" placeholder="IP[x.x.x.x/x]"></td>
+            $(wan_input_id).empty();
+            $(wan_input_id).append(`<td><input id="wan1_ip_input" placeholder="IP[x.x.x.x/x]"></td>
             <td><input id="wan1_gw_input" placeholder="GW[x.x.x.x]"></td>`);
         break;
         case "pppoe":
-            $("#wan1_input_tr").empty();
-            $("#wan1_input_tr").append(`<td><input id="pppoe1_user_input" placeholder="PPPoE[x.163.gd]"></td>
+            $(wan_input_id).empty();
+            $(wan_input_id).append(`<td><input id="pppoe1_user_input" placeholder="PPPoE[x.163.gd]"></td>
             <td><input id="pppoe1_pass_input" placeholder="PPPoE[******]"></td>`);
         break;
     };
 
 }
 
-function fastip001sub(url){
+function fastip102sub(url){
   let user = $("#user_input").val();
   let time=getTime(new Date());
   let wan1 = $("#wan1_select").val();
@@ -170,9 +205,25 @@ set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
     break;
   };
   let cname = $("#cname_input").val();
-  let area = $("#area_input").val();
-  let lineid = $("#lineid_td").html();
+  let area = $("#area_select").val();
+  let line1id = $("#line1_id_td").html();
+  let cid = line1id.substr(0,6);
+  let lineid = line1id.substr(0,7);
+  let bgp1server1 = $("#bgp_server1_input").val();
+  let bgp1server2 = $("#bgp_server2_input").val();
+  let bgp1server3 = $("#bgp_server3_input").val();
+  let bgp1server4 = $("#bgp_server4_input").val();
+
 //获取主线参数
+  let pe1 = $("#pe1_td").html();
+  let pe1if = $("#pe1_if_td").html();
+  let pe1ifNum = pe1if.match(/[1-9]\d+/)[0];
+  let pe1ips = ipNext($("#pe1_ip_td").html().split('/')[0]);
+  let pe1ip1 = pe1ips[0];
+  let pe1ip2 = pe1ips[1];
+  let pe1lo = $("#pe1_lo_td").html();
+  let ce1lo = $("#ce1_lo_td").html();
+
   let ac1 = $("#ac1_td").html();
   let ac1if = $("#ac1_if_td").html();
   let ac1port = ac1if.replace('vtun','');
@@ -180,11 +231,16 @@ set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
   let ac1ip1 = ac1ips[0];
   let ac1ip2 = ac1ips[1];
   let ac1remote = $("#ac1_pub_td").html();
-  let bgp1servers1 = $("#ac1_bgp_td").html().split(',');
-  let bgp1server1 = bgp1servers1[0];
-  let bgp1server3 = bgp1servers1[1];
 
 //获取备线参数
+  let pe2 = $("#pe2_td").html();
+  let pe2if = $("#pe2_if_td").html();
+  let pe2ifNum = pe2if.match(/[1-9]\d+/)[0];
+  let pe2ips = ipNext($("#pe2_ip_td").html().split('/')[0]);
+  let pe2ip1 = pe2ips[0];
+  let pe2ip2 = pe2ips[1];
+  let pe2lo = $("#pe2_lo_td").html();
+  let ce2lo = $("#ce2_lo_td").html();
   let ac2 = $("#ac2_td").html();
   let ac2if = $("#ac2_if_td").html();
   let ac2port = ac2if.replace('vtun','');
@@ -192,11 +248,8 @@ set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
   let ac2ip1 = ac2ips[0];
   let ac2ip2 = ac2ips[1];
   let ac2remote = $("#ac2_pub_td").html();
-  let bgp1servers2 = $("#ac2_bgp_td").html().split(',');
-  let bgp1server2 = bgp1servers2[0];
-  let bgp1server4 = bgp1servers2[1];
 
-let fastip001fastipGreOverOpenvpn  =
+let fastip102fastipGreOverOpenvpn  =
 `#Fnet MPLS with GRE Over OpenVPN Template.
 #操作人员：${user}
 #时间：${time.cn}
@@ -232,6 +285,26 @@ set interfaces openvpn ${ac2if} openvpn-option '--ping 10'
 set interfaces openvpn ${ac2if} openvpn-option '--ping-restart 60'
 set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
 set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'
+echo '>>>GRE 配置[Main]<<<'
+set interfaces tunnel tun${pe1ifNum} description PE1_${pe1if}
+set interfaces tunnel tun${pe1ifNum} address ${pe1ip2}/30
+#[v3.2]set interfaces tunnel tun${pe1ifNum} local-ip ${ac1ip2}
+#[v3.2]set interfaces tunnel tun${pe1ifNum} remote-ip ${pe1lo}
+set interfaces tunnel tun${pe1ifNum} source-address ${ac1ip2}
+set interfaces tunnel tun${pe1ifNum} remote ${pe1lo}
+set interfaces tunnel tun${pe1ifNum} encapsulation gre
+set interfaces tunnel tun${pe1ifNum} multicast disable
+set interfaces tunnel tun${pe1ifNum} parameters ip ttl 255
+echo '>>>GRE 配置[Backup]<<<'
+set interfaces tunnel tun${pe2ifNum} description PE2_${pe2if}
+set interfaces tunnel tun${pe2ifNum} address ${pe2ip2}/30
+#[v3.2]set interfaces tunnel tun${pe2ifNum} local-ip ${ac2ip2}
+#[v3.2]set interfaces tunnel tun${pe2ifNum} remote-ip ${pe2lo}
+set interfaces tunnel tun${pe2ifNum} source-address ${ac2ip2}
+set interfaces tunnel tun${pe2ifNum} remote ${pe2lo}
+set interfaces tunnel tun${pe2ifNum} encapsulation gre
+set interfaces tunnel tun${pe2ifNum} multicast disable
+set interfaces tunnel tun${pe2ifNum} parameters ip ttl 255
 echo '>>>MTU TCP-MSS配置[interface]<<<'
 set firewall options interface ${ac1if} adjust-mss '1300'
 set firewall options interface ${ac2if} adjust-mss '1300'
@@ -250,8 +323,8 @@ set track name to-main test 10 target 10.30.20.129
 set track name to-main test 10 ttl-limit 1
 set track name to-main test 10 type ping
 echo '>>>静态路由配置[Static]<<<'
-set protocols static route ${ac1remote}/32 next-hop 1.1.1.1
-set protocols static route ${ac1remote}/32 next-hop 1.1.1.1
+set protocols static route ${ac1remote}/32 next-hop ${ac1ip1}
+set protocols static route ${ac2remote}/32 next-hop 1.1.1.1
 set protocols static route 114.113.245.99/32 next-hop ${ac1ip1}
 set protocols static route 114.113.245.100/32 next-hop ${ac2ip1}
 set protocols static route 192.168.55.125/32 next-hop ${ac1ip1} track to-main
@@ -265,7 +338,6 @@ set protocols static route ${bgp1server3}/32 next-hop ${ac1ip1} track 'to-main'
 set protocols static route ${bgp1server3}/32 blackhole distance '5'
 set protocols static route ${bgp1server2}/32 next-hop ${ac2ip1}
 set protocols static route ${bgp1server4}/32 next-hop ${ac2ip1}
-#
 set policy community-list 80 rule 10 action 'permit'
 set policy community-list 80 rule 10 description 'to_hk'
 set policy community-list 80 rule 10 regex '65000:9939'
@@ -335,11 +407,75 @@ set protocols bgp 65000 peer-group RSVR2 remote-as '65000'
 set protocols bgp 65000 peer-group RSVR2 update-source ${ac2ip1}
 set protocols bgp 65000 timers holdtime '15'
 set protocols bgp 65000 timers keepalive '60'
+echo '>>>DNS配置<<<'
+set epoch file-sync task 1 local '/run/cn.txt'
+set epoch file-sync task 1 remote 'http://59.37.126.146:1909/f32x/domainlist/cn_domainlist.last'
+set epoch file-sync task 2 local '/run/oversea.txt'
+set epoch file-sync task 2 remote 'http://59.37.126.146:1909/f32x/domainlist/oversea_domainlist.last'
+set service dns forwarding allow-from '0.0.0.0/0'
+set service dns forwarding cache-size '10000'
+set service dns forwarding dnssec 'off'
+set service dns forwarding domainlist CN file '/opt/cn.txt'
+set service dns forwarding domainlist CN recursion-desired
+set service dns forwarding domainlist CN server '223.5.5.5'
+set service dns forwarding domainlist CN server '223.6.6.6'
+set service dns forwarding domainlist CN server '114.114.114.114'
+set service dns forwarding domainlist HK file '/opt/oversea.txt'
+set service dns forwarding domainlist HK recursion-desired
+set service dns forwarding domainlist HK server '8.8.8.8'
+set service dns forwarding domainlist HK server '8.8.4.4'
+set service dns forwarding listen-address '0.0.0.0'
+set service dns forwarding name-server '8.8.8.8'
+set service dns forwarding name-server '208.67.222.222'
+set service smartping
+set service snmp community both-win authorization 'ro'
+set service ssh disable-host-validation
+set service ssh port '2707'
+set system name-server '127.0.0.1'
+set system ntp server 192.168.55.250
+set system ntp server 202.104.174.178
+set system time-zone 'Asia/Hong_Kong'
+echo '>>>本地NAT配置<<<'
+set nat destination rule 50 destination port '53'
+set nat destination rule 50 inbound-interface 'br1'
+set nat destination rule 50 protocol 'tcp_udp'
+set nat destination rule 50 translation address '112.91.84.107'
+set nat source rule 50 outbound-interface 'br1'
+set nat source rule 50 source address '100.64.1.0/24'
+set nat source rule 50 translation address 'masquerade'
+echo '>>>外网NAT配置<<<'
+set nat source rule 1000 destination address '8.8.8.8/32'
+set nat source rule 1000 outbound-interface 'vtun1000'
+set nat source rule 1000 translation address '100.72.1.56'
+set nat source rule 2000 destination address '8.8.8.8/32'
+set nat source rule 2000 outbound-interface 'vtun2000'
+set nat source rule 2000 translation address '100.72.1.56'
+#
+set nat source rule 1001 destination address '8.8.4.4/32'
+set nat source rule 1001 outbound-interface 'vtun1000'
+set nat source rule 1001 translation address '100.72.1.56'
+set nat source rule 2001 destination address '8.8.4.4/32'
+set nat source rule 2001 outbound-interface 'vtun2000'
+set nat source rule 2001 translation address '100.72.1.56'
+#
+set nat source rule 1002 destination address '208.67.222.222/32'
+set nat source rule 1002 outbound-interface 'vtun1000'
+set nat source rule 1002 translation address '100.72.1.56'
+set nat source rule 2002 destination address '208.67.222.222/32'
+set nat source rule 2002 outbound-interface 'vtun2000'
+set nat source rule 2002 translation address '100.72.1.56'
+#
+set nat source rule 1003 outbound-interface 'vtun1000'
+set nat source rule 1003 source address '112.91.84.104/29'
+set nat source rule 1003 translation address '100.72.1.56'
+set nat source rule 2003 outbound-interface 'vtun2000'
+set nat source rule 2003 source address '112.91.84.104/29'
+set nat source rule 2003 translation address '100.72.1.56'
 `;
   let filename = `${lineid}-Fast-SD-WAN-FastIP-GREOverOpenVPN-Config-${time.ez}-By-${user}`;
   let data = {};
-  console.log(fastip001fastipGreOverOpenvpn);
-  downloadConfig(filename, fastip001fastipGreOverOpenvpn);
+  console.log(fastip102fastipGreOverOpenvpn);
+  downloadConfig(filename, fastip102fastipGreOverOpenvpn);
   let type = 'post'
   let datatype = 'json';
   ajaxHandler(url,data,datatype,type);

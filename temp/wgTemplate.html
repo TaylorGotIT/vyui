@@ -1,0 +1,20 @@
+#{{ s_name }}.conf
+[Interface]
+Address = 10.0.0.1/24
+ListenPort = {{ s_port }}
+PrivateKey = {{ s_pri }}
+[Peer]
+PublicKey = {{ c_pub }}
+PresharedKey = {{ s_pre }}
+AllowedIPs = {{ s_allow }}
+
+#{{ c_name }}
+[Interface]
+Address = 10.0.0.1/24
+PrivateKey = {{ c_pri }}
+[Peer]
+PublicKey = {{ s_pub }}
+PresharedKey = {{ s_pre }}
+Endpoint = {{ endpoint }}
+AllowedIPs = {{ c_allow }}
+PersistentKeepalive = 25

@@ -8,26 +8,8 @@
 </head>
 <body>
     <label for="user_input">Hello</label>
-    <input id="user_input" disabled value="{{ uname }}"><br>
-    <textarea id="config_textarea" rows="8" cols="48" placeholder="输入NOC分配的配置信息"></textarea><br>
-    <select id="service_select" onchange="getTempJS(this.value)">
-            <option value="">请下拉选中一个服务模板[ 默认为空 ]</option>
-            <option value="fastip001">FastIP 旁挂模式[ fnetos ]</option>
-            <option value="fastip002">FastIP 桥接模式[ fnetos ]</option>
-            <option value="fastip003">FastIP 网关模式[ fnetos ]</option>
-            <option value="fastip004">FastIP 假组网模式[ fnetos ]</option>
-            <option value="fastip005">FastIP 假组网模式[ centos gre]</option>
-            <option value="fastip006">FastIP 假组网模式[ centos gre over openvpn]</option>
-            <option value="sdwan001">华为SD-WAN自环[ huawei ]</option>
-            <option value="sdwan003">华为SD-WAN子接口自环[ huawei]</option>
-            <option value="mpls001">组网 旁挂模式[ fnetos ]</option>
-            <option value="mpls002">组网 + FastIP 旁挂模式[ fnetos ]</option>
-    </select>
-
-    <div id="info_dev">
-        <form id="service_dev"></form>
-    </div>
-    <div>
+    <input id="user_input" disabled value="{{ uname }}"><br><br>
+    <a href="/autoScript">[ AutoScript ]</a> <a href="/wg">[ WireGuard ]</a>
         <p>开局信息填写</p>
         <p>***</p>
         <label for="wan_if_select">公网接口（WAN Interface）：</label>

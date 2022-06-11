@@ -1,29 +1,21 @@
-const sdwan001html = `<table border="1">
+const sdwan002html = `<table border="1">
 <tr><td><select id="wan1_select">
 <option value="G0/0/6" selected="selected">WAN-G0/0/6</option>
  <option value="G0/0/7">WAN-G0/0/7</option>
  <option value="G0/0/8">WAN-G0/0/8</option>
  <option value="G0/0/9">WAN-G0/0/9</option>
-</select></td><td><select id="loop_if1_select">
- <option value="G0/0/2">自环LAN[G0/0/2]</option>
- <option value="G0/0/3">自环LAN[G0/0/3]</option>
- <option value="G0/0/4" selected="selected">自环LAN[G0/0/4]</option>
- <option value="G0/0/5">自环LAN[G0/0/5]</option>
- <option value="G0/0/6">自环LAN[G0/0/6]</option>
- <option value="G0/0/7">自环LAN[G0/0/7]</option>
- <option value="G0/0/7">自环LAN[G0/0/8]</option>
- <option value="G0/0/7">自环LAN[G0/0/9]</option></select></td></tr>
-<tr><td><input id="wan1_ip_input" placeholder="[wan-ip]192.168.1.254/24"></td>
-<td><select id="loop_if2_select">
- <option value="G0/0/2">自环WAN[G0/0/2]</option>
- <option value="G0/0/3">自环WAN[G0/0/3]</option>
- <option value="G0/0/4">自环WAN[G0/0/4]</option>
- <option value="G0/0/5" selected="selected">自环WAN[G0/0/5]</option>
- <option value="G0/0/6">自环WAN[G0/0/6]</option>
- <option value="G0/0/7">自环WAN[G0/0/7]</option>
- <option value="G0/0/7">自环WAN[G0/0/8]</option>
- <option value="G0/0/7">自环WAN[G0/0/9]</option></select></td></tr>
-<tr><td><input id="wan1_gw_input" placeholder="[wan-gw]192.168.1.1"></td>
+</select></td>
+<td><select id="wan2_select">
+<option value="G0/0/7">WAN-G0/0/6</option>
+ <option value="G0/0/7" selected="selected">WAN-G0/0/7</option>
+ <option value="G0/0/8">WAN-G0/0/8</option>
+ <option value="G0/0/9">WAN-G0/0/9</option>
+</select></td></tr>
+<tr><td><input id="wan1_ip_input" placeholder="[wan1-ip]192.168.1.254/24"></td>
+<td><input id="wan2_gw_input" placeholder="[wan2-gw]192.168.2.1"></td></tr>
+<tr><td><input id="wan1_gw_input" placeholder="[wan1-gw]192.168.1.1"></td>
+<td><input id="wan2_ip_input" placeholder="[wan2-ip]192.168.2.254/24"></td></tr>
+<tr><td id="lineid_td"></td>
 <td><select id="loop_ip_select">
  <option value="0.1-0.2" selected="selected">站点A[0.0/30]</option>
  <option value="0.5-0.6">站点B[0.4/30]</option>
@@ -34,8 +26,25 @@ const sdwan001html = `<table border="1">
  <option value="0.25-0.26">站点G[0.24/30]</option>
  <option value="0.29-0.30">站点G[0.28/30]</option>
  <option value="0.33-0.34">站点H[0.32/30]</option></select></td></tr>
-<tr><td id="lineid_td"></td><td></td></tr>
-  <tr><td id="line1_th"></td><td id="line2_th"></td></tr>
+ <tr><td><select id="loop_if1_select">
+ <option value="G0/0/2">自环LAN[G0/0/2]</option>
+ <option value="G0/0/3">自环LAN[G0/0/3]</option>
+ <option value="G0/0/4" selected="selected">自环LAN[G0/0/4]</option>
+ <option value="G0/0/5">自环LAN[G0/0/5]</option>
+ <option value="G0/0/6">自环LAN[G0/0/6]</option>
+ <option value="G0/0/7">自环LAN[G0/0/7]</option>
+ <option value="G0/0/7">自环LAN[G0/0/8]</option>
+ <option value="G0/0/7">自环LAN[G0/0/9]</option></select></td>
+ <td><select id="loop_if2_select">
+ <option value="G0/0/2">自环WAN[G0/0/2]</option>
+ <option value="G0/0/3">自环WAN[G0/0/3]</option>
+ <option value="G0/0/4">自环WAN[G0/0/4]</option>
+ <option value="G0/0/5" selected="selected">自环WAN[G0/0/5]</option>
+ <option value="G0/0/6">自环WAN[G0/0/6]</option>
+ <option value="G0/0/7">自环WAN[G0/0/7]</option>
+ <option value="G0/0/7">自环WAN[G0/0/8]</option>
+ <option value="G0/0/7">自环WAN[G0/0/9]</option></select></td></tr>
+  <tr><th id="line1_th"></th><th id="line2_th"></th></tr>
   <tr><td id="pe1_td"></td><td id="pe2_td"></td></tr>
   <tr><td id="pe1_if_td"></td><td id="pe2_if_td"></tr>
   <tr><td id="pe1_ip_td"></td><td id="pe2_ip_td"></td></tr>
@@ -44,10 +53,10 @@ const sdwan001html = `<table border="1">
   <tr><td id="pe1_pub_td"></td><td id="pe2_pub_td"></td></tr>
   <tr><td id="pe1_psk_td"></td><td id="pe2_psk_td"></td></tr>
 </table>
-<button type="button" onclick="sdwan001sub('/config')">提交配置信息(Submit Config Info)</button>
+<button type="button" onclick="sdwan002sub('/config')">提交配置信息(Submit Config Info)</button>
 `;
 
-function sdwan001getList() {
+function sdwan002getList() {
     let str = $("#config_textarea").val();
     let lines = str.split(/\r?\n/);
     let id_html ="";
@@ -132,10 +141,10 @@ function sdwan001getList() {
     $("#pe2_psk_td").append(info_json.psk[1]);
 }
 //填充模板表格
-$("#service_dev").append(sdwan001html);
+$("#service_dev").append(sdwan002html);
 //加载测试资源的解析数据
-sdwan001getList();
-function sdwan001setWan1type(value){
+sdwan002getList();
+function sdwan002setWan1type(value){
     $("#wan_setup_td").empty();
     let html = '';
     switch(value){
@@ -156,7 +165,7 @@ function sdwan001setWan1type(value){
     $("#wan_setup_td").append(html);
 };
 
-function sdwan001sub(url){
+function sdwan002sub(url){
   let user = $("#user_input").val();
   let time=getTime(new Date());
   let wan1 = $("#wan1_select").val();
@@ -187,7 +196,7 @@ function sdwan001sub(url){
   let pe2lo = $("#pe2_lo_td").html();
   let pe2pub = $("#pe2_pub_td").html();
   let ce2lo = $("#ce2_lo_td").html();
-  let sdwan001mplsGreOverIPsec  =
+  let sdwan002mplsGreOverIPsec  =
 `#Fnet Huawei SD-WAN MPLS with GRE Over Ipsec Template.
 #Operator: ${user}
 #${time.cn}
@@ -206,10 +215,6 @@ def ops_execute(ops):
     handle, err_desp = ops.cli.open()
     print(err_desp)
     result, n11, n21 = ops.cli.execute(handle, "system-view")
-    result, n11, n21 = ops.cli.execute(handle, "ops")
-    result, n11, n21 = ops.cli.execute(handle, "environment mainip ${pe1pub}")
-    result, n11, n21 = ops.cli.execute(handle, "environment backupip ${pe2pub}")
-    result, n11, n21 = ops.cli.execute(handle, "quit")
     result, n11, n21 = ops.cli.execute(handle, "ip vpn-instance underlay_ipsec")
     result, n11, n21 = ops.cli.execute(handle, "ipv4-family")
     result, n11, n21 = ops.cli.execute(handle, "quit")
@@ -314,26 +319,13 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "destination vpn-instance underlay_ipsec ${pe2lo}")
     result, n11, n21 = ops.cli.execute(handle, "quit")
     # nqa
-    result, n11, n21 = ops.cli.execute(handle, "nqa event 1 log")
-    result, n11, n21 = ops.cli.execute(handle, "nqa test-instance admin ipsecmain")
+    result, n11, n21 = ops.cli.execute(handle, "nqa test-instance pri pri")
     result, n11, n21 = ops.cli.execute(handle, "test-type icmp")
-    result, n11, n21 = ops.cli.execute(handle, "destination-address ipv4 ${pe1lo}")
-    result, n11, n21 = ops.cli.execute(handle, "source-address ipv4 ${ce1lo}")
+    result, n11, n21 = ops.cli.execute(handle, "destination-address ipv4 ${pe1ip1}")
+    result, n11, n21 = ops.cli.execute(handle, "source-address ipv4 ${pe1ip2}")
     result, n11, n21 = ops.cli.execute(handle, "frequency 30")
     result, n11, n21 = ops.cli.execute(handle, "probe-count 6")
     result, n11, n21 = ops.cli.execute(handle, "vpn-instance underlay_ipsec")
-    result, n11, n21 = ops.cli.execute(handle, "alarm 1 lost-packet-ratio absolute rising-threshold 100 1")
-    result, n11, n21 = ops.cli.execute(handle, "start now")
-    result, n11, n21 = ops.cli.execute(handle, "quit")
-    result, n11, n21 = ops.cli.execute(handle, "nqa event 1 log")
-    result, n11, n21 = ops.cli.execute(handle, "nqa test-instance admin ipsecbackup")
-    result, n11, n21 = ops.cli.execute(handle, "test-type icmp")
-    result, n11, n21 = ops.cli.execute(handle, "destination-address ipv4 ${pe2lo}")
-    result, n11, n21 = ops.cli.execute(handle, "source-address ipv4 ${ce2lo}")
-    result, n11, n21 = ops.cli.execute(handle, "frequency 30")
-    result, n11, n21 = ops.cli.execute(handle, "probe-count 6")
-    result, n11, n21 = ops.cli.execute(handle, "vpn-instance underlay_ipsec")
-    result, n11, n21 = ops.cli.execute(handle, "alarm 1 lost-packet-ratio absolute rising-threshold 100 1")
     result, n11, n21 = ops.cli.execute(handle, "start now")
     result, n11, n21 = ops.cli.execute(handle, "quit")
     # static route
@@ -352,7 +344,7 @@ def ops_execute(ops):
     ops.cli.close(handle)
     return 0
 `;
-let sdwan001helpText = `##########初始化开局脚本#####
+let sdwan002helpText = `##########初始化开局脚本#####
 ip vpn-instance underlay_ipsec
  ipv4-family
 quit
@@ -380,18 +372,14 @@ aaa
 local-user admin password irreversible-cipher admin@huawei.com
 quit
 quit
-#####上传 ${lineid}.py 开局脚本及ipsec自动重置脚本#####
+#####上传 test.py 开局脚本#####
 # 电脑网口 192.168.1.100/24 连接华为SD-WAN路由器 G0/0/0
 # windows文件浏览页面输入访问路径：ftp://192.168.1.1/
-# 认证登录后 上传${lineid}.py ipsec_main.py ipsec_backup.py
+# 认证登录后 上传${lineid}.py
 ops install file ${lineid}.py
-ops install file ipsec_main.py
-ops install file ipsec_backup.py
 sys
 ops
 script-assistant python ${lineid}.py
-script-assistant python ipsec_main.py
-script-assistant python ipsec_backup.py
 quit
 quit
 set factory-configuration from current-configuration
@@ -448,10 +436,10 @@ display agile-controller status`;
   let scriptName = `${lineid}.py`;
   let helpTextName = `HelpText-${time.ez}`;
   let data = {};
-  console.log(sdwan001mplsGreOverIPsec);
-  console.log(sdwan001helpText);
-  downloadConfig(scriptName, sdwan001mplsGreOverIPsec);
-  downloadConfig(helpTextName, sdwan001helpText);
+  console.log(sdwan002mplsGreOverIPsec);
+  console.log(sdwan002helpText);
+  downloadConfig(scriptName, sdwan002mplsGreOverIPsec);
+  downloadConfig(helpTextName, sdwan002helpText);
   let type = 'post'
   let datatype = 'json';
   ajaxHandler(url,data,datatype,type);

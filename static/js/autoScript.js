@@ -10,7 +10,6 @@ const ipv4_regex2 = /^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$
 //生成可选 参数池，手动确认哪些信息留下。
 //生成待取用参数列表ListIP、ListIF、ListOther。
 
-
 function getCookie(name) {
     var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
     return r ? r[1] : undefined;
@@ -25,7 +24,6 @@ function setCookie(cname, cvalue, exdays){
 
 window.onload=function(){
     const xsrf = getCookie('_xsrf');
-    const uname = getCookie('uname');
     //_xsrf Header Setup for Ajax
     function xsrfSafeMethod(method) {
         // these HTTP methods do not require CSRF protection
@@ -98,10 +96,6 @@ function initConfig(url){
     console.log(if_type);
 }
 
-function checkVersion(){
-
-}
-
 //动态获取选中的模板JS文件
 function getTempJS(value){
     console.log(value);
@@ -132,6 +126,32 @@ function getTempJS(value){
                 js_path = "/static/js/"+ value + ".js";
                 $.getScript(js_path, function(){});
                 console.log("fastip002 未下载");
+            };
+            break;
+        case "fastip101":
+            try{
+                if($.isFunction(fastip101sub)){
+                    $("#service_dev").append(fastip101html);
+                    fastip101getList();
+                    console.log("fastip101 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("fastip101 未下载");
+            };
+            break;
+        case "fastip102":
+            try{
+                if($.isFunction(fastip102sub)){
+                    $("#service_dev").append(fastip102html);
+                    fastip102getList();
+                    console.log("fastip102 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("fastip102 未下载");
             };
             break;
         case "sdwan001":

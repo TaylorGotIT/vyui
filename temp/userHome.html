@@ -1,15 +1,20 @@
 <!DOCTYPE html>
-<head xmlns:Accept-Language="http://www.w3.org/1999/xhtml">
+    <head xmlns:Accept-Language="http://www.w3.org/1999/xhtml">
     <meta Accept-Language: fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5 />
     <title>{{ title }}</title>
     <link rel="shortcut icon" type="image/x-icon" href="static/img/favicon.ico"/>
-</head>
-<body>
-    <input type="text" name="username" maxlength="64" id="username_input" placeholder="Username" required>
-    <input type="password" name="password" maxlength="64" id="password_input" placeholder="Password" required>
-    <button type="button" onclick="login('{{ request.path }}')">登入(SigniIN)</button>
-</body>
+    {% module xsrf_form_html() %}
+
+    </head>
+    <body>
+        <input type="text" name="username" maxlength="64" id="username_input" placeholder="Username" required>
+        <input type="password" name="password" maxlength="64" id="password_input" placeholder="Password" required>
+        <button type="button" onclick="login('{{ request.path }}')">登入(SigniIN)</button>
+
+
+    </body>
 <style>
+
 </style>
 <script type="text/javascript" src="/static/js/jquery-3.6.0.min.js"></script>
 <script>
@@ -50,25 +55,17 @@ function ajaxHandler(url,data,datatype,type,callback){
     data:data,
     dataType:datatype,
     type:type,
-    error:function(d){
-      console.log(d);
+    error:function(msg){
+      console.log(JSON.stringify(msg));
     },
-    success:function(d){
-      console.log(d);
-      if(d.authed){
-        console.log(d);
-        if(d['uname']){
-          setCookie('uname', "", -1);
-          setCookie('uname', d.uname, 7);
-        };
-        next(d.url);
-      }else{
-         $('#username_input').val('');
-         $('#password_input').val('');
-      };
+    success:function(msg){
+      if(msg.hasOwnProperty("url")){
+        next(msg["url"]);
+      }
+      console.log(msg);
     },
-    complete:function(d){
-      console.log(d);
+    complete:function(msg){
+      console.log(JSON.stringify(msg));
     },
   });
 }
