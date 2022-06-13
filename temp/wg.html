@@ -7,19 +7,18 @@
 
     </head>
 <body>
-    <label for="server_num_input">WG服务端个数</label>
-    <input type="number" maxlength="4" id="server_num_input" placeholder="x" required>
-    <label for="client_num_input">WG客户端个数</label>
-    <input type="number" maxlength="4" id="client_num_input" placeholder="x" required>
-    <label for="prekey_num_input">共享密钥个数</label>
-    <input type="number" maxlength="4" id="prekey_num_input" placeholder="x" required>
-    <button type="button" onclick="getWgConf('{{ request.path }}')">登入(SigniIN)</button>
-
+    <a href="/home">[ Home ]</a> <a href="/autoScript">[ AutoScript ]</a><br>
+    <input type="number" maxlength="4" id="server_num_input" placeholder="WG服务端个数[x]" required><br>
+    <input type="number" maxlength="4" id="client_num_input" placeholder="WG客户端个数[x]" required><br>
+    <input type="number" maxlength="4" id="prekey_num_input" placeholder="共享密钥个数[x]" required><br>
+    <button type="button" onclick="getWgConf('{{ request.path }}')">自动生成WireGuard配置</button>
+    <div id="qrcode"></div>
 </body>
 <style>
 
 </style>
 <script type="text/javascript" src="/static/js/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="/static/js/qrcode.min.js"></script>
 <script>
 const T_FORM = 'application/x-www-form-urlencoded'
 const T_JSON = 'application/json';
@@ -52,25 +51,86 @@ window.onload=function(){
     });
 }
 
-function ajaxHandler(url,data,datatype,type,callback){
+function ajaxHandler(url,data,datatype,type){
   $.ajax({
     url:url,
     data:data,
     dataType:datatype,
     type:type,
-    error:function(msg){
-      console.log(JSON.stringify(msg));
+    error:function(d){
+      console.log(d);
     },
-    success:function(msg){
-      if(msg.hasOwnProperty("url")){
-        next(msg["url"]);
-      }
-      console.log(msg);
+    success:function(d){
+      console.log(d);
     },
-    complete:function(msg){
-      console.log(JSON.stringify(msg));
+    complete:function(d){
+      console.log(d);
     },
   });
+}
+
+function genWgConfig(d){
+  let s = d.server;
+  let c = d.client;
+  let p = d.prekey;
+  let s_port = '443';
+  let s_address = '100.64.0.1/24';
+  let c_address = '100.64.0.1/24'
+  let endpoint = '188.1.1.1:51280';
+  let s_ifs = '';
+  let s_peers = '';
+  let clients = [];
+  let servers = [];
+  let list = {
+    'server':{},
+    'client':{},
+  };
+  for(var i=0;i<s.length;i++){
+    for(var j=0;j<c.length;j++){
+        let s_peer =`
+[Peer]
+PublicKey = ${ c[j].PublicKey }
+PresharedKey = ${ p[j].PresharedKey }
+AllowedIPs = 0.0.0.0/0
+
+`;
+let c_if = `
+#client${ i }-${ j }.conf
+[Interface]
+PrivateKey = ${ c[j].PrivateKey }
+Address = ${ c_address }
+DNS = ${ s_address }
+MTU = 1420
+
+[Peer]
+PublicKey = ${ s[i].PublicKey }
+PresharedKey = ${ p[j].PresharedKey }
+AllowedIPs = 0.0.0.0/0
+Endpoint = ${ endpoint }
+PersistentKeepalive = 25
+`;
+$('#qrcode').append(`<dev id="qrcode${ i }${ j }"></dev>`);
+$('#qrcode').append(`<dev><a>[ Client${ i }-${ j } ]</a>
+<pre backgroud-clo>${ c_if }<pre></dev>
+`);
+new QRCode(document.getElementById(`qrcode${ i }${ j }`), c_if);
+        clients.push(c_if)
+        s_peers += s_peer;
+    }
+
+      let s_if = `
+#wg${ i }.conf
+[Interface]
+Address = ${ s_address }
+ListenPort = ${ s_port }
+PrivateKey = ${ s[i].PrivateKey }
+
+${ s_peers }
+`;
+servers.push(s_if);
+  }
+console.log(clients);
+console.log(servers);
 }
 
 function getWgConf(url){
@@ -84,7 +144,16 @@ function getWgConf(url){
     "client": client,
     "prekey": prekey,
   });
-  ajaxHandler(url,data,datatype,type);
+$.ajax({
+    url:url,
+    data:data,
+    dataType:datatype,
+    type:type,
+    success:function(d){
+      console.log(d);
+      genWgConfig(d);
+    },
+  });
 }
 
 function next(url){
@@ -94,5 +163,8 @@ function next(url){
   }
 }
 
+function genQrcode(id,str){
+  new QRCode($("#"+id), str);
+}
 </script>
 </html>
