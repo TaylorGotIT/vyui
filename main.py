@@ -157,18 +157,27 @@ class VYwg(VYreq):
     @authed
     def post(self):
         j = self.get_req_json()
+        c = int(j['client'])
+        p = int(j['prekey'])
+        s = int(j['server'])
         result = {
             'server': [],
             'client': [],
             'prekey': [],
         }
         print(j)
-        for i in range(int(j['server'])):
-            result['server'].append(self.gen_wg_keys())
-        for i in range(int(j['client'])):
+        if p == 1:
+            prekey = self.gen_preshared()
+            for i in range(c):
+                result['prekey'].append(prekey)
+        else:
+            for i in range(c):
+                result['prekey'].append(self.gen_preshared())
+        for i in range(c):
             result['client'].append(self.gen_wg_keys())
-        for i in range(int(j['prekey'])):
-            result['prekey'].append(self.gen_preshared())
+        for i in range(s):
+            result['server'].append(self.gen_wg_keys())
+
         self.write_json(result)
 
 

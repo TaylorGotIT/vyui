@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<head xmlns:Accept-Language="http://www.w3.org/1999/xhtml">
+    <meta Accept-Language: fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5 />
+    <title>{{ title }}</title>
+    <link rel="shortcut icon" type="image/x-icon" href="static/img/favicon.ico"/>
+    {% module xsrf_form_html() %}
+
+    </head>
+<body>
+    <a href="/">[ Home ]</a> <a href="/autoScript">[ AutoScript ]</a><br>
+
+    <select id="service_select" onchange="getTempJS(this.value)">
+            <option value="">请下拉选中一个服务模板[ 默认为空 ]</option>
+            <option value="wg001">Wireguard单个服务端[ fnetos ]</option>
+            <option value="wg002">Wireguard多个服务端[ fnetos ]</option>
+            <option value="wg101">Wireguard单个服务端[ linux ]</option>
+            <option value="wg102">Wireguard多个服务端[ linux ]</option>
+    </select>
+
+    <div id="info_dev">
+        <form id="service_dev"></form>
+    </div>
+
+    <input type="number" maxlength="4" id="server_num_input" placeholder="Server Num"><br>
+    <input maxlength="4" id="server_pubkey_input" placeholder="Server PubKey"><br>
+    <input type="number" maxlength="5" id="server_port_input" placeholder="Server Port[1-65535]"><br>
+    <input maxlength="32" id="server_allowed_ips_input" placeholder="Server AllowedIPs"><br>
+    <input maxlength="32" id="server_desc_input" placeholder="Server Description"><br>
+
+    <input maxlength="32" id="client_desc_input" placeholder="Client Description"><br>
+    <select id="client_allowed_ips_select" onchange=getClientAllowedIps(this.value)>
+        <option value=0 selected="selected">默认路由[Default]</option>
+        <option value=1 >私网路由[Private]</option>
+        <option value=2 >自定义路由[Custom]</option>
+    </select><br>
+    <input maxlength="128" id="client_allowed_ips_input" placeholder="Client AllowedIPs"><br>
+    <input maxlength="128" id="client_dns_input" placeholder="Client DNS"><br>
+    <input maxlength="128" id="client_mtu_input" placeholder="Client MTU"><br>
+    <input type="number" maxlength="4" id="client_keepalive_input" placeholder="WG客户端Keepalive[x]" required><br>
+    <input type="number" maxlength="4" id="client_num_input" placeholder="WG客户端个数[x]" required><br>
+    <input type="number" maxlength="4" id="prekey_num_input" placeholder="共享密钥个数[x]" required><br>
+    <select id="client_prekey_select">
+        <option value=1 selected="selected">共用一共预共享密钥</option>
+        <option value=0 >每客户端一个预共享密钥</option>
+    </select><br>
+    <button type="button" onclick="getWgConf('{{ request.path }}')">自动生成WireGuard配置</button>
+    <div id="qrcode"></div>
+</body>
+<style>
+
+</style>
+<script type="text/javascript" src="/static/js/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="/static/js/qrcode.min.js"></script>
+<script>
+const T_FORM = 'application/x-www-form-urlencoded'
+const T_JSON = 'application/json';
+
+function getCookie(name) {
+    var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+    return r ? r[1] : undefined;
+}
+
+function setCookie(cname, cvalue, exdays){
+    let d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    let expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+window.onload=function(){
+    const xsrf = getCookie('_xsrf');
+    //_xsrf Header Setup for Ajax
+    function xsrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!xsrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-XSRFToken", xsrf);
+            }
+        }
+    });
+}
+
+function ajaxHandler(url,data,datatype,type){
+  $.ajax({
+    url:url,
+    data:data,
+    dataType:datatype,
+    type:type,
+    error:function(d){
+      console.log(d);
+    },
+    success:function(d){
+      console.log(d);
+    },
+    complete:function(d){
+      console.log(d);
+    },
+  });
+}
+
+//动态获取选中的模板JS文件
+function getTempJS(value){
+    console.log(value);
+    $("#service_dev").children().remove();
+    switch(value){
+        case "wg001":
+            try{
+                if($.isFunction(wg001sub)){
+                    //已下载脚本时需要调用脚本执行
+                    $("#service_dev").append(wg001html);
+                    wg001getList();
+                    console.log("wg001 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("wg001 未下载");
+            };
+            break;
+        case "wg002":
+            try{
+                if($.isFunction(wg002sub)){
+                    $("#service_dev").append(wg002html);
+                    wg002getList();
+                    console.log("wg002 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("wg002 未下载");
+            };
+            break;
+        case "wg101":
+            try{
+                if($.isFunction(wg101sub)){
+                    $("#service_dev").append(wg101html);
+                    wg101getList();
+                    console.log("wg101 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("wg101 未下载");
+            };
+            break;
+        case "wg102":
+            try{
+                if($.isFunction(wg102sub)){
+                    $("#service_dev").append(wg102html);
+                    wg102getList();
+                    console.log("wg102 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("wg102 未下载");
+            };
+            break;
+    };
+
+};
+
+function genWgConfig(d){
+  let s = d.server;
+  let c = d.client;
+  let p = d.prekey;
+  //服务端
+  let s_pubkey = $("#server_pubkey_input").val();
+  let s_port = $("#server_port_input").val();
+  let s_address = $("#server_allowed_ips_input").val();
+  //客户端
+  let c_address = $("#client_allowed_ips_input").val();
+  let c_dns = $("#client_dns_input").val();
+  let c_mtu = $("#client_mtu_input").val();
+  let endpoint = $("#client_endpoint_input").val();
+  let s_ifs = '';
+  let s_peers = '';
+  let clients = [];
+  let servers = [];
+  let list = {
+    'server':{},
+    'client':{},
+  };
+  for(var i=0;i<s.length;i++){
+    for(var j=0;j<c.length;j++){
+        let s_peer =`
+[Peer]
+PublicKey = ${ c[j].PublicKey }
+PresharedKey = ${ p[j].PresharedKey }
+AllowedIPs = 0.0.0.0/0
+
+`;
+let c_if = `
+#client${ i }-${ j }.conf
+[Interface]
+PrivateKey = ${ c[j].PrivateKey }
+Address = ${ c_address }
+DNS = ${ s_address }
+MTU = 1420
+
+[Peer]
+PublicKey = ${ s[i].PublicKey }
+PresharedKey = ${ p[j].PresharedKey }
+AllowedIPs = 0.0.0.0/0
+Endpoint = ${ endpoint }
+PersistentKeepalive = 25
+`;
+$('#qrcode').append(`<dev id="qrcode${ i }${ j }"></dev>`);
+$('#qrcode').append(`<dev><a>[ Client${ i }-${ j } ]</a>
+<pre backgroud-clo>${ c_if }<pre></dev>
+`);
+new QRCode(document.getElementById(`qrcode${ i }${ j }`), c_if);
+        clients.push(c_if)
+        s_peers += s_peer;
+    }
+
+      let s_if = `
+#wg${ i }.conf
+[Interface]
+Address = ${ s_address }
+ListenPort = ${ s_port }
+PrivateKey = ${ s[i].PrivateKey }
+
+${ s_peers }
+`;
+servers.push(s_if);
+  }
+console.log(clients);
+console.log(servers);
+}
+
+function getWgConf(url){
+  let server = $("#server_num_input").val();
+  if(server){};
+  let client = $("#client_num_input").val();
+  let prekey = $("#client_prekey_select").val();
+  if(prekey == 0){
+    prekey+=client
+  };
+  console.log(prekey);
+  let type = 'post';
+  let datatype = 'json';
+  let data = JSON.stringify({
+    "server": server,
+    "client": client,
+    "prekey": prekey,
+  });
+$.ajax({
+    url:url,
+    data:data,
+    dataType:datatype,
+    type:type,
+    success:function(d){
+      console.log(d);
+      genWgConfig(d);
+    },
+  });
+}
+
+function next(url){
+  console.log('redirect to===>' + url);
+  if(url!=null){
+    window.location.href = url;
+  }
+}
+
+function genQrcode(id,str){
+  new QRCode($("#"+id), str);
+}
+</script>
+</html>
