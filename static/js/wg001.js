@@ -124,11 +124,12 @@ function genWgConfig(d){
   console.log(c_ips);
   for(var i=0;i<s.length;i++){
     for(var j=0;j<c.length;j++){
-let s_peer =
-`set interfaces wireguard wg${i} peer ${c_desc}${j} allowed-ips ${c_ips[j]}
+let s_peer =`
+set interfaces wireguard wg${i} peer ${c_desc}${j} allowed-ips ${c_ips[j]}
 set interfaces wireguard wg${i} peer ${c_desc}${j} persistent-keepalive ${c_keepalive}
 set interfaces wireguard wg${i} peer ${c_desc}${j} preshared-key ${p[j].PresharedKey}
-set interfaces wireguard wg${i} peer ${c_desc}${j} pubkey ${c[j].PublicKey }`;
+set interfaces wireguard wg${i} peer ${c_desc}${j} pubkey ${c[j].PublicKey }
+`;
 
 let c_if =
 `#Client${ i }-${ j }.conf
@@ -169,8 +170,8 @@ set interfaces wireguard wg${i} port ${ s_port }
 
 ${ s_peers }
 `;
-//let s_config_name = `wg${i}.conf`;
-//downloadConfig(s_config_name,s_if);
+let s_config_name = `wg${i}.conf`;
+downloadConfig(s_config_name,s_if);
 servers.push(s_if);
   }
 console.log(clients);

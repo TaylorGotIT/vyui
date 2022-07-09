@@ -123,9 +123,7 @@ function getIPAll(str,num){
     let s = addr[0].split('.');
     let ips = [];
     for(let i=0;i<num;i++){
-        console.log(s[3]);
         let s3 = Number(s[3]) + i;
-        console.log(s3)
         let m2 = s3/254
         let p = '';
         if(m2<=1){
@@ -133,18 +131,14 @@ function getIPAll(str,num){
                 ip = `${s[0]}.${s[1]}.${s[2]}.1/32`;
             }else{
                 ip = `${s[0]}.${s[1]}.${s[2]}.${s3.toString()}/32`;
-                console.log(ip)
             }
         }else{
             s3 -= parseInt(m2)*254;
             let s2 = s[2] + parseInt(m2);
                 ip =  `${s[0]}.${s[1]}.${s2.toString()}.${s3.toString()}/32`;
         }
-
         ips[i]=ip;
-        console.log(ips);
     }
-
     return ips;
 }
 

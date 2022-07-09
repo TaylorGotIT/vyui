@@ -193,6 +193,45 @@ function getTempJS(value){
                 console.log("fastip105 未下载");
             };
             break;
+        case "fastip201":
+            try{
+                if($.isFunction(fastip201sub)){
+                    $("#service_dev").append(fastip201html);
+                    fastip201getList();
+                    console.log("fastip201 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("fastip201 未下载");
+            };
+            break;
+        case "fastip202":
+            try{
+                if($.isFunction(fastip202sub)){
+                    $("#service_dev").append(fastip202html);
+                    fastip202getList();
+                    console.log("fastip202 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("fastip202 未下载");
+            };
+            break;
+        case "fastip203":
+            try{
+                if($.isFunction(fastip203sub)){
+                    $("#service_dev").append(fastip203html);
+                    fastip201getList();
+                    console.log("fastip203 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("fastip203 未下载");
+            };
+            break;
         case "sdwan001":
             try{
                 if($.isFunction(sdwan001sub)){
