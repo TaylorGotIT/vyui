@@ -16,7 +16,9 @@ eth0=dhcp
 eth0=192.168.1.254/24
 gw=192.168.1.1
 ---宽带拨号【PPPoE】----
-eth0=pppoe(account,passwd)
+eth0=pppoe
+user=account
+pass=password
 ---其他【Other】-------
 br0(eth0,eth1)=
 vlan1(eth0)=
@@ -151,7 +153,12 @@ function fastip001sub(url){
   let user = $("#user_input").val();
   let bas = $("#basic_textarea").val().split('\n');
   let src =  $("#resource_textarea").val().split('\n')
-  let wan = $("#wan1_textarea").val().split('\n');
+
+  let wan1list = $("#wan1_textarea").val().split('\n');
+  let wan1isp = wan1list[0].split('=')[1].toUpperCase();
+  let wan1 = wan1list[1].split('=')[0];
+  let wan1str = wan1list[1].split('=')[1]
+
   let wlan = $("#wlan0_textarea").val().split('\n');
 
   let version = bas[0].split('=')[1];
@@ -159,9 +166,7 @@ function fastip001sub(url){
   let cnameEN = bas[2].split('=')[1];
   let cnameCN = bas[3].split('=')[1];
   let wlan0ip = wlan[0].split('=')[1];
-  let wan1isp = wan[0].split('=')[1].toUpperCase();
-  let wan1 = wan[1].split('=')[0];
-  let wan1Type = wan[1].split('=')[1];
+
   let lineid = src[0].split('=')[1];
 //获取主线参数
   let ac1 = src[1].split('=')[1];
@@ -195,28 +200,28 @@ function fastip001sub(url){
   let oversea2dns = dnss2[1].split('=')[1];
 //差异化配置生成
 let wanTemp = '';
-if(wan[1].includes('dhcp')){
-    wanTemp += `set interfaces ethernet ${wan1} description WAN1-${wan1isp}-DHCP
+  if(wan1str.includes('dhcp')){
+wanTemp += `set interfaces ethernet ${wan1} description WAN1-${wan1isp}-DHCP
 set interfaces ethernet ${wan1} address dhcp
 set protocols static route 1.1.1.1/32 dhcp-interface ${wan1}`;
-}else if(wan[1].includes('pppoe')){
-    let pppoe = wan[1].split('=')[1].split('(')[1].split(')')[0].split(',');
-    let pppoe1user = pppoe[0];
-    let pppoe1pass = pppoe[1];
-    wanTemp +=
-`set interfaces ethernet ${wan[0].split('=')} description WAN1_${wan1isp}_${pppoe1user}/${pppoe1pass}
+  }else if(wan1str.includes('pppoe')){
+let pppoe = wan1str.split('(')[1].split(')')[0].split(',');
+let pppoe1user = pppoe[0];
+let pppoe1pass = pppoe[1];
+wanTemp +=
+`set interfaces ethernet ${wan1} description WAN1_${wan1isp}_${pppoe1user}/${pppoe1pass}
 set interfaces ethernet ${wan1} pppoe 1 default-route 'none'
 set interfaces ethernet ${wan1} pppoe 1 mtu '1472'
 set interfaces ethernet ${wan1} pppoe 1 name-server 'none'
 set interfaces ethernet ${wan1} pppoe 1 password ${pppoe1user}
 set interfaces ethernet ${wan1} pppoe 1 user-id ${pppoe1pass}
 set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
-}else{
-    let wan1gw = wan[2].split('=')[1]
-    wanTemp += `set interfaces ethernet ${wan1} description WAN1-${wan1isp}-GW-${wan1gw}
-set interfaces ethernet ${wan1} address ${wan1ip}
+  }else{
+let wan1gw = wan[2].split('=')[1]
+wanTemp += `set interfaces ethernet ${wan1} description WAN1-${wan1isp}-GW-${wan1gw}
+set interfaces ethernet ${wan1} address ${wan1str}
 set protocols static route 1.1.1.1/32 next-hop ${wan1gw}`;
-}
+  }
 
 let smartdns = '';
 switch(version){
@@ -272,6 +277,20 @@ let fastip001fastipOpenvpn  =
 #系统：vyui-v1
 #FnetOS Version ${version}
 +++++++++++++++++++++++++++++++++++++++++++
+echo '初始化设备'
+delete system host-name
+delete epoch controller
+sudo systemctl stop epoch-openvpnd
+rm /config/.initagentd.status
+delete interface openvpn
+delete interface tunnel
+delete interface loopback lo
+delete firewall options interface
+delete nat
+delete protocols
+delete policy
+delete track
+delete service dns
 echo '基础配置[防火墙规则，系统名称，物理接口]'
 set firewall group network-group GROUP-FNET-Whitelist network 202.104.174.178/32
 set firewall group network-group GROUP-FNET-Whitelist network 114.112.232.0/23
@@ -413,7 +432,7 @@ set protocols bgp 65000 neighbor ${bgp1server1} peer-group 'RSVR'
 set protocols bgp 65000 neighbor ${bgp1server2} peer-group 'RSVR'
 set protocols bgp 65000 neighbor ${bgp1server3} peer-group 'RSVR2'
 set protocols bgp 65000 neighbor ${bgp1server4} peer-group 'RSVR2'
-set protocols bgp 65000 parameters router-id 10.30.140.14
+set protocols bgp 65000 parameters router-id ${loip}
 set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast route-map import 'bgp-from--RSVR'
 set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast soft-reconfiguration inbound
 set protocols bgp 65000 peer-group RSVR remote-as '65000'

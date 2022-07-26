@@ -48,7 +48,7 @@ const fastip101html = `<table border="1">
 
 function fastip101getList() {
 //空格全角分号去除
-    let str = $("#config_textarea").val().replaceAll(' ','').replaceAll('：',':');
+    let str = $("#config_textarea").val().replaceAll(' ','').replaceAll('：',':').replaceAll(';','');
     if(str.length>32){
     let lines = str.split(/\r?\n/);
     let info_json = {
@@ -103,6 +103,7 @@ function fastip101getList() {
                     info_json.as.push(l1);
                     break;
                 default:
+                    console.log(l1)
                     if(l1.search('.')!=-1){
                         info_json.oversea.push(l1);
                     }else{
@@ -183,7 +184,7 @@ function fastip101sub(url){
   let bgp1server2 = $("#bgp_server2_input").val();
   let bgp1server3 = $("#bgp_server3_input").val();
   let bgp1server4 = $("#bgp_server4_input").val();
-  let oversea1ips = $("#pe1_oversea_td").html();
+  let oversea1ips = $("#pe1_oversea_td").html().split(',')[0];
   let oversea1ip1 = oversea1ips.split(',')[0].split('-')[0];
 //获取主线参数
   let pe1 = $("#pe1_td").html();
@@ -308,6 +309,7 @@ delete interface loopback lo
 delete firewall options interface
 delete nat
 delete protocols
+delete policy
 delete track
 delete service dns
 echo '基础配置[防火墙规则，系统名称，物理接口]'
@@ -326,10 +328,22 @@ set firewall name WAN2LOCAL rule 1000 source group network-group 'GROUP-FNET-Whi
 set firewall name WAN2LOCAL rule 2000 action 'drop'
 set firewall name WAN2LOCAL rule 2000 destination port '179,2707,53,161,123,8899'
 set firewall name WAN2LOCAL rule 2000 protocol 'tcp_udp'
+set firewall name VPN2LOCAL default-action 'accept'
+set firewall name VPN2LOCAL rule 1000 action 'accept'
+set firewall name VPN2LOCAL rule 1000 source group network-group 'GROUP-FNET-Whitelist'
+set firewall name VPN2LOCAL rule 2000 action 'drop'
+set firewall name VPN2LOCAL rule 2000 destination port '179,2707,53,161,123,8899'
+set firewall name VPN2LOCAL rule 2000 protocol 'tcp_udp'
+set firewall name VPN2LOCAL rule 3000 action 'drop'
+set firewall name VPN2LOCAL rule 3000 destination port '22,80,135,137,138,139,443,445,1080'
+set firewall name VPN2LOCAL rule 3000 protocol 'tcp_udp'
+set firewall name VPN2LOCAL rule 4000 action 'drop'
+set firewall name VPN2LOCAL rule 4000 destination port '1723,3124,3127,3128,3389,5000,8080,31337'
+set firewall name VPN2LOCAL rule 4000 protocol 'tcp_udp'
 set interfaces ethernet eth0 firewall local name 'WAN2LOCAL'
 set interfaces ethernet eth1 firewall local name 'WAN2LOCAL'
-set interfaces tunnel ${pe1if} firewall local name 'WAN2LOCAL'
-set interfaces tunnel ${pe2if} firewall local name 'WAN2LOCAL'
+set interfaces tunnel ${pe1if} firewall local name 'VPN2LOCAL'
+set interfaces tunnel ${pe2if} firewall local name 'VPN2LOCAL'
 set system host-name ${lineid}-${cname}-${area}
 set service snmp community both-win authorization 'ro'
 set service smartping

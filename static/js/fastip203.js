@@ -11,36 +11,6 @@ const fastip203html = `<table border="1">
 <td><input id="cnameCN_input" value="XX公司"></td>
 </tr>
 <tr>
-<td>PE</td>
-<td><input id="pe1_input"></td>
-<td><input id="pe2_input"></td>
-</tr>
-<tr>
-<td>PE IF</td>
-<td><input id="pe1_if_input"></td>
-<td><input id="pe2_if_input"></td>
-</tr>
-<tr>
-<td>PE IP</td>
-<td><input id="pe1_ip_input"></td>
-<td><input id="pe2_ip_input"></td>
-</tr>
-<tr>
-<td>PE loip</td>
-<td><input id="pe1_lo_input"></td>
-<td><input id="pe2_lo_input"></td>
-</tr>
-<tr>
-<td>PE AS</td>
-<td><input id="pe1_as_input"></td>
-<td><input id="pe2_as_input"></td>
-</tr>
-<tr>
-<td>CE AS</td>
-<td><input id="ce1_as_input"></td>
-<td><input id="ce2_as_input"></td>
-</tr>
-<tr>
 <td>AC</td>
 <td><input id="ac1_input"></td>
 <td><input id="ac2_input"></td>
@@ -59,6 +29,14 @@ const fastip203html = `<table border="1">
 <td>AC Pub</td>
 <td><input id="ac1_pub_input"></td>
 <td><input id="ac2_pub_input"></td>
+</tr>
+<td>AC loip</td>
+<td><input id="ac1_lo_input"></td>
+<td><input id="ac2_lo_input"></td>
+</tr>
+<td>Oversea</td>
+<td><input id="oversea1_input"></td>
+<td><input id="oversea2_input"></td>
 </tr>
 </table>
 <button type="button" onclick="fastip203sub('/config')">提交配置信息(Submit Config Info)</button>

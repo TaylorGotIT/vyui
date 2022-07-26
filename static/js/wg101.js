@@ -1,5 +1,5 @@
-/* Wireguard FnetOS 单服务端 */
-const wg001html = `<table border="1">
+/* Wireguard Linux 单服务端 */
+const wg101html = `<table border="1">
 <tr><td>服务端描述</td>
 <td><input maxlength="32" id="server_desc_input" value="WG_65000A_GZ"></td>
 </tr>
@@ -61,14 +61,14 @@ const wg001html = `<table border="1">
 </tr>
 </table>
 
-<button type="button" onclick="wg001sub('/wg')">自动生成WireGuard配置</button>
+<button type="button" onclick="wg101sub('/wg')">自动生成WireGuard配置</button>
 
-<div id="wg001qrcode"></div>
+<div id="wg101qrcode"></div>
 `;
 
 
 
-function wg001sub(url){
+function wg101sub(url){
   let server = 1;
   let client = $("#client_end_input").val() - $("#client_start_input").val() + 1;
   console.log(client);
@@ -153,8 +153,8 @@ AllowedIPs = ${ c_allowed_ips }
 Endpoint = ${ c_endpoint }
 PersistentKeepalive = ${ c_keepalive }`;
 
-$('#wg001qrcode').append(`<dev id="qrcode${ i }${ j }"></dev>`);
-$('#wg001qrcode').append(`<dev><a>[ Client${ i }-${ j } ]</a>
+$('#wg101qrcode').append(`<dev id="qrcode${ i }${ j }"></dev>`);
+$('#wg101qrcode').append(`<dev><a>[ Client${ i }-${ j } ]</a>
 <pre backgroud-clo>${ c_if }<pre></dev>`);
 let qrcode_dev = document.getElementById(`qrcode${ i }${ j }`);
 new QRCode(qrcode_dev, c_if);
@@ -188,5 +188,5 @@ function genQrcode(id,str){
   new QRCode($("#"+id), str);
 }
 
-$("#service_dev").append(wg001html);
+$("#service_dev").append(wg101html);
 

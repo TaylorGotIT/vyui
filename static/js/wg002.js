@@ -1,5 +1,5 @@
-/* Wireguard FnetOS 单服务端 */
-const wg001html = `<table border="1">
+/* Wireguard fnetos 多服务端 */
+const wg002html = `<table border="1">
 <tr><td>服务端描述</td>
 <td><input maxlength="32" id="server_desc_input" value="WG_65000A_GZ"></td>
 </tr>
@@ -11,11 +11,8 @@ const wg001html = `<table border="1">
 </td>
 </tr>
 <tr>
-<td>客户端范围</td>
-<td>
-<input type="number" id="client_start_input" min="1" max="1024" value="0">
-<input type="number" id="client_end_input" min="1" max="1024" value="9">
-</td>
+<td>客户端个数</td>
+<td><input type="number" id="client_num_input" min="1" max="1024" value="5"></td>
 </tr>
 <tr>
 <td>客户端子网</td>
@@ -61,17 +58,16 @@ const wg001html = `<table border="1">
 </tr>
 </table>
 
-<button type="button" onclick="wg001sub('/wg')">自动生成WireGuard配置</button>
+<button type="button" onclick="wg002sub('/wg')">自动生成WireGuard配置</button>
 
-<div id="wg001qrcode"></div>
+<div id="wg002qrcode"></div>
 `;
 
 
 
-function wg001sub(url){
+function wg002sub(url){
   let server = 1;
-  let client = $("#client_end_input").val() - $("#client_start_input").val() + 1;
-  console.log(client);
+  let client = $("#client_num_input").val();
   let prekey = $("#client_prekey_select").val();
   if(prekey == 0){
     prekey+=client
@@ -109,7 +105,6 @@ function genWgConfig(d){
 
   //客户端
   let c_desc = $("#client_desc_input").val();
-  let c_start = parseInt($("#client_start_input").val());
   let c_ip_start =  $("#client_ip_start_input").val();
   let c_allowed_ips = $("#client_allowed_ip_textarea").val();
   let c_dns = $("#client_dns_input").val();
@@ -129,16 +124,15 @@ function genWgConfig(d){
   console.log(c_ips);
   for(var i=0;i<s.length;i++){
     for(var j=0;j<c.length;j++){
-let c_num = c_start + j;
 let s_peer =`
-set interfaces wireguard wg${i} peer ${c_desc}${c_num} allowed-ips ${c_ips[j]}
-set interfaces wireguard wg${i} peer ${c_desc}${c_num} persistent-keepalive ${c_keepalive}
-set interfaces wireguard wg${i} peer ${c_desc}${c_num} preshared-key ${p[j].PresharedKey}
-set interfaces wireguard wg${i} peer ${c_desc}${c_num} pubkey ${c[j].PublicKey }
+set interfaces wireguard wg${i} peer ${c_desc}${j} allowed-ips ${c_ips[j]}
+set interfaces wireguard wg${i} peer ${c_desc}${j} persistent-keepalive ${c_keepalive}
+set interfaces wireguard wg${i} peer ${c_desc}${j} preshared-key ${p[j].PresharedKey}
+set interfaces wireguard wg${i} peer ${c_desc}${j} pubkey ${c[j].PublicKey }
 `;
 
 let c_if =
-`#S${ i }Client${ c_num }.conf
+`#Client${ i }-${ j }.conf
 #PublicKey = ${ c[j].PublicKey }
 [Interface]
 PrivateKey = ${ c[j].PrivateKey }
@@ -153,8 +147,8 @@ AllowedIPs = ${ c_allowed_ips }
 Endpoint = ${ c_endpoint }
 PersistentKeepalive = ${ c_keepalive }`;
 
-$('#wg001qrcode').append(`<dev id="qrcode${ i }${ j }"></dev>`);
-$('#wg001qrcode').append(`<dev><a>[ Client${ i }-${ j } ]</a>
+$('#wg002qrcode').append(`<dev id="qrcode${ i }${ j }"></dev>`);
+$('#wg002qrcode').append(`<dev><a>[ Client${ i }-${ j } ]</a>
 <pre backgroud-clo>${ c_if }<pre></dev>`);
 let qrcode_dev = document.getElementById(`qrcode${ i }${ j }`);
 new QRCode(qrcode_dev, c_if);
@@ -162,9 +156,9 @@ new QRCode(qrcode_dev, c_if);
         s_peers += s_peer;
 //通过Canvas下载二维码
         let str = qrcode_dev.firstChild.toDataURL("image/png");
-        let c_qrcode_name = `S${ i }Client${ c_num }.png`;
+        let c_qrcode_name = `#Client${ i }-${ j }.png`;
         downloadConfig(c_qrcode_name,str);
-        let c_config_name = `S${ i }Client${ c_num }.conf`;
+        let c_config_name = `#Client${ i }-${ j }.conf`;
         downloadConfig(c_config_name,c_if);
     }
 
@@ -188,5 +182,5 @@ function genQrcode(id,str){
   new QRCode($("#"+id), str);
 }
 
-$("#service_dev").append(wg001html);
+$("#service_dev").append(wg002html);
 

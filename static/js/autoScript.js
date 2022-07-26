@@ -128,6 +128,19 @@ function getTempJS(value){
                 console.log("fastip002 未下载");
             };
             break;
+        case "fastip003":
+            try{
+                if($.isFunction(fastip003sub)){
+                    $("#service_dev").append(fastip003html);
+                    fastip003getList();
+                    console.log("fastip003 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("fastip003 未下载");
+            };
+            break;
         case "fastip101":
             try{
                 if($.isFunction(fastip101sub)){

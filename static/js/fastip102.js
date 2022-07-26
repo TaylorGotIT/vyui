@@ -256,8 +256,56 @@ let fastip102fastipGreOverOpenvpn  =
 #系统：vyui-v1
 #vyos version >= 4.0
 +++++++++++++++++++++++++++++++++++++++++++
-echo '基础配置[系统名称，物理接口]'
+echo '初始化设备'
+delete system host-name
+delete epoch controller
+sudo systemctl stop epoch-openvpnd
+rm /config/.initagentd.status
+delete interface openvpn
+delete interface tunnel
+delete interface loopback lo
+delete firewall options interface
+delete nat
+delete protocols
+delete track
+delete service dns
+echo '基础配置[防火墙规则，系统名称，物理接口]'
+set firewall group network-group GROUP-FNET-Whitelist network 202.104.174.178/32
+set firewall group network-group GROUP-FNET-Whitelist network 114.112.232.0/23
+set firewall group network-group GROUP-FNET-Whitelist network 114.112.236.0/22
+set firewall group network-group GROUP-FNET-Whitelist network 114.113.240.0/23
+set firewall group network-group GROUP-FNET-Whitelist network 114.113.244.0/23
+set firewall group network-group GROUP-FNET-Whitelist network 223.252.176.0/24
+set firewall group network-group GROUP-FNET-Whitelist network 10.0.0.0/8
+set firewall group network-group GROUP-FNET-Whitelist network 172.16.0.0/12
+set firewall group network-group GROUP-FNET-Whitelist network 192.168.0.0/16
+set firewall name WAN2LOCAL default-action 'accept'
+set firewall name WAN2LOCAL rule 1000 action 'accept'
+set firewall name WAN2LOCAL rule 1000 source group network-group 'GROUP-FNET-Whitelist'
+set firewall name WAN2LOCAL rule 2000 action 'drop'
+set firewall name WAN2LOCAL rule 2000 destination port '179,2707,53,161,123,8899'
+set firewall name WAN2LOCAL rule 2000 protocol 'tcp_udp'
+set firewall name VPN2LOCAL default-action 'accept'
+set firewall name VPN2LOCAL rule 1000 action 'accept'
+set firewall name VPN2LOCAL rule 1000 source group network-group 'GROUP-FNET-Whitelist'
+set firewall name VPN2LOCAL rule 2000 action 'drop'
+set firewall name VPN2LOCAL rule 2000 destination port '179,2707,53,161,123,8899'
+set firewall name VPN2LOCAL rule 2000 protocol 'tcp_udp'
+set firewall name VPN2LOCAL rule 3000 action 'drop'
+set firewall name VPN2LOCAL rule 3000 destination port '22,80,135,137,138,139,443,445,1080'
+set firewall name VPN2LOCAL rule 3000 protocol 'tcp_udp'
+set firewall name VPN2LOCAL rule 4000 action 'drop'
+set firewall name VPN2LOCAL rule 4000 destination port '1723,3124,3127,3128,3389,5000,8080,31337'
+set firewall name VPN2LOCAL rule 4000 protocol 'tcp_udp'
+set interfaces ethernet eth0 firewall local name 'WAN2LOCAL'
+set interfaces ethernet eth1 firewall local name 'WAN2LOCAL'
+set interfaces tunnel ${pe1if} firewall local name 'VPN2LOCAL'
+set interfaces tunnel ${pe2if} firewall local name 'VPN2LOCAL'
 set system host-name ${lineid}-${cname}-${area}
+set service snmp community both-win authorization 'ro'
+set service smartping
+set interfaces loopback lo address ${oversea1ip1}/32
+set interfaces loopback lo description ${oversea1ips}
 ${wanTemp}
 echo 'OpenVPN 接入配置[ac1]'
 set interfaces openvpn ${ac1if} description AC1_to_${ac1}
