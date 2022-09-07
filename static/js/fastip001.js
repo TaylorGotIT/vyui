@@ -358,7 +358,7 @@ set track name to-114 test 10 type ping
 set track name to-main failure-count 2
 set track name to-main success-count 2
 set track name to-main test 10 resp-time 5
-set track name to-main test 10 target 10.30.20.129
+set track name to-main test 10 target ${ac1ip1}
 set track name to-main test 10 ttl-limit 1
 set track name to-main test 10 type ping
 echo '>>>静态路由配置[Static]<<<'

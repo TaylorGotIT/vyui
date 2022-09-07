@@ -1,5 +1,5 @@
-/* FastIP 假组网 双运营商 */
-const fastip101html = `<table border="1">
+/* FastIP 假组网 Tiktok 单运营商 */
+const fastip103html = `<table border="1">
 <tr><td><select id="version_select">
 <option value="40" selected="selected">FnetOS[ 4.0 ]</option>
 <option value="32">FnetOS[ 3.2 ]</option>
@@ -16,7 +16,7 @@ const fastip101html = `<table border="1">
 <option value="CT" selected="selected">电信[CT]</option>
 <option value="CU">联通[CU]</option>
 <option value="CM">移动[CM]</option></select></td>
-<td><select id="wan1_type_select" onchange=fastip101setWan(this.value)>
+<td><select id="wan1_type_select" onchange=fastip103setWan(this.value)>
 <option value="dhcp" selected="selected">WAN Type[ DHCP ]</option>
 <option value="static">WAN Type[ Static ]</option>
 <option value="pppoe">WAN Type[ PPPoE ]</option></select></td></tr>
@@ -43,10 +43,10 @@ const fastip101html = `<table border="1">
 <tr><td id="ac1_ip_td"></td><td id="ac2_ip_td"></td></tr>
 <tr><td id="ac1_pub_td"></td><td id="ac2_pub_td"></td></tr>
 </table>
-<button type="button" onclick="fastip101sub('/config')">提交配置信息(Submit Config Info)</button>
+<button type="button" onclick="fastip103sub('/config')">提交配置信息(Submit Config Info)</button>
 `;
 
-function fastip101getList() {
+function fastip103getList() {
 //空格全角分号去除
     let str = $("#config_textarea").val().replaceAll(' ','').replaceAll('：',':').replaceAll(';','');
     if(str.length>32){
@@ -141,11 +141,11 @@ function fastip101getList() {
   };
 };
 
-$("#service_dev").append(fastip101html);
+$("#service_dev").append(fastip103html);
 //加载测试资源的解析数据
-fastip101getList();
+fastip103getList();
 
-function fastip101setWan(value){
+function fastip103setWan(value){
     let html='';
     wan_input_tr = '#wan1_input_tr';
     switch(value){
@@ -165,7 +165,7 @@ function fastip101setWan(value){
     };
 }
 
-function fastip101sub(url){
+function fastip103sub(url){
   let user = $("#user_input").val();
   let time=getTime(new Date());
   let wan1 = $("#wan1_select").val();
@@ -201,7 +201,7 @@ function fastip101sub(url){
   let ac1ips = ipNext($("#ac1_ip_td").html().split('/')[0]);
   let ac1ip1 = ac1ips[0];
   let ac1ip2 = ac1ips[1];
-  let ac1pub = $("#ac1_pub_td").html();
+  let ac1remote = $("#ac1_pub_td").html();
 
 //获取备线参数
   let pe2 = $("#pe2_td").html();
@@ -217,7 +217,7 @@ function fastip101sub(url){
   let ac2ips = ipNext($("#ac2_ip_td").html().split('/')[0]);
   let ac2ip1 = ac2ips[0];
   let ac2ip2 = ac2ips[1];
-  let ac2pub = $("#ac2_pub_td").html();
+  let ac2remote = $("#ac2_pub_td").html();
 //差异化配置生成
 let wanTemp = '';
 switch(wan1Type){
@@ -291,7 +291,7 @@ set service dns forwarding name-server ${oversea1dns}
 set service dns forwarding name-server ${oversea2dns}`;
     break;
   };
-let fastip101fastipGreOverOpenvpn  =
+let fastip103fastipGreOverOpenvpn  =
 `#Fnet MPLS with GRE Over OpenVPN Template.
 #操作人员：${user}
 #时间：${time.cn}
@@ -416,8 +416,8 @@ set track name to-main test 10 target ${pe1ip1}
 set track name to-main test 10 ttl-limit 1
 set track name to-main test 10 type ping
 echo '>>>静态路由配置[Static]<<<'
-set protocols static route ${ac1pub}/32 next-hop 1.1.1.1
-set protocols static route ${ac2pub}/32 next-hop 1.1.1.1
+set protocols static route ${ac1remote}/32 next-hop 1.1.1.1
+set protocols static route ${ac2remote}/32 next-hop 1.1.1.1
 set protocols static route ${pe1lo}/32 next-hop ${ac1ip1}
 set protocols static route ${pe2lo}/32 next-hop ${ac2ip1}
 set protocols static route 114.113.245.99/32 next-hop ${pe1ip1}
@@ -531,8 +531,8 @@ set system name-server 127.0.0.1
 `;
   let filename = `${lineid}-Fast-SD-WAN-FastIP-GREOverOpenVPN-Config-${time.ez}-By-${user}`;
   let data = {};
-  console.log(fastip101fastipGreOverOpenvpn);
-  downloadConfig(filename, fastip101fastipGreOverOpenvpn);
+  console.log(fastip103fastipGreOverOpenvpn);
+  downloadConfig(filename, fastip103fastipGreOverOpenvpn);
   let type = 'post'
   let datatype = 'json';
   ajaxHandler(url,data,datatype,type);
