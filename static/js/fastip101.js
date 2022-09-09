@@ -354,7 +354,7 @@ echo 'OpenVPN 接入配置[ac1]'
 set interfaces openvpn ${ac1if} description AC1_to_${ac1}
 set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
 set interfaces openvpn ${ac1if} remote-address ${ac1ip1}
-set interfaces openvpn ${ac1if} remote-host ${ac1remote}
+set interfaces openvpn ${ac1if} remote-host ${ac1pub}
 set interfaces openvpn ${ac1if} remote-port ${ac1port}
 set interfaces openvpn ${ac1if} mode site-to-site
 set interfaces openvpn ${ac1if} protocol udp
@@ -367,7 +367,7 @@ echo 'OpenVPN 接入配置[ac2]'
 set interfaces openvpn ${ac2if} description AC2_to_${ac2}
 set interfaces openvpn ${ac2if} local-address ${ac2ip2} subnet-mask 255.255.255.252
 set interfaces openvpn ${ac2if} remote-address ${ac2ip1}
-set interfaces openvpn ${ac2if} remote-host ${ac2remote}
+set interfaces openvpn ${ac2if} remote-host ${ac2pub}
 set interfaces openvpn ${ac2if} remote-port ${ac2port}
 set interfaces openvpn ${ac2if} mode site-to-site
 set interfaces openvpn ${ac2if} protocol udp
