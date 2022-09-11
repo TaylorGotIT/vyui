@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<head xmlns:Accept-Language="http://www.w3.org/1999/xhtml">
+    <meta Accept-Language: fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5 />
+    <title>{{ title }}</title>
+    <link rel="shortcut icon" type="image/x-icon" href="static/img/favicon.ico"/>
+    {% module xsrf_form_html() %}
+
+    </head>
+<body>
+    <a href="/">[ Home ]</a> <a href="/autoScript">[ AutoScript ]</a><br>
+    <textarea id="config_textarea" rows="8" cols="48" placeholder="输入NOC分配的配置信息"></textarea><br>
+    <select id="service_select" onchange="getTempJS(this.value)">
+            <option value="">请下拉选中一个服务模板[ 默认为空 ]</option>
+            <option value="excel001">Excel[ Huawei命令行转Excel ]</option>
+            <option value="wg002">Excel[ Cisco ]</option>
+            <option value="wg101">Excel[ Huawei ]</option>
+            <option value="wg102">Excel[ Huawei ]</option>
+    </select>
+
+    <div id="info_dev">
+        <form id="service_dev"></form>
+    </div>
+
+
+</body>
+<style>
+
+</style>
+<script type="text/javascript" src="/static/js/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="/static/js/xlsx.full.min.js"></script>
+
+<script>
+function empty2str(e) {
+	if (e == undefined || e == "") {
+		return e = "-";
+	}
+	return e
+}
+
+//判断是否在前面加0
+function checkTime(s){
+    return s < 10 ? '0' + s: s;
+};
+
+function getTime(d) {
+    let yyyy = d.getFullYear();
+    let MM = checkTime(d.getMonth() + 1);
+    let dd = checkTime(d.getDate());
+    let hh = checkTime(d.getHours());
+    let mm = checkTime(d.getMinutes());
+    let t = {
+        "cn": yyyy + "年" + MM + "月" + dd + "日  " + hh + ":" + mm,
+        "en": yyyy + "/" + MM + "/" + dd + " " + hh + ":" + mm,
+        "ez": yyyy + MM + dd + hh + mm,
+    }
+    return t;
+};
+
+function jsonToExcel(data, head, name) {
+    let str = head ? head + '\n' : '';
+    data.forEach(item => {
+    	// 拼接json数据, 增加 \t 为了不让表格显示科学计数法或者其他格式
+        for(let key in item) {
+            str = `${str + item[key] + '\t'},`
+        }
+        str += '\n'
+    });
+    // encodeURIComponent解决中文乱码
+    const uri = 'data:text/csv;charset=utf-8,\ufeff' + encodeURIComponent(str);
+     // 通过创建a标签实现
+     const link = document.createElement("a");
+     link.href = uri;
+     // 对下载的文件命名
+     link.download =  `${name + '.csv'}`;
+     link.click();
+}
+
+// 读取本地excel文件
+function readWorkbookFromLocalFile(file, callback) {
+	var reader = new FileReader();
+	reader.onload = function(e) {
+		var data = e.target.result;
+		var workbook = XLSX.read(data, {type: 'binary'});
+		if(callback) callback(workbook);
+	};
+	reader.readAsBinaryString(file);
+};
+
+
+
+//读取上传excel
+function getExcelFile(file){
+    readWorkbookFromLocalFile(file, function(workbook) {
+				outputWorkbook(workbook);
+			});
+};
+
+//反掩码
+function v4unmask2cidr(str){
+    let c = 0;
+    if(Number(str)==0){
+        c+=32;
+        return c;
+    }
+    let a = str.split('.');
+    let b = [];
+    for(let i = 0; i < a.length; i++){
+        let d = Number(a[i]);
+        if(d==0){
+            c+=8;
+        }
+        if(d==127){
+            c+=7;
+            break;
+        }
+        if(d==63){
+            c+=6;
+            break;
+        }
+        if(d==31){
+            c+=5;
+            break;
+        }
+        if(d==15){
+            c+=4;
+            break;
+        }
+        if(d==7){
+            c+=3;
+            break;
+        }
+        if(d==3){
+            c+=2;
+            break;
+        }
+        if(d==1){
+            c+=1;
+            break;
+        }
+    }
+    return c;
+}
+//掩码转换
+function createNetmaskAddr(bitCount) {
+  var mask = [], i, n;
+  for(i=0; i<4; i++) {
+    n = Math.min(bitCount, 8);
+    mask.push(256 - Math.pow(2, 8-n));
+    bitCount -= n;
+  }
+  return mask.join('.');
+}
+
+//动态获取选中的模板JS文件
+function getTempJS(value){
+    console.log(value);
+    $("#service_dev").children().remove();
+    switch(value){
+        case "excel001":
+            try{
+                if($.isFunction(excel001sub)){
+                    //已下载脚本时需要调用脚本执行
+                    $("#service_dev").append(excel001html);
+                    console.log("excel001 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("excel001 未下载");
+            };
+            break;
+        case "wg002":
+            try{
+                if($.isFunction(wg002sub)){
+                    $("#service_dev").append(wg002html);
+                    wg002getList();
+                    console.log("wg002 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("wg002 未下载");
+            };
+            break;
+        case "wg101":
+            try{
+                if($.isFunction(wg101sub)){
+                    $("#service_dev").append(wg101html);
+                    wg101getList();
+                    console.log("wg101 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("wg101 未下载");
+            };
+            break;
+        case "wg102":
+            try{
+                if($.isFunction(wg102sub)){
+                    $("#service_dev").append(wg102html);
+                    wg102getList();
+                    console.log("wg102 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("wg102 未下载");
+            };
+            break;
+    };
+
+};
+const T_FORM = 'application/x-www-form-urlencoded'
+const T_JSON = 'application/json';
+
+function getCookie(name) {
+    var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+    return r ? r[1] : undefined;
+}
+
+function setCookie(cname, cvalue, exdays){
+    let d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    let expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+window.onload=function(){
+    const xsrf = getCookie('_xsrf');
+    //_xsrf Header Setup for Ajax
+    function xsrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!xsrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-XSRFToken", xsrf);
+            }
+        }
+    });
+}
+
+function getIPAll(str,num){
+    let addr = str.split('/');
+    let cidr = addr[1];
+    let s = addr[0].split('.');
+    let ips = [];
+    for(let i=0;i<num;i++){
+        let s3 = Number(s[3]) + i;
+        let m2 = s3/254
+        let p = '';
+        if(m2<=1){
+            if(s3==0){
+                ip = `${s[0]}.${s[1]}.${s[2]}.1/32`;
+            }else{
+                ip = `${s[0]}.${s[1]}.${s[2]}.${s3.toString()}/32`;
+            }
+        }else{
+            s3 -= parseInt(m2)*254;
+            let s2 = s[2] + parseInt(m2);
+                ip =  `${s[0]}.${s[1]}.${s2.toString()}.${s3.toString()}/32`;
+        }
+        ips[i]=ip;
+    }
+    return ips;
+}
+
+function downloadConfig(name, str) {
+  let a = document.createElement('a');
+  if(str.search('base64')==-1){
+    a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(str));
+  }else{
+  //当确认为base64图片数据时，直接将其url更改为 base64图片路径；
+    a.href=str;
+  }
+  a.setAttribute('download', name);
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+
+function next(url){
+  console.log('redirect to===>' + url);
+  if(url!=null){
+    window.location.href = url;
+  }
+}
+</script>
+</html>

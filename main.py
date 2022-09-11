@@ -181,6 +181,48 @@ class VYwg(VYreq):
         self.write_json(result)
 
 
+class VYExcel(VYreq):
+    def gen_wg_keys(self):
+        k1 = subprocess.check_output("wg genkey", shell=True).decode("utf-8").strip()
+        k2 = subprocess.check_output("echo %s | wg pubkey" % (k1,), shell=True).decode("utf-8").strip()
+        return {'PrivateKey': k1, 'PublicKey': k2}
+
+    def gen_preshared(self):
+        k1 = subprocess.check_output("wg genkey", shell=True).decode("utf-8").strip()
+        return {'PresharedKey': k1}
+
+    @authed
+    def get(self):
+        self.render("temp/excelHandler.html", title="ExcelHandler")
+
+    @authed
+    def post(self):
+        j = self.get_req_json()
+        c = int(j['client'])
+        p = int(j['prekey'])
+        s = int(j['server'])
+        result = {
+            'server': [],
+            'client': [],
+            'prekey': [],
+        }
+        print(j)
+        if p == 1:
+            prekey = self.gen_preshared()
+            for i in range(c):
+                result['prekey'].append(prekey)
+        else:
+            for i in range(c):
+                result['prekey'].append(self.gen_preshared())
+        for i in range(c):
+            result['client'].append(self.gen_wg_keys())
+        for i in range(s):
+            result['server'].append(self.gen_wg_keys())
+
+        self.write_json(result)
+
+
+
 settings = {
     "cookie_secret": "__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__",
     "login_url": "/login",
@@ -194,6 +236,7 @@ if __name__ == "__main__":
         (r"/user", VYUHome),
         (r"/config", VYConfig),
         (r"/wg", VYwg),
+        (r"/excel", VYExcel),
         (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), './static')}),
         (r'/temp/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), './temp')})
     ], **settings)
