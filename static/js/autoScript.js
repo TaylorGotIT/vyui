@@ -57,6 +57,41 @@ function getTime(d) {
     return t;
 };
 
+const a2z = "abcdefghijklmnopqrstuvwxyz";
+
+function getColNum(str){
+    s = str.toLowerCase();
+    let a = null;
+    for(let i = 0;i < s.length; i++){
+
+        let b = a2z.indexOf(s[i])+1;
+        if(s.length==0){
+            a+=b;
+            break;
+        }else if(i==s.length-1){
+            a+=b;
+            break;
+        }else{
+            a+=26*b;
+        }
+    }
+    console.log(a);
+    return a
+}
+
+function getLoopIP(num){
+    let n = num-1
+    let a = n%64;
+    let b,c = null;
+    if(a==0){
+        b=0;
+    }else{
+        b = a*4;
+    }
+    c= parseInt(n/64);
+    return [`100.64.${c}.${b}/30`,`100.65.${c}.${b}/30`];
+}
+
 function ajaxHandler(url,data,datatype,type,callback){
   $.ajax({
     url:url,
@@ -268,6 +303,18 @@ function getTempJS(value){
                 js_path = "/static/js/"+ value + ".js";
                 $.getScript(js_path, function(){});
                 console.log("sdwab002 未下载");
+            };
+            break;
+        case "sdwan003":
+            try{
+                if($.isFunction(sdwan003sub)){
+                    $("#service_dev").append(sdwan003html);
+                    console.log("sdwan003 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("sdwab003 未下载");
             };
             break;
         case "mpls001":

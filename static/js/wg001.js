@@ -3,8 +3,10 @@ const wg001html = `<table border="1">
 <tr><td>服务端描述</td>
 <td><input maxlength="32" id="server_desc_input" value="WG_65000A_GZ"></td>
 </tr>
-<tr><td>服务端公钥</td>
+<tr>
+<td>服务端公钥</td>
 <td><textarea id="server_pubkey_textarea" rows="2" cols="21"></textarea></td>
+</tr>
 <tr><td>服务端端口</td>
 <td>
 <input type="number" id="server_port_input" min="49152" max="65535" value="51820">
@@ -57,7 +59,7 @@ const wg001html = `<table border="1">
 <td><input id="client_endpoint_input"  maxlength="64"  value="192.168.1.1:51820"></td>
 </tr>
 <td>客户端保活间隔</td>
-<td><input id="client_keepalive_input" type="number" min="1" max="30" value="30"></td>
+<td><input id="client_keepalive_input" type="number" min="1" max="30" value="15"></td>
 </tr>
 </table>
 
@@ -113,6 +115,10 @@ function genWgConfig(d){
   let c_ip_start =  $("#client_ip_start_input").val();
   let c_allowed_ips = $("#client_allowed_ip_textarea").val();
   let c_dns = $("#client_dns_input").val();
+  let dnsTemp = "";
+  if(c_dns.length > 0){
+    dnsTemp += `DNS = ${ c_dns }`;
+  }
   let c_mtu = $("#client_mtu_input").val();
   let c_endpoint = $("#client_endpoint_input").val();
   let c_keepalive = $("#client_keepalive_input").val();
@@ -143,9 +149,8 @@ let c_if =
 [Interface]
 PrivateKey = ${ c[j].PrivateKey }
 Address = ${ c_ips[j] }
-DNS = ${ c_dns }
 MTU = ${ c_mtu }
-
+${ dnsTemp }
 [Peer]
 PublicKey = ${ s_pubkey }
 PresharedKey = ${ p[j].PresharedKey }

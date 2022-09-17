@@ -9,30 +9,9 @@
 <body>
     <label for="user_input">Hello</label>
     <input id="user_input" disabled value="{{ uname }}"><br><br>
-    <a href="/autoScript">[ AutoScript ]</a><br><br>
-    <a href="/wg">[ WireGuard ]</a><br><br>
+    <a href="/autoScript">[ AutoScript ]</a>
+    <a href="/wg">[ WireGuard ]</a>
     <a href="/excel">[ ExcelHandler ]</a>
-        <p>开局信息填写</p>
-        <p>***</p>
-        <label for="wan_if_select">公网接口（WAN Interface）：</label>
-        <select id="wan_if_select">
-            {% for type in iflist %}
-                {% for item in iflist[type] %}
-                    <option value='{{type}}{{ item }}'>{{type}}_{{ item }}</option>
-                {% end %}
-            {% end %}
-
-        </select>
-        <button type="button" onclick="ifConfig('/interface')">新增(Add)</button>
-        <button type="button" onclick="initConfig('/config')">配置(Config)</button>
-        <br>
-
-        <input type="text" name="controller" maxlength="64" id="controller_input" placeholder="SD-WAN Controller" required>
-        <input type="text" name="controllerKey" maxlength="64" id="controllerKey_input" placeholder="Auth Key" required>
-    </div><br>
-<button type="button" onclick="logout('/login')">退出(Logout)</button>
-<button type="button" onclick="sdwanRegest('/login')">SD-WAN开局(SD-WAN Register)</button>
 </body>
-<script type="text/javascript" src="/static/js/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" src="/static/js/home.js"></script>
 </html>
