@@ -20,28 +20,50 @@ const fastip103html = `<table border="1">
 <option value="dhcp" selected="selected">WAN Type[ DHCP ]</option>
 <option value="static">WAN Type[ Static ]</option>
 <option value="pppoe">WAN Type[ PPPoE ]</option></select></td></tr>
-<tr id="wan1_input_tr"></tr>
-<tr><td><select id="wifi1_select">
-<option value=1 selected="selected">WIFI1-Enable</option>
-<option value=0 >WIFI1-Disable</option></select></td></tr>
-<tr><td><input id="local1_dns_input" placeholder="本地DNS1[eg:223.5.5.5]"></td>
-<td><input id="local2_dns_input" placeholder="本地DNS2[eg:223.6.6.6]"></td></tr>
-<tr><td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]"></td>
-<td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]"></td></tr>
-<tr><td><input id="bgp_server1_input" value="10.10.99.200"></td>
-<td><input id="bgp_server2_input" value="10.10.99.202"></td></tr>
-<tr><td><input id="bgp_server3_input" value="10.10.99.201"></td>
-<td><input id="bgp_server4_input" value="10.10.99.203"></td></tr>
-<tr><td id="pe1_td"></td><td id="pe2_td"></td></tr>
-<tr><td id="pe1_if_td"></td><td id="pe2_if_td"></td></tr>
-<tr><td id="pe1_ip_td"></td><td id="pe2_ip_td"></td></tr>
-<tr><td id="pe1_lo_td"></td><td id="pe2_lo_td"></td></tr>
-<tr><td id="ce1_lo_td"></td><td id="ce2_lo_td"></td></tr>
-<tr><td id="pe1_oversea_td"></td><td id="pe2_oversea_td"></td></tr>
-<tr><td id="ac1_td"></td><td id="ac2_td"></td></tr>
-<tr><td id="ac1_if_td"></td><td id="ac2_if_td"></td></tr>
-<tr><td id="ac1_ip_td"></td><td id="ac2_ip_td"></td></tr>
-<tr><td id="ac1_pub_td"></td><td id="ac2_pub_td"></td></tr>
+<tr>
+<td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]"></td>
+<td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]"></td>
+</tr>
+<tr>
+<td><input id="pe1_input"></td>
+<td><input id="pe2_input"></td>
+</tr>
+<tr>
+<td><input id="pe1_if_input"></td>
+<td><input id="pe2_if_input"></td>
+</tr>
+<tr>
+<td><input id="pe1_ip_input"></td>
+<td><input id="pe2_ip_input"></td>
+</tr>
+<tr>
+<td><input id="pe1_lo_input"></td>
+<td><input id="pe2_lo_input"></td>
+</tr>
+<tr>
+<td><input id="ce1_lo_input"></td>
+<td><input id="ce2_lo_input"></td>
+</tr>
+<tr>
+<td><input id="pe1_oversea_input"></td>
+<td><input id="pe2_oversea_input"></td>
+</tr>
+<tr>
+<td><input id="ac1_input"></td>
+<td><input id="ac2_input"></td>
+</tr>
+<tr>
+<td><input id="ac1_if_input"></td>
+<td><input id="ac2_if_input"></td>
+</tr>
+<tr>
+<td><input id="ac1_ip_input"></td>
+<td><input id="ac2_ip_input"></td>
+</tr>
+<tr>
+<td><input id="ac1_pub_input"></td>
+<td><input id="ac2_pub_input"></td>
+</tr>
 </table>
 <button type="button" onclick="fastip103sub('/config')">提交配置信息(Submit Config Info)</button>
 `;
@@ -114,30 +136,30 @@ function fastip103getList() {
         }
     };
     console.log(info_json);
-    $("#lineid_td").append(info_json.id[0].substr(0,7));
-    $("#pe1_td").append(info_json.pe[0]);
-    $("#pe1_if_td").append(info_json.if[0]);
-    $("#pe1_ip_td").append(info_json.ip[0]);
-    $("#pe1_lo_td").append(info_json.lo[0]);
-    $("#ce1_lo_td").append(info_json.lo[1]);
-    $("#pe1_oversea_td").append(info_json.oversea[1]);
-    $("#pe1_as_td").append(info_json.as[1]);
-    $("#ac1_td").append(info_json.ac[0]);
-    $("#ac1_if_td").append(info_json.if[1]);
-    $("#ac1_ip_td").append(info_json.ip[1]);
-    $("#ac1_pub_td").append(info_json.pub[0]);
+    $("#lineid_input").val(info_json.id[0].substr(0,7));
+    $("#pe1_input").val(info_json.pe[0]);
+    $("#pe1_if_input").val(info_json.if[0]);
+    $("#pe1_ip_input").val(info_json.ip[0]);
+    $("#pe1_lo_input").val(info_json.lo[0]);
+    $("#ce1_lo_input").val(info_json.lo[1]);
+    $("#pe1_oversea_input").val(info_json.oversea[1]);
+    $("#pe1_as_input").val(info_json.as[1]);
+    $("#ac1_input").val(info_json.ac[0]);
+    $("#ac1_if_input").val(info_json.if[1]);
+    $("#ac1_ip_input").val(info_json.ip[1]);
+    $("#ac1_pub_input").val(info_json.pub[0]);
 
-    $("#pe2_td").append(info_json.pe[1]);
-    $("#pe2_if_td").append(info_json.if[2]);
-    $("#pe2_ip_td").append(info_json.ip[2]);
-    $("#pe2_lo_td").append(info_json.lo[2]);
-    $("#ce2_lo_td").append(info_json.lo[3]);
-    $("#pe2_oversea_td").append(info_json.oversea[1]);
-    $("#pe2_as_td").append(info_json.as[1]);
-    $("#ac2_td").append(info_json.ac[1]);
-    $("#ac2_if_td").append(info_json.if[3]);
-    $("#ac2_ip_td").append(info_json.ip[3]);
-    $("#ac2_pub_td").append(info_json.pub[1]);
+    $("#pe2_input").val(info_json.pe[1]);
+    $("#pe2_if_input").val(info_json.if[2]);
+    $("#pe2_ip_input").val(info_json.ip[2]);
+    $("#pe2_lo_input").val(info_json.lo[2]);
+    $("#ce2_lo_input").val(info_json.lo[3]);
+    $("#pe2_oversea_input").val(info_json.oversea[1]);
+    $("#pe2_as_input").val(info_json.as[1]);
+    $("#ac2_input").val(info_json.ac[1]);
+    $("#ac2_if_input").val(info_json.if[3]);
+    $("#ac2_ip_input").val(info_json.ip[3]);
+    $("#ac2_pub_input").val(info_json.pub[1]);
   };
 };
 
@@ -173,51 +195,45 @@ function fastip103sub(url){
   let wan1Provider = $("#wan1_provider_select").val();
 
   let version = $("#version_select").val();
-  let lineid = $("#lineid_td").html();
+  let lineid = $("#lineid_td").val();
   let cname = $("#cname_input").val();
   let area = $("#area_input").val();
-  let local1dns = $("#local1_dns_input").val();
-  let local2dns = $("#local2_dns_input").val();
   let oversea1dns = $("#oversea1_dns_input").val();
   let oversea2dns = $("#oversea2_dns_input").val();
-  let bgp1server1 = $("#bgp_server1_input").val();
-  let bgp1server2 = $("#bgp_server2_input").val();
-  let bgp1server3 = $("#bgp_server3_input").val();
-  let bgp1server4 = $("#bgp_server4_input").val();
-  let oversea1ips = $("#pe1_oversea_td").html().split(',')[0];
+  let oversea1ips = $("#pe1_oversea_input").val().split(',')[0];
   let oversea1ip1 = oversea1ips.split(',')[0].split('-')[0];
 //获取主线参数
-  let pe1 = $("#pe1_td").html();
-  let pe1if = "tun"+$("#pe1_if_td").html().match(/[1-9]\d+/)[0];
-  let pe1ips = ipNext($("#pe1_ip_td").html().split('/')[0]);
+  let pe1 = $("#pe1_input").val();
+  let pe1if = "tun"+$("#pe1_if_input").val().match(/[1-9]\d+/)[0];
+  let pe1ips = ipNext($("#pe1_ip_input").val().split('/')[0]);
   let pe1ip1 = pe1ips[0];
   let pe1ip2 = pe1ips[1];
-  let pe1lo = $("#pe1_lo_td").html();
-  let ce1lo = $("#ce1_lo_td").html();
+  let pe1lo = $("#pe1_lo_input").val();
+  let ce1lo = $("#ce1_lo_input").val();
 
-  let ac1 = $("#ac1_td").html();
-  let ac1if = $("#ac1_if_td").html();
+  let ac1 = $("#ac1_input").val();
+  let ac1if = $("#ac1_if_input").val();
   let ac1port = ac1if.replace('vtun','');
-  let ac1ips = ipNext($("#ac1_ip_td").html().split('/')[0]);
+  let ac1ips = ipNext($("#ac1_ip_input").val().split('/')[0]);
   let ac1ip1 = ac1ips[0];
   let ac1ip2 = ac1ips[1];
-  let ac1remote = $("#ac1_pub_td").html();
+  let ac1remote = $("#ac1_pub_input").val();
 
 //获取备线参数
-  let pe2 = $("#pe2_td").html();
-  let pe2if = "tun"+$("#pe2_if_td").html().match(/[1-9]\d+/)[0];
-  let pe2ips = ipNext($("#pe2_ip_td").html().split('/')[0]);
+  let pe2 = $("#pe2_input").val();
+  let pe2if = "tun"+$("#pe2_if_input").val().match(/[1-9]\d+/)[0];
+  let pe2ips = ipNext($("#pe2_ip_input").val().split('/')[0]);
   let pe2ip1 = pe2ips[0];
   let pe2ip2 = pe2ips[1];
-  let pe2lo = $("#pe2_lo_td").html();
-  let ce2lo = $("#ce2_lo_td").html();
-  let ac2 = $("#ac2_td").html();
-  let ac2if = $("#ac2_if_td").html();
+  let pe2lo = $("#pe2_lo_input").val();
+  let ce2lo = $("#ce2_lo_input").val();
+  let ac2 = $("#ac2_input").val();
+  let ac2if = $("#ac2_if_input").val();
   let ac2port = ac2if.replace('vtun','');
-  let ac2ips = ipNext($("#ac2_ip_td").html().split('/')[0]);
+  let ac2ips = ipNext($("#ac2_ip_input").val().split('/')[0]);
   let ac2ip1 = ac2ips[0];
   let ac2ip2 = ac2ips[1];
-  let ac2remote = $("#ac2_pub_td").html();
+  let ac2remote = $("#ac2_pub_input").html();
 //差异化配置生成
 let wanTemp = '';
 switch(wan1Type){
@@ -245,57 +261,12 @@ set interfaces ethernet ${wan1} pppoe 1 user-id ${pppoe1pass}
 set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
     break;
   };
-let smartdns = '';
-switch(version){
-    case "40":
-smartdns += `set epoch file-sync task 1 local '/opt/cn.txt'
-set epoch file-sync task 1 remote 'http://59.37.126.146:1909/f32x/domainlist/cn_domainlist.last'
-set epoch file-sync task 2 local '/opt/oversea.txt'
-set epoch file-sync task 2 remote 'http://59.37.126.146:1909/f32x/domainlist/oversea_domainlist.last'
-set service dns forwarding allow-from '0.0.0.0/0'
-set service dns forwarding cache-size '10000'
-set service dns forwarding dnssec 'off'
-set service dns forwarding domainlist CN file '/opt/cn.txt'
-set service dns forwarding domainlist CN recursion-desired
-set service dns forwarding domainlist CN server ${local1dns}
-set service dns forwarding domainlist CN server ${local2dns}
-set service dns forwarding domainlist CN server '114.114.114.114'
-set service dns forwarding domainlist HK file '/opt/oversea.txt'
-set service dns forwarding domainlist HK recursion-desired
-set service dns forwarding domainlist HK server ${oversea1dns}
-set service dns forwarding domainlist HK server ${oversea2dns}
-set service dns forwarding listen-address 0.0.0.0
-set service dns forwarding name-server ${oversea1dns}
-set service dns forwarding name-server ${oversea2dns}`;
-    break;
-    case "32":
-smartdns +=`set service dns dnsmasq cache-size '9999'
-set service dns dnsmasq fnetlink-dns enable
-set service dns dnsmasq fnetlink-dns local-isp-dns ${local1dns}
-set service dns dnsmasq fnetlink-dns local-isp-dns ${local2dns}
-set service dns dnsmasq fnetlink-dns upchinadomain host '59.37.126.146'
-set service dns dnsmasq listen-on ${wan1}
-set service dns dnsmasq name-server ${oversea1dns}
-set service dns dnsmasq name-server ${oversea2dns}`;
-    break;
-    case "31":
-smartdns +=`set service dns forwarding cache-size '9999'
-set service dns forwarding fnetlink-dns 'enable'
-set service dns forwarding fnetlink-dns local-isp-dns ${local1dns}
-set service dns forwarding fnetlink-dns local-isp-dns ${local2dns}
-set service dns forwarding fnetlink-dns upchinadomain host '59.37.126.146'
-set service dns forwarding fnetlink-dns upchinadomain uptime hour '0'
-set service dns forwarding fnetlink-dns upchinadomain uptime min '0'
-set service dns forwarding listen-on ${wan1}
-set service dns forwarding name-server ${oversea1dns}
-set service dns forwarding name-server ${oversea2dns}`;
-    break;
-  };
+
 let fastip103fastipGreOverOpenvpn  =
-`#Fnet MPLS with GRE Over OpenVPN Template.
+`#Fnet MPLS with GRE Over OpenVPN Tiktok Template.
 #操作人员：${user}
 #时间：${time.cn}
-#系统：vyui-v1
+#系统：vyui-v2
 #FnetOS Version ${version}
 +++++++++++++++++++++++++++++++++++++++++++
 echo '初始化设备'
@@ -420,96 +391,14 @@ set protocols static route ${ac1remote}/32 next-hop 1.1.1.1
 set protocols static route ${ac2remote}/32 next-hop 1.1.1.1
 set protocols static route ${pe1lo}/32 next-hop ${ac1ip1}
 set protocols static route ${pe2lo}/32 next-hop ${ac2ip1}
+set protocols static route 0.0.0.0/0 next-hop ${pe1ip1} track to-main
+set protocols static route 0.0.0.0/0 next-hop ${pe2ip1} distance 5
 set protocols static route 114.113.245.99/32 next-hop ${pe1ip1}
 set protocols static route 114.113.245.100/32 next-hop ${pe2ip1}
 set protocols static route 192.168.55.125/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.125/32 next-hop ${pe2ip1} distance 5
 set protocols static route 192.168.55.250/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.250/32 next-hop ${pe2ip1} distance 5
-echo '>>>动态路由配置[BGP]<<<'
-set protocols static route ${bgp1server1}/32 next-hop ${pe1ip1} track 'to-main'
-set protocols static route ${bgp1server1}/32 blackhole distance '5'
-set protocols static route ${bgp1server3}/32 next-hop ${pe1ip1} track 'to-main'
-set protocols static route ${bgp1server3}/32 blackhole distance '5'
-set protocols static route ${bgp1server2}/32 next-hop ${pe2ip1}
-set protocols static route ${bgp1server4}/32 next-hop ${pe2ip1}
-set policy community-list 80 rule 10 action 'permit'
-set policy community-list 80 rule 10 description 'to_hk'
-set policy community-list 80 rule 10 regex '65000:9939'
-set policy community-list 81 rule 10 action 'permit'
-set policy community-list 81 rule 10 description 'to_ct'
-set policy community-list 81 rule 10 regex '65000:4134'
-set policy community-list 82 rule 10 action 'permit'
-set policy community-list 82 rule 10 description 'to_cnc'
-set policy community-list 82 rule 10 regex '65000:4837'
-set policy community-list 83 rule 10 action 'permit'
-set policy community-list 83 rule 10 description 'to_cn_other'
-set policy community-list 83 rule 10 regex '65000:9808'
-set policy community-list 85 rule 10 action 'permit'
-set policy community-list 85 rule 10 description 'to_deny'
-set policy community-list 85 rule 10 regex '65000:9807'
-set policy community-list 88 rule 10 action 'permit'
-set policy community-list 88 rule 10 description 'to_google'
-set policy community-list 88 rule 10 regex '65000:9008'
-set policy route-map bgp-from--RSVR rule 100 action 'permit'
-set policy route-map bgp-from--RSVR rule 100 description 'to_hk'
-set policy route-map bgp-from--RSVR rule 100 match community community-list '80'
-set policy route-map bgp-from--RSVR rule 100 set ip-next-hop ${pe1ip1}
-set policy route-map bgp-from--RSVR rule 200 action 'permit'
-set policy route-map bgp-from--RSVR rule 200 description 'to_ct'
-set policy route-map bgp-from--RSVR rule 200 match community community-list '81'
-set policy route-map bgp-from--RSVR rule 200 set ip-next-hop 1.1.1.1
-set policy route-map bgp-from--RSVR rule 300 action 'permit'
-set policy route-map bgp-from--RSVR rule 300 description 'to_cnc'
-set policy route-map bgp-from--RSVR rule 300 match community community-list '82'
-set policy route-map bgp-from--RSVR rule 300 set ip-next-hop 1.1.1.1
-set policy route-map bgp-from--RSVR rule 400 action 'permit'
-set policy route-map bgp-from--RSVR rule 400 description 'to_cn_other'
-set policy route-map bgp-from--RSVR rule 400 match community community-list '83'
-set policy route-map bgp-from--RSVR rule 400 set ip-next-hop 1.1.1.1
-set policy route-map bgp-from--RSVR2 rule 100 action 'permit'
-set policy route-map bgp-from--RSVR2 rule 100 description 'to_hk'
-set policy route-map bgp-from--RSVR2 rule 100 match community community-list '80'
-set policy route-map bgp-from--RSVR2 rule 100 set ip-next-hop ${pe2ip1}
-set policy route-map bgp-from--RSVR2 rule 100 set local-preference '50'
-set policy route-map bgp-from--RSVR2 rule 200 action 'permit'
-set policy route-map bgp-from--RSVR2 rule 200 description 'to_ct'
-set policy route-map bgp-from--RSVR2 rule 200 match community community-list '81'
-set policy route-map bgp-from--RSVR2 rule 200 set ip-next-hop 1.1.1.1
-set policy route-map bgp-from--RSVR2 rule 200 set local-preference '50'
-set policy route-map bgp-from--RSVR2 rule 300 action 'permit'
-set policy route-map bgp-from--RSVR2 rule 300 description 'to_cnc'
-set policy route-map bgp-from--RSVR2 rule 300 match community community-list '82'
-set policy route-map bgp-from--RSVR2 rule 300 set ip-next-hop 1.1.1.1
-set policy route-map bgp-from--RSVR2 rule 300 set local-preference '50'
-set policy route-map bgp-from--RSVR2 rule 400 action 'permit'
-set policy route-map bgp-from--RSVR2 rule 400 description 'to_cn_other'
-set policy route-map bgp-from--RSVR2 rule 400 match community community-list '83'
-set policy route-map bgp-from--RSVR2 rule 400 set ip-next-hop 1.1.1.1
-set policy route-map bgp-from--RSVR2 rule 400 set local-preference '50'
-set protocols bgp 65000 neighbor ${bgp1server1} peer-group 'RSVR'
-set protocols bgp 65000 neighbor ${bgp1server3} peer-group 'RSVR'
-set protocols bgp 65000 neighbor ${bgp1server2} peer-group 'RSVR2'
-set protocols bgp 65000 neighbor ${bgp1server4} peer-group 'RSVR2'
-set protocols bgp 65000 parameters router-id 10.30.140.14
-set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast route-map import 'bgp-from--RSVR'
-set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast soft-reconfiguration inbound
-set protocols bgp 65000 peer-group RSVR remote-as '65000'
-set protocols bgp 65000 peer-group RSVR update-source ${pe1ip2}
-set protocols bgp 65000 peer-group RSVR2 address-family ipv4-unicast route-map import 'bgp-from--RSVR2'
-set protocols bgp 65000 peer-group RSVR2 address-family ipv4-unicast soft-reconfiguration inbound
-set protocols bgp 65000 peer-group RSVR2 remote-as '65000'
-set protocols bgp 65000 peer-group RSVR2 update-source ${pe2ip2}
-set protocols bgp 65000 timers holdtime '15'
-set protocols bgp 65000 timers keepalive '60'
-echo '>>>DNS劫持<<<'
-set nat destination rule 50 destination port 53
-set nat destination rule 50 inbound-interface ${wan1}
-set nat destination rule 50 protocol tcp_udp
-set nat destination rule 50 translation address 127.0.0.1
-echo '>>>本地NAT<<<'
-set nat source rule 100 outbound-interface ${wan1}
-set nat source rule 100 translation address masquerade
 echo '>>>海外NAT<<<'
 set nat source rule 1001 destination address ${oversea1dns}/32
 set nat source rule 1001 outbound-interface ${pe1if}
@@ -523,11 +412,64 @@ set nat source rule 1002 translation address ${oversea1ip1}
 set nat source rule 2002 destination address ${oversea2dns}/32
 set nat source rule 2002 outbound-interface ${pe2if}
 set nat source rule 2002 translation address ${oversea1ip1}
-echo '>>>SmartDNS配置<<<'
-${smartdns}
-###以上配置commit后再贴###
-delete system name-server
-set system name-server 127.0.0.1
+set nat source rule 1003 source address 192.168.8.0/24
+set nat source rule 1003 outbound-interface ${pe1if}
+set nat source rule 1003 translation address ${oversea1ip1}
+set nat source rule 2003 source address 192.168.0.0/16
+set nat source rule 2003 outbound-interface ${pe2if}
+set nat source rule 2003 translation address ${oversea1ip1}
+echo '>>>Table default 海外，DHCP指定海外DNS<<<'
+delete interface eth1 address
+delete interface eth2 address
+set interfaces bridge br2 description lan
+set interfaces bridge br2 ip address 192.168.8.1/24
+set interfaces bridge br2 member interface eth1
+set interfaces bridge br2 member interface eth2
+set interfaces bridge br2 member interface eth3
+set interfaces bridge br2 member interface eth4
+set interfaces bridge br2 member interface eth5
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 description 'Br_2_DHCP'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 default-router '192.168.8.1'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 lease '86400'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 name-server ${oversea1dns}
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 name-server ${oversea2dns}
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 range 0 start '192.168.8.2'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 range 0 stop '192.168.8.200'
+echo '>>>Table 100 走英国，直播手机IP与MAC绑定，DHCP指定英国DNS<<<'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 201 ip-address '192.168.8.201'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 201 mac-address '54:05:db:b4:4a:4f'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 201 static-mapping-parameters 'option domain-name-servers 212.78.94.40, 158.43.128.72;'
+set protocols static table 100 route 0.0.0.0/0 next-hop 英国GRE-IP
+set policy local-route rule 100 set table '100'
+set policy local-route rule 100 source '192.168.8.201'
+echo '5G WIFI DHCP'
+set interfaces wireless wlan1 address '192.168.9.1/24'
+set interfaces wireless wlan1 channel '0'
+set interfaces wireless wlan1 country-code 'cn'
+set interfaces wireless wlan1 dhcp-options client-id 'uk-wifi'
+set interfaces wireless wlan1 hw-id 'cc:d3:9d:99:ff:61'
+set interfaces wireless wlan1 mode 'ac'
+set interfaces wireless wlan1 physical-device 'phy0'
+set interfaces wireless wlan1 security wpa mode 'wpa2'
+set interfaces wireless wlan1 security wpa passphrase '123456@vpn'
+set interfaces wireless wlan1 ssid 'us_wifi'
+set interfaces wireless wlan1 type 'access-point'
+set service dhcp-server shared-network-name dhcp_wifi subnet 192.168.9.0/24 default-router '192.168.9.1'
+set service dhcp-server shared-network-name dhcp_wifi subnet 192.168.9.0/24 lease '86400'
+set service dhcp-server shared-network-name dhcp_wifi subnet 192.168.9.0/24 name-server ${oversea1dns}
+set service dhcp-server shared-network-name dhcp_wifi subnet 192.168.9.0/24 name-server ${oversea2dns}
+set service dhcp-server shared-network-name dhcp_wifi subnet 192.168.9.0/24 range 0 start '192.168.9.2'
+set service dhcp-server shared-network-name dhcp_wifi subnet 192.168.9.0/24 range 0 stop '192.168.9.200'
+################
+IP/环境监测
+    IP当地
+    AS号当地
+    ISP > Business > hosting
+    whoer.net 100%
+    污染度 < 50%
+测速：
+    网站测速
+    谷歌云盘上传下载测速
 `;
   let filename = `${lineid}-Fast-SD-WAN-FastIP-GREOverOpenVPN-Config-${time.ez}-By-${user}`;
   let data = {};

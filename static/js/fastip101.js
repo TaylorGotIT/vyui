@@ -523,6 +523,29 @@ set nat source rule 1002 translation address ${oversea1ip1}
 set nat source rule 2002 destination address ${oversea2dns}/32
 set nat source rule 2002 outbound-interface ${pe2if}
 set nat source rule 2002 translation address ${oversea1ip1}
+set nat source rule 1003 source address 192.168.0.0/16
+set nat source rule 1003 outbound-interface ${pe1if}
+set nat source rule 1003 translation address ${oversea1ip1}
+set nat source rule 2003 source address 192.168.0.0/16
+set nat source rule 2003 outbound-interface ${pe2if}
+set nat source rule 2003 translation address ${oversea1ip1}
+echo '>>>Table default 海外，DHCP指定海外DNS<<<'
+delete interface eth1 address
+delete interface eth2 address
+set interfaces bridge br2 description lan
+set interfaces bridge br2 ip address 192.168.8.1/24
+set interfaces bridge br2 member interface eth1
+set interfaces bridge br2 member interface eth2
+set interfaces bridge br2 member interface eth3
+set interfaces bridge br2 member interface eth4
+set interfaces bridge br2 member interface eth5
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 description 'Br_2_DHCP'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 default-router '192.168.8.1'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 lease '86400'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 name-server ${oversea1dns}
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 name-server ${oversea2dns}
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 range 0 start '192.168.8.2'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 range 0 stop '192.168.8.200'
 echo '>>>SmartDNS配置<<<'
 ${smartdns}
 ###以上配置commit后再贴###
