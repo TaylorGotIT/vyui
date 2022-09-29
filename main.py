@@ -9,6 +9,7 @@ import json
 from tornado.escape import json_encode
 from tornado.template import Template, Loader
 import subprocess
+import platform
 
 class VYreq(RequestHandler):
     def get_current_user(self):

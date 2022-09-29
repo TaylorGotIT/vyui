@@ -4,7 +4,7 @@ const fastip103html = `<table border="1">
 <option value="40" selected="selected">FnetOS[ 4.0 ]</option>
 <option value="32">FnetOS[ 3.2 ]</option>
 <option value="31">FnetOS[ 3.1 ]</option></select></td>
-<td id="lineid_td"></td></tr>
+<td><input id="lineid_input" placeholder="Area[GZ,SZ,SH,etc...]"></td></tr>
 <tr><td><input id="cname_input" placeholder="CompanyName[eg:Huawei]"></td>
 <td><input id="area_input" placeholder="Area[GZ,SZ,SH,etc...]"></td></tr>
 <tr><td><select id="wan1_select">
@@ -195,7 +195,7 @@ function fastip103sub(url){
   let wan1Provider = $("#wan1_provider_select").val();
 
   let version = $("#version_select").val();
-  let lineid = $("#lineid_td").val();
+  let lineid = $("#lineid_input").val();
   let cname = $("#cname_input").val();
   let area = $("#area_input").val();
   let oversea1dns = $("#oversea1_dns_input").val();
@@ -233,7 +233,7 @@ function fastip103sub(url){
   let ac2ips = ipNext($("#ac2_ip_input").val().split('/')[0]);
   let ac2ip1 = ac2ips[0];
   let ac2ip2 = ac2ips[1];
-  let ac2remote = $("#ac2_pub_input").html();
+  let ac2remote = $("#ac2_pub_input").val();
 //差异化配置生成
 let wanTemp = '';
 switch(wan1Type){
