@@ -142,7 +142,7 @@ function fastip103getList() {
     $("#pe1_ip_input").val(info_json.ip[0]);
     $("#pe1_lo_input").val(info_json.lo[0]);
     $("#ce1_lo_input").val(info_json.lo[1]);
-    $("#pe1_oversea_input").val(info_json.oversea[1]);
+    $("#pe1_oversea_input").val(info_json.oversea[0]);
     $("#pe1_as_input").val(info_json.as[1]);
     $("#ac1_input").val(info_json.ac[0]);
     $("#ac1_if_input").val(info_json.if[1]);
@@ -154,7 +154,7 @@ function fastip103getList() {
     $("#pe2_ip_input").val(info_json.ip[2]);
     $("#pe2_lo_input").val(info_json.lo[2]);
     $("#ce2_lo_input").val(info_json.lo[3]);
-    $("#pe2_oversea_input").val(info_json.oversea[1]);
+    $("#pe2_oversea_input").val(info_json.oversea[0]);
     $("#pe2_as_input").val(info_json.as[1]);
     $("#ac2_input").val(info_json.ac[1]);
     $("#ac2_if_input").val(info_json.if[3]);
@@ -422,7 +422,7 @@ echo '>>>Table default 海外，DHCP指定海外DNS<<<'
 delete interface eth1 address
 delete interface eth2 address
 set interfaces bridge br2 description lan
-set interfaces bridge br2 ip address 192.168.8.1/24
+set interfaces bridge br2 address 192.168.8.1/24
 set interfaces bridge br2 member interface eth1
 set interfaces bridge br2 member interface eth2
 set interfaces bridge br2 member interface eth3
