@@ -428,47 +428,59 @@ set interfaces bridge br2 member interface eth2
 set interfaces bridge br2 member interface eth3
 set interfaces bridge br2 member interface eth4
 set interfaces bridge br2 member interface eth5
+echo '5G WIFI SSID: sdwan PASSWD: 123456@sdwan'
+set interfaces wireless wlan1 address '192.168.8.2/24'
+set interfaces wireless wlan1 channel '0'
+set interfaces wireless wlan1 country-code 'cn'
+set interfaces wireless wlan1 dhcp-options client-id 'sdwan'
+set interfaces wireless wlan1 hw-id 'cc:d3:9d:99:ff:61'
+set interfaces wireless wlan1 mode 'ac'
+set interfaces wireless wlan1 physical-device 'phy0'
+set interfaces wireless wlan1 security wpa mode 'wpa2'
+set interfaces wireless wlan1 security wpa passphrase '123456@sdwan'
+set interfaces wireless wlan1 ssid 'sdwan'
+set interfaces wireless wlan1 type 'access-point'
+echo 'DHCP Server Range: 20-200'
 set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 description 'Br_2_DHCP'
 set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 default-router '192.168.8.1'
 set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 lease '86400'
 set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 name-server ${oversea1dns}
 set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 name-server ${oversea2dns}
-set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 range 0 start '192.168.8.2'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 range 0 start '192.168.8.20'
 set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 range 0 stop '192.168.8.200'
-echo '>>>Table 100 走英国，直播手机IP与MAC绑定，DHCP指定英国DNS<<<'
+echo '策略路由匹配源IP走不通Table路由表，默认table 100 美国，table 200 英国'
 set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 201 ip-address '192.168.8.201'
 set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 201 mac-address '54:05:db:b4:4a:4f'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 201 static-mapping-parameters 'option domain-name-servers 156.154.70.25, 156.154.70.25;'
+#
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 201 ip-address '192.168.8.202'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 201 mac-address '55:05:db:b4:4a:40'
 set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 201 static-mapping-parameters 'option domain-name-servers 212.78.94.40, 158.43.128.72;'
-set protocols static table 100 route 0.0.0.0/0 next-hop 英国GRE-IP
+#
+set protocols static table 100 route 0.0.0.0/0 next-hop <美国GRE-IP>
 set policy local-route rule 100 set table '100'
 set policy local-route rule 100 source '192.168.8.201'
-echo '5G WIFI DHCP'
-set interfaces wireless wlan1 address '192.168.9.1/24'
-set interfaces wireless wlan1 channel '0'
-set interfaces wireless wlan1 country-code 'cn'
-set interfaces wireless wlan1 dhcp-options client-id 'uk-wifi'
-set interfaces wireless wlan1 hw-id 'cc:d3:9d:99:ff:61'
-set interfaces wireless wlan1 mode 'ac'
-set interfaces wireless wlan1 physical-device 'phy0'
-set interfaces wireless wlan1 security wpa mode 'wpa2'
-set interfaces wireless wlan1 security wpa passphrase '123456@vpn'
-set interfaces wireless wlan1 ssid 'us_wifi'
-set interfaces wireless wlan1 type 'access-point'
-set service dhcp-server shared-network-name dhcp_wifi subnet 192.168.9.0/24 default-router '192.168.9.1'
-set service dhcp-server shared-network-name dhcp_wifi subnet 192.168.9.0/24 lease '86400'
-set service dhcp-server shared-network-name dhcp_wifi subnet 192.168.9.0/24 name-server ${oversea1dns}
-set service dhcp-server shared-network-name dhcp_wifi subnet 192.168.9.0/24 name-server ${oversea2dns}
-set service dhcp-server shared-network-name dhcp_wifi subnet 192.168.9.0/24 range 0 start '192.168.9.2'
-set service dhcp-server shared-network-name dhcp_wifi subnet 192.168.9.0/24 range 0 stop '192.168.9.200'
+#
+set protocols static table 200 route 0.0.0.0/0 next-hop <英国GRE-IP>
+set policy local-route rule 200 set table '200'
+set policy local-route rule 200 source '192.168.8.202'
 ################
 IP/环境监测
     IP当地
-    AS号当地
-    ISP > Business > hosting
-    whoer.net 100%
-    污染度 < 50%
-测速：
+    IP类型     ISP > Business > hosting
+    AS号当地   URL: <https://bgp.he.net>
+    whoer.net 100%  URL: <https://whoer.net>
+    污染度     < 50% URL: <https://scamalytics.com>
+测试：
+    大包测试
+        openvpn     CMD: sudo ping x.x.x.x -s 1500
+        tunnel      CMD: sudo ping x.x.x.x -s 1500
+        pc          CMD: ping www.yahoo.com -l 1500
     网站测速
+        speedtest   URL: <https://www.speedtest.net>
+        Fast        URL: <https://fast.com>
+        ATT         URL: <https://www.att.com/support/speedtest>
+        泰国         URL: <https://speedtest.adslthailand.com>
     谷歌云盘上传下载测速
 `;
   let filename = `${lineid}-Fast-SD-WAN-FastIP-GREOverOpenVPN-Config-${time.ez}-By-${user}`;
