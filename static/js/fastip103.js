@@ -274,6 +274,12 @@ delete system host-name
 delete epoch controller
 sudo systemctl stop epoch-openvpnd
 rm /config/.initagentd.status
+delete interfaces ethernet eth0 address
+delete interfaces ethernet eth1 address
+delete interfaces ethernet eth2 address
+delete interfaces ethernet eth3 address
+delete interfaces ethernet eth4 address
+delete interfaces ethernet eth5 address
 delete interface openvpn
 delete interface tunnel
 delete interface loopback lo
@@ -419,9 +425,7 @@ set nat source rule 2003 source address 192.168.0.0/16
 set nat source rule 2003 outbound-interface ${pe2if}
 set nat source rule 2003 translation address ${oversea1ip1}
 echo '>>>Table default 海外，DHCP指定海外DNS<<<'
-delete interface eth1 address
-delete interface eth2 address
-set interfaces bridge br2 description lan
+set interfaces bridge br2 description LAN-Bridge-ETH1-5
 set interfaces bridge br2 address 192.168.8.1/24
 set interfaces bridge br2 member interface eth1
 set interfaces bridge br2 member interface eth2
