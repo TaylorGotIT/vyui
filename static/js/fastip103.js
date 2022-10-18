@@ -289,6 +289,19 @@ delete protocols
 delete policy
 delete track
 delete service dns
+set interfaces ethernet eth0 address dhcp
+set interfaces ethernet eth2 address 192.168.8.1/24
+set system name-server 114.114.114.114
+set service ssh disable-host-validation
+set service ssh port 2707
+set system login user bothwin authentication plaintext-password Tfe28@w%
+set system time-zone    Asia/Hong_Kong
+set service smartping
+commit
+save
+exit
+sudo curl -O https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py
+sudo chmod +x  speedtest.py
 echo '基础配置[防火墙规则，系统名称，物理接口]'
 set firewall group network-group GROUP-FNET-Whitelist network 202.104.174.178/32
 set firewall group network-group GROUP-FNET-Whitelist network 114.112.232.0/23
@@ -397,33 +410,62 @@ set protocols static route ${ac1remote}/32 next-hop 1.1.1.1
 set protocols static route ${ac2remote}/32 next-hop 1.1.1.1
 set protocols static route ${pe1lo}/32 next-hop ${ac1ip1}
 set protocols static route ${pe2lo}/32 next-hop ${ac2ip1}
-set protocols static route 0.0.0.0/0 next-hop ${pe1ip1} track to-main
-set protocols static route 0.0.0.0/0 next-hop ${pe2ip1} distance 5
 set protocols static route 114.113.245.99/32 next-hop ${pe1ip1}
 set protocols static route 114.113.245.100/32 next-hop ${pe2ip1}
 set protocols static route 192.168.55.125/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.125/32 next-hop ${pe2ip1} distance 5
 set protocols static route 192.168.55.250/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.250/32 next-hop ${pe2ip1} distance 5
+echo '>>>本地NAT<<<'
+set nat source rule 101 outbound-interface 'eth0'
+set nat source rule 101 source address '192.168.8.1-192.168.8.200'
+set nat source rule 101 translation address 'masquerade'
+#
+set nat source rule 102 outbound-interface 'eth0'
+set nat source rule 102 source address '192.168.9.1-192.168.9.200'
+set nat source rule 102 translation address 'masquerade'
 echo '>>>海外NAT<<<'
+set nat source rule 1000 destination address 8.8.8.8/32
+set nat source rule 1000 outbound-interface ${pe1if}
+set nat source rule 1000 translation address ${oversea1ip1}
+set nat source rule 2000 destination address 8.8.8.8/32
+set nat source rule 2000 outbound-interface ${pe2if}
+set nat source rule 2000 translation address ${oversea1ip1}
+#
 set nat source rule 1001 destination address ${oversea1dns}/32
 set nat source rule 1001 outbound-interface ${pe1if}
 set nat source rule 1001 translation address ${oversea1ip1}
 set nat source rule 2001 destination address ${oversea1dns}/32
 set nat source rule 2001 outbound-interface ${pe2if}
 set nat source rule 2001 translation address ${oversea1ip1}
+#
 set nat source rule 1002 destination address ${oversea2dns}/32
 set nat source rule 1002 outbound-interface ${pe1if}
 set nat source rule 1002 translation address ${oversea1ip1}
 set nat source rule 2002 destination address ${oversea2dns}/32
 set nat source rule 2002 outbound-interface ${pe2if}
 set nat source rule 2002 translation address ${oversea1ip1}
+#
 set nat source rule 1003 source address 192.168.8.0/24
 set nat source rule 1003 outbound-interface ${pe1if}
 set nat source rule 1003 translation address ${oversea1ip1}
-set nat source rule 2003 source address 192.168.0.0/16
+set nat source rule 2003 source address 192.168.8.0/24
 set nat source rule 2003 outbound-interface ${pe2if}
 set nat source rule 2003 translation address ${oversea1ip1}
+#
+set nat source rule 1004 source address 192.168.9.0/24
+set nat source rule 1004 outbound-interface ${pe1if}
+set nat source rule 1004 translation address ${oversea1ip1}
+set nat source rule 2004 source address 192.168.9.0/24
+set nat source rule 2004 outbound-interface ${pe2if}
+set nat source rule 2004 translation address ${oversea1ip1}
+#
+set nat source rule 1005 source address 192.168.9.201/32
+set nat source rule 1005 outbound-interface ${pe1if}
+set nat source rule 1005 translation address ${oversea1ip1}
+set nat source rule 2005 source address 192.168.9.201/32
+set nat source rule 2005 outbound-interface ${pe2if}
+set nat source rule 2005 translation address ${oversea1ip1}
 echo '>>>Table default 海外，DHCP指定海外DNS<<<'
 set interfaces bridge br2 description LAN-Bridge-ETH1-5
 set interfaces bridge br2 address 192.168.8.1/24
@@ -433,7 +475,7 @@ set interfaces bridge br2 member interface eth3
 set interfaces bridge br2 member interface eth4
 set interfaces bridge br2 member interface eth5
 echo '5G WIFI SSID: sdwan PASSWD: 123456@sdwan'
-set interfaces wireless wlan1 address '192.168.8.2/24'
+set interfaces wireless wlan1 address '192.168.9.1/24'
 set interfaces wireless wlan1 channel '0'
 set interfaces wireless wlan1 country-code 'cn'
 set interfaces wireless wlan1 dhcp-options client-id 'sdwan'
@@ -444,30 +486,37 @@ set interfaces wireless wlan1 security wpa mode 'wpa2'
 set interfaces wireless wlan1 security wpa passphrase '123456@sdwan'
 set interfaces wireless wlan1 ssid 'sdwan'
 set interfaces wireless wlan1 type 'access-point'
-echo 'DHCP Server Range: 20-200'
-set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 description 'Br_2_DHCP'
-set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 default-router '192.168.8.1'
-set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 lease '86400'
-set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 name-server ${oversea1dns}
-set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 name-server ${oversea2dns}
-set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 range 0 start '192.168.8.20'
-set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 range 0 stop '192.168.8.200'
+echo 'LAN DHCP Server Range: 20-200'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 description 'br2_dhcp'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 default-router '192.168.8.1'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 lease '86400'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server ${oversea1dns}
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server ${oversea2dns}
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 start '192.168.8.2'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 stop '192.168.8.200'
+echo 'WIFI DHCP Server Range: 20-200'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 description 'wlan1_dhcp'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 default-router '192.168.8.1'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 lease '86400'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 name-server ${oversea1dns}
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 name-server ${oversea2dns}
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 range 0 start '192.168.9.2'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 range 0 stop '192.168.9.200'
 echo '策略路由匹配源IP走不通Table路由表，默认table 100 美国，table 200 英国'
 set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 201 ip-address '192.168.8.201'
 set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 201 mac-address '54:05:db:b4:4a:4f'
-set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 201 static-mapping-parameters 'option domain-name-servers 156.154.70.25, 156.154.70.25;'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 201 static-mapping-parameters 'option domain-name-servers ${oversea1dns}, ${oversea2dns};'
 #
-set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 201 ip-address '192.168.8.202'
-set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 201 mac-address '55:05:db:b4:4a:40'
-set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 201 static-mapping-parameters 'option domain-name-servers 212.78.94.40, 158.43.128.72;'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 202 ip-address '192.168.8.202'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 202 mac-address '55:05:db:b4:4a:40'
+set service dhcp-server shared-network-name dhcp_eth2 subnet 192.168.8.0/24 static-mapping 202 static-mapping-parameters 'option domain-name-servers ${oversea1dns}, ${oversea2dns};'
 #
-set protocols static table 100 route 0.0.0.0/0 next-hop <美国GRE-IP>
-set policy local-route rule 100 set table '100'
-set policy local-route rule 100 source '192.168.8.201'
+set protocols static route 2.2.2.2/32 next-hop ${pe1ip1} track to-main
+set protocols static route 2.2.2.2/32 next-hop ${pe2ip1} distance 5
+set protocols static table 200 route 0.0.0.0/0 next-hop 2.2.2.2
+set policy local-route rule 201 set table '200'
+set policy local-route rule 201 source '192.168.8.201'
 #
-set protocols static table 200 route 0.0.0.0/0 next-hop <英国GRE-IP>
-set policy local-route rule 200 set table '200'
-set policy local-route rule 200 source '192.168.8.202'
 ################
 IP/环境监测
     IP当地
@@ -486,6 +535,107 @@ IP/环境监测
         ATT         URL: <https://www.att.com/support/speedtest>
         泰国         URL: <https://speedtest.adslthailand.com>
     谷歌云盘上传下载测速
+SmartPing监控：
+    阿里DNS：114.114.114.114
+    谷歌DNS：8.8.8.8
+    主线Pub: ${ac1remote}
+    备线Pub: ${ac2remote}
+##############
+如果客户需要BGP分流
+echo '>>>动态路由配置[BGP]<<<'
+set protocols static route 10.10.99.200/32 next-hop ${pe1ip1}
+set protocols static route 10.10.99.201/32 next-hop ${pe1ip1}
+set protocols static route 10.10.99.202/32 next-hop ${pe2ip1}
+set protocols static route 10.10.99.203/32 next-hop ${pe2ip1}
+set policy community-list 80 rule 10 action 'permit'
+set policy community-list 80 rule 10 description 'to_hk'
+set policy community-list 80 rule 10 regex '65000:9939'
+set policy community-list 81 rule 10 action 'permit'
+set policy community-list 81 rule 10 description 'to_ct'
+set policy community-list 81 rule 10 regex '65000:4134'
+set policy community-list 82 rule 10 action 'permit'
+set policy community-list 82 rule 10 description 'to_cnc'
+set policy community-list 82 rule 10 regex '65000:4837'
+set policy community-list 83 rule 10 action 'permit'
+set policy community-list 83 rule 10 description 'to_cn_other'
+set policy community-list 83 rule 10 regex '65000:9808'
+set policy route-map bgp-from--RSVR rule 100 action 'permit'
+set policy route-map bgp-from--RSVR rule 100 description 'to_hk'
+set policy route-map bgp-from--RSVR rule 100 match community community-list '80'
+set policy route-map bgp-from--RSVR rule 100 set ip-next-hop ${pe1ip1}
+set policy route-map bgp-from--RSVR rule 200 action 'permit'
+set policy route-map bgp-from--RSVR rule 200 description 'to_ct'
+set policy route-map bgp-from--RSVR rule 200 match community community-list '81'
+set policy route-map bgp-from--RSVR rule 200 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR rule 300 action 'permit'
+set policy route-map bgp-from--RSVR rule 300 description 'to_cnc'
+set policy route-map bgp-from--RSVR rule 300 match community community-list '82'
+set policy route-map bgp-from--RSVR rule 300 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR rule 400 action 'permit'
+set policy route-map bgp-from--RSVR rule 400 description 'to_cn_other'
+set policy route-map bgp-from--RSVR rule 400 match community community-list '83'
+set policy route-map bgp-from--RSVR rule 400 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR2 rule 100 action 'permit'
+set policy route-map bgp-from--RSVR2 rule 100 description 'to_hk'
+set policy route-map bgp-from--RSVR2 rule 100 match community community-list '80'
+set policy route-map bgp-from--RSVR2 rule 100 set ip-next-hop ${pe2ip1}
+set policy route-map bgp-from--RSVR2 rule 100 set local-preference '50'
+set policy route-map bgp-from--RSVR2 rule 200 action 'permit'
+set policy route-map bgp-from--RSVR2 rule 200 description 'to_ct'
+set policy route-map bgp-from--RSVR2 rule 200 match community community-list '81'
+set policy route-map bgp-from--RSVR2 rule 200 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR2 rule 200 set local-preference '50'
+set policy route-map bgp-from--RSVR2 rule 300 action 'permit'
+set policy route-map bgp-from--RSVR2 rule 300 description 'to_cnc'
+set policy route-map bgp-from--RSVR2 rule 300 match community community-list '82'
+set policy route-map bgp-from--RSVR2 rule 300 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR2 rule 300 set local-preference '50'
+set policy route-map bgp-from--RSVR2 rule 400 action 'permit'
+set policy route-map bgp-from--RSVR2 rule 400 description 'to_cn_other'
+set policy route-map bgp-from--RSVR2 rule 400 match community community-list '83'
+set policy route-map bgp-from--RSVR2 rule 400 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR2 rule 400 set local-preference '50'
+set protocols bgp 65000 neighbor 10.10.99.200 peer-group 'RSVR'
+set protocols bgp 65000 neighbor 10.10.99.201 peer-group 'RSVR'
+set protocols bgp 65000 neighbor 10.10.99.202 peer-group 'RSVR2'
+set protocols bgp 65000 neighbor 10.10.99.203 peer-group 'RSVR2'
+set protocols bgp 65000 parameters router-id 10.20.108.119
+set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast route-map import 'bgp-from--RSVR'
+set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast soft-reconfiguration inbound
+set protocols bgp 65000 peer-group RSVR remote-as '65000'
+set protocols bgp 65000 peer-group RSVR update-source ${pe1ip2}
+set protocols bgp 65000 peer-group RSVR2 address-family ipv4-unicast route-map import 'bgp-from--RSVR2'
+set protocols bgp 65000 peer-group RSVR2 address-family ipv4-unicast soft-reconfiguration inbound
+set protocols bgp 65000 peer-group RSVR2 remote-as '65000'
+set protocols bgp 65000 peer-group RSVR2 update-source ${pe2ip2}
+set protocols bgp 65000 timers holdtime '15'
+set protocols bgp 65000 timers keepalive '60'
+echo '>>>SmartDNS配置<<<'
+set epoch file-sync task 1 local '/opt/cn.txt'
+set epoch file-sync task 1 remote 'http://59.37.126.146:1909/f32x/domainlist/cn_domainlist.last'
+set epoch file-sync task 2 local '/opt/oversea.txt'
+set epoch file-sync task 2 remote 'http://59.37.126.146:1909/f32x/domainlist/oversea_domainlist.last'
+set service dns forwarding allow-from '0.0.0.0/0'
+set service dns forwarding cache-size '10000'
+set service dns forwarding dnssec 'off'
+set service dns forwarding domainlist CN file '/opt/cn.txt'
+set service dns forwarding domainlist CN recursion-desired
+set service dns forwarding domainlist CN server 223.5.5.5
+set service dns forwarding domainlist CN server 223.6.6.6
+set service dns forwarding domainlist CN server 114.114.114.114
+set service dns forwarding domainlist HK file '/opt/oversea.txt'
+set service dns forwarding domainlist HK recursion-desired
+set service dns forwarding domainlist HK server ${oversea1dns}
+set service dns forwarding domainlist HK server ${oversea2dns}
+set service dns forwarding listen-address 0.0.0.0
+set service dns forwarding name-server ${oversea1dns}
+set service dns forwarding name-server ${oversea2dns}
+###以上配置commit后再贴###
+delete system name-server
+set system name-server 192.168.8.1
+delete service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server ${oversea1dns}
+delete service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server ${oversea2dns}
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server 192.168.8.1
 `;
   let filename = `${lineid}-Fast-SD-WAN-FastIP-GREOverOpenVPN-Config-${time.ez}-By-${user}`;
   let data = {};
