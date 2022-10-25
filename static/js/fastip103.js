@@ -294,7 +294,7 @@ set interfaces ethernet eth2 address 192.168.8.1/24
 set system name-server 114.114.114.114
 set service ssh disable-host-validation
 set service ssh port 2707
-set system login user bothwin authentication plaintext-password Tfe28@w%
+set system login user bothwin authentication encrypted-password '$6$v.wWSn9tGGGWzElK$qrB79AFWdg4lCtrbVNjea6Gs.oMGeQ8now53XO/h8V8DZ5yiqzv33h0rSMw8wWKTZXRFf6O8uRRCcPaIHsaiq0'
 set system time-zone    Asia/Hong_Kong
 set service smartping
 commit
