@@ -1,4 +1,4 @@
-/* FastIP 假组网 海外VPS GreOverOpenVPN */
+/* FastIP Tiktok 假组网 GreOverIPsec @Huawei */
 const fastip201html = `<table border="1">
 <tr>
 <td>LineID</td>
