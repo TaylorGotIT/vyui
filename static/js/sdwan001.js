@@ -80,7 +80,7 @@ const sdwan001html = `<table border="1">
 `;
 
 function sdwan001getList() {
-    let str = $("#config_textarea").val();
+    let str = $("#config_textarea").val().replaceAll(' ','').replaceAll('：',':').replaceAll(';','');;
     let lines = str.split(/\r?\n/);
     let id_html ="";
     let pe_html ="";
@@ -127,10 +127,10 @@ function sdwan001getList() {
                 case 'wanip':
                     info_json.ip.push(l1);
                     break;
-                case 'pe 对接':
+                case 'pe对接':
                     info_json.pelo.push(l1);
                     break;
-                case 'ce 对接':
+                case 'ce对接':
                     info_json.celo.push(l1);
                     break;
                 case '拨号ip':

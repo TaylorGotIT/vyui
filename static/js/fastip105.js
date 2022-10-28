@@ -21,7 +21,6 @@ const fastip103html = `<table border="1">
 <option value="static">WAN Type[ Static ]</option>
 <option value="pppoe">WAN Type[ PPPoE ]</option></select></td></tr>
 <tr>
-<tr id="wan1_input_tr"></tr>
 <td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]"></td>
 <td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]"></td>
 </tr>
@@ -290,8 +289,6 @@ delete protocols
 delete policy
 delete track
 delete service dns
-delete service dhcp-server
-delete system name-server
 set interfaces ethernet eth0 address dhcp
 echo '>>>Table default 海外，DHCP指定海外DNS<<<'
 set interfaces bridge br2 description LAN-Bridge-ETH1-5
@@ -312,7 +309,6 @@ save
 exit
 sudo curl -O https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py
 sudo chmod +x  speedtest.py
-conf
 echo '基础配置[防火墙规则，系统名称，物理接口]'
 set firewall group network-group GROUP-FNET-Whitelist network 202.104.174.178/32
 set firewall group network-group GROUP-FNET-Whitelist network 114.112.232.0/23
@@ -431,8 +427,6 @@ set protocols static route 192.168.55.125/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.125/32 next-hop ${pe2ip1} distance 5
 set protocols static route 192.168.55.250/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.250/32 next-hop ${pe2ip1} distance 5
-set protocols static route 0.0.0.0/0 next-hop ${pe1ip1} track to-main
-set protocols static route 0.0.0.0/0 next-hop ${pe2ip1} distance 5
 echo '5G WIFI SSID: sdwan PASSWD: 123456@sdwan'
 set interfaces wireless wlan1 address '192.168.9.1/24'
 set interfaces wireless wlan1 channel '0'
@@ -446,7 +440,7 @@ set interfaces wireless wlan1 security wpa passphrase '123456@sdwan'
 set interfaces wireless wlan1 ssid 'sdwan'
 set interfaces wireless wlan1 type 'access-point'
 echo 'LAN DHCP Server Range: 2-200'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 description 'dhcp_br2'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 description 'br2_dhcp'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 default-router '192.168.8.1'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 lease '86400'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server ${oversea1dns}
@@ -454,7 +448,7 @@ set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 start '192.168.8.2'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 stop '192.168.8.200'
 echo 'WIFI DHCP Server Range: 2-200'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 description 'dhcp_wlan1'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 description 'wlan1_dhcp'
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 default-router '192.168.9.1'
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 lease '86400'
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 name-server ${oversea1dns}
@@ -469,6 +463,18 @@ echo '192.168.9.202  55:05:db:b4:4a:40 dhcp_br2  iPhone'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 202 ip-address '192.168.8.202'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 202 mac-address '55:05:db:b4:4a:40'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 202 static-mapping-parameters 'option domain-name-servers ${oversea1dns}, ${oversea2dns};'
+echo '策略路由匹配源IP走不通Table路由表，table 100 美国'
+set protocols static route 2.2.2.1/32 next-hop ${pe1ip1} track to-main
+set protocols static route 2.2.2.1/32 next-hop ${pe2ip1} distance 5
+set protocols static table 100 route 0.0.0.0/0 next-hop 2.2.2.1
+set policy local-route rule 101 set table '100'
+set policy local-route rule 101 source '192.168.9.101'
+echo '策略路由匹配源IP走不通Table路由表，table 200 英国'
+set protocols static route 2.2.2.2/32 next-hop ${pe1ip1} track to-main
+set protocols static route 2.2.2.2/32 next-hop ${pe2ip1} distance 5
+set protocols static table 200 route 0.0.0.0/0 next-hop 2.2.2.2
+set policy local-route rule 201 set table '200'
+set policy local-route rule 201 source '192.168.9.201'
 #
 echo '>>>本地NAT<<<'
 set nat source rule 100 outbound-interface 'eth0'
