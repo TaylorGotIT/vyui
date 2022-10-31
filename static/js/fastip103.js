@@ -4,7 +4,7 @@ const fastip103html = `<table border="1">
 <option value="40" selected="selected">FnetOS[ 4.0 ]</option>
 <option value="32">FnetOS[ 3.2 ]</option>
 <option value="31">FnetOS[ 3.1 ]</option></select></td>
-<td><input id="lineid_input" placeholder="Area[GZ,SZ,SH,etc...]"></td></tr>
+<td><input id="lineid_input" placeholder="线路ID"></td></tr>
 <tr><td><input id="cname_input" placeholder="CompanyName[eg:Huawei]"></td>
 <td><input id="area_input" placeholder="Area[GZ,SZ,SH,etc...]"></td></tr>
 <tr><td><select id="wan1_select">
@@ -13,9 +13,9 @@ const fastip103html = `<table border="1">
 <option value="br0">WAN1-BR0</option>
 <option value="br1">WAN1-BR1</option></select>
 <select id="wan1_provider_select">
-<option value="CT" selected="selected">电信[CT]</option>
-<option value="CU">联通[CU]</option>
-<option value="CM">移动[CM]</option></select></td>
+<option value="CT" selected="selected">电信</option>
+<option value="CU">联通</option>
+<option value="CM">移动</option></select></td>
 <td><select id="wan1_type_select" onchange=fastip103setWan(this.value)>
 <option value="dhcp" selected="selected">WAN Type[ DHCP ]</option>
 <option value="static">WAN Type[ Static ]</option>
@@ -26,44 +26,44 @@ const fastip103html = `<table border="1">
 <td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]"></td>
 </tr>
 <tr>
-<td><input id="pe1_input"></td>
-<td><input id="pe2_input"></td>
+<td><input id="pe1_input" placeholder="PE1[eg:gzd-upe1]"></td>
+<td><input id="pe2_input" placeholder="PE2[eg:szd-upe2]"></td>
 </tr>
 <tr>
-<td><input id="pe1_if_input"></td>
-<td><input id="pe2_if_input"></td>
+<td><input id="pe1_if_input" placeholder="PE1IF[eg:Tunnel0/0/1]"></td>
+<td><input id="pe2_if_input" placeholder="PE2IF[eg:Tunnel0/0/2]"></td>
 </tr>
 <tr>
-<td><input id="pe1_ip_input"></td>
-<td><input id="pe2_ip_input"></td>
+<td><input id="pe1_ip_input" placeholder="PE1IP[eg:10.x.x.x/30]"></td>
+<td><input id="pe2_ip_input" placeholder="PE2IP[eg:10.x.x.x/30]"></td>
 </tr>
 <tr>
-<td><input id="pe1_lo_input"></td>
-<td><input id="pe2_lo_input"></td>
+<td><input id="pe1_lo_input" placeholder="PE1LO[eg:10.x.x.x/32]"></td>
+<td><input id="pe2_lo_input" placeholder="PE2LO[eg:10.x.x.x/32]"></td>
 </tr>
 <tr>
-<td><input id="ce1_lo_input"></td>
-<td><input id="ce2_lo_input"></td>
+<td><input id="ce1_lo_input" placeholder="CE1LO[eg:10.x.x.x/32]"></td>
+<td><input id="ce2_lo_input" placeholder="CE2LO[eg:10.x.x.x/32]"></td>
 </tr>
 <tr>
-<td><input id="pe1_oversea_input"></td>
-<td><input id="pe2_oversea_input"></td>
+<td><input id="pe1_oversea_input" placeholder="海外IP[eg:10.x.x.x-x.x.x.x]"></td>
+<td><input id="pe2_oversea_input" placeholder="海外IP[eg:10.x.x.x-x.x.x.x]"></td>
 </tr>
 <tr>
-<td><input id="ac1_input"></td>
-<td><input id="ac2_input"></td>
+<td><input id="ac1_input" placeholder="AC1[eg:gzd-acvpnpe1]"></td>
+<td><input id="ac2_input" placeholder="AC2[eg:szd-acvpnpe1]"></td>
 </tr>
 <tr>
-<td><input id="ac1_if_input"></td>
-<td><input id="ac2_if_input"></td>
+<td><input id="ac1_if_input" placeholder="AC1IF[eg:vtun1000]"></td>
+<td><input id="ac2_if_input" placeholder="AC2IF[eg:vtun2000]"></td>
 </tr>
 <tr>
-<td><input id="ac1_ip_input"></td>
-<td><input id="ac2_ip_input"></td>
+<td><input id="ac1_ip_input" placeholder="AC1IP[eg:10.x.x.x/30]"></td>
+<td><input id="ac2_ip_input" placeholder="AC2IP[eg:10.x.x.x/30]"></td>
 </tr>
 <tr>
-<td><input id="ac1_pub_input"></td>
-<td><input id="ac2_pub_input"></td>
+<td><input id="ac1_pub_input" placeholder="AC1Pub[eg:x.x.x.x]"></td>
+<td><input id="ac2_pub_input" placeholder="AC2Pub[eg:x.x.x.x]"></td>
 </tr>
 </table>
 <button type="button" onclick="fastip103sub('/config')">提交配置信息(Submit Config Info)</button>
@@ -287,7 +287,7 @@ delete interface loopback lo
 delete firewall options interface
 delete nat
 delete protocols
-delete policy
+delete policyikkklggjkk'\['''''
 delete track
 delete smokeping
 delete traffic-policy
@@ -296,16 +296,17 @@ delete service dhcp-server
 delete system name-server
 delete system flow-accounting
 set interfaces ethernet eth0 address dhcp
+commit
+exit
+###接网线下载镜像!!!
 echo '>>>升级到最新镜像<<<'
 curl http://202.104.174.189:18080/epochos/ | \
 grep vyos-epoch | \
 awk -F '"' '{print "http://192.168.75.15/epochos/"$2}' | \
 sed -n '$p' > img_list
 while read -r url; do wget "$url" done < img_list
-#
-echo '>>>等待下载完成后升级系统<<<'
+####等待下载完成后升级系统!!!
 while read -r img; do add system image "$img"; done < img_list
-#
 echo '>>>Table default 海外，DHCP指定海外DNS<<<'
 set interfaces bridge br2 description LAN-Bridge-ETH1-5
 set interfaces bridge br2 address 192.168.8.1/24
