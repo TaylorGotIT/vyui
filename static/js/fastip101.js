@@ -1,13 +1,21 @@
 /* FastIP 假组网 双运营商 */
 const fastip101html = `<table border="1">
-<tr><td><select id="version_select">
+<tr>
+<td>LineID</td>
+<td><input id="lineid_td" placeholder="CompanyName[eg:Huawei]"></td>
+<td><select id="version_select">
 <option value="40" selected="selected">FnetOS[ 4.0 ]</option>
 <option value="32">FnetOS[ 3.2 ]</option>
 <option value="31">FnetOS[ 3.1 ]</option></select></td>
-<td id="lineid_td"></td></tr>
-<tr><td><input id="cname_input" placeholder="CompanyName[eg:Huawei]"></td>
-<td><input id="area_input" placeholder="Area[GZ,SZ,SH,etc...]"></td></tr>
-<tr><td><select id="wan1_select">
+</tr>
+<tr>
+<td>Company</td>
+<td><input id="cname_input" placeholder="CompanyName[eg:Huawei]"></td>
+<td><input id="area_input" placeholder="Area[GZ,SZ,SH,etc...]"></td>
+</tr>
+<tr>
+<td>WAN</td>
+<td><select id="wan1_select">
 <option value="eth0" selected="selected">WAN1-ETH0</option>
 <option value="eth1">WAN1-ETH1</option>
 <option value="br0">WAN1-BR0</option>
@@ -20,28 +28,78 @@ const fastip101html = `<table border="1">
 <option value="dhcp" selected="selected">WAN Type[ DHCP ]</option>
 <option value="static">WAN Type[ Static ]</option>
 <option value="pppoe">WAN Type[ PPPoE ]</option></select></td></tr>
-<tr id="wan1_input_tr"></tr>
-<tr><td><select id="wifi1_select">
-<option value=1 selected="selected">WIFI1-Enable</option>
-<option value=0 >WIFI1-Disable</option></select></td></tr>
-<tr><td><input id="local1_dns_input" placeholder="本地DNS1[eg:223.5.5.5]"></td>
-<td><input id="local2_dns_input" placeholder="本地DNS2[eg:223.6.6.6]"></td></tr>
-<tr><td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]"></td>
-<td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]"></td></tr>
-<tr><td><input id="bgp_server1_input" value="10.10.99.200"></td>
-<td><input id="bgp_server2_input" value="10.10.99.202"></td></tr>
-<tr><td><input id="bgp_server3_input" value="10.10.99.201"></td>
-<td><input id="bgp_server4_input" value="10.10.99.203"></td></tr>
-<tr><td id="pe1_td"></td><td id="pe2_td"></td></tr>
-<tr><td id="pe1_if_td"></td><td id="pe2_if_td"></td></tr>
-<tr><td id="pe1_ip_td"></td><td id="pe2_ip_td"></td></tr>
-<tr><td id="pe1_lo_td"></td><td id="pe2_lo_td"></td></tr>
-<tr><td id="ce1_lo_td"></td><td id="ce2_lo_td"></td></tr>
-<tr><td id="pe1_oversea_td"></td><td id="pe2_oversea_td"></td></tr>
-<tr><td id="ac1_td"></td><td id="ac2_td"></td></tr>
-<tr><td id="ac1_if_td"></td><td id="ac2_if_td"></td></tr>
-<tr><td id="ac1_ip_td"></td><td id="ac2_ip_td"></td></tr>
-<tr><td id="ac1_pub_td"></td><td id="ac2_pub_td"></td></tr>
+<tr id="wan1_input_tr">
+</tr>
+<tr>
+<td>LocalDNS</td>
+<td><input id="local1_dns_input" placeholder="本地DNS1[eg:223.5.5.5]"></td>
+<td><input id="local2_dns_input" placeholder="本地DNS2[eg:223.6.6.6]"></td>
+</tr>
+<tr>
+<td>OverseaDNS</td>
+<td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]"></td>
+<td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]"></td>
+</tr>
+<tr>
+<td>BGPServerA</td>
+<td><input id="bgp_server1_input" value="10.10.99.200"></td>
+<td><input id="bgp_server2_input" value="10.10.99.202"></td>
+</tr>
+<tr>
+<td>BGPServerB</td>
+<td><input id="bgp_server3_input" value="10.10.99.201"></td>
+<td><input id="bgp_server4_input" value="10.10.99.203"></td>
+</tr>
+<tr>
+<td>PE</td>
+<td id="pe1_td"></td>
+<td id="pe2_td"></td>
+</tr>
+<tr>
+<td>PE IF</td>
+<td id="pe1_if_td"></td>
+<td id="pe2_if_td"></td>
+</tr>
+<tr>
+<td>PE IP</td>
+<td id="pe1_ip_td"></td>
+<td id="pe2_ip_td"></td>
+</tr>
+<tr>
+<td>PE LO</td>
+<td id="pe1_lo_td"></td>
+<td id="pe2_lo_td"></td>
+</tr>
+<tr>
+<td>CE LO</td>
+<td id="ce1_lo_td"></td>
+<td id="ce2_lo_td"></td>
+</tr>
+<tr>
+<td>OverseaIP</td>
+<td id="pe1_oversea_td"></td>
+<td id="pe2_oversea_td"></td>
+</tr>
+<tr>
+<td>AC</td>
+<td id="ac1_td"></td>
+<td id="ac2_td"></td>
+</tr>
+<tr>
+<td>AC IF</td>
+<td id="ac1_if_td"></td>
+<td id="ac2_if_td"></td>
+</tr>
+<tr>
+<td>AC IP</td>
+<td id="ac1_ip_td"></td>
+<td id="ac2_ip_td"></td>
+</tr>
+<tr>
+<td>AC Pub</td>
+<td id="ac1_pub_td"></td>
+<td id="ac2_pub_td"></td>
+</tr>
 </table>
 <button type="button" onclick="fastip101sub('/config')">提交配置信息(Submit Config Info)</button>
 `;
@@ -103,18 +161,26 @@ function fastip101getList() {
                     info_json.as.push(l1);
                     break;
                 default:
-                    console.log(l1)
-                    if(l1.search('.')!=-1){
-                        info_json.oversea.push(l1);
+                    let b = l1.replaceAll('-',',').replaceAll('_',',').split(',');
+                    if(ipv4_regex.test(b[0])){
+                        let ip_str = "";
+                        for(let i = 0; i < b.length/2; i++){
+                            if(i==b.length/2-1){
+                                ip_str += `${b[i*2+1]}-${b[i*2]};`;
+                            }else{
+                                ip_str += `${b[i*2+1]}-${b[i*2]},`;
+                            };
+                        };
+                        console.log(ip_str);
+                        info_json.oversea.push(ip_str);
                     }else{
                         info_json.other.push(l1);
-                    }
-
+                    };
             };
         }
     };
     console.log(info_json);
-    $("#lineid_td").append(info_json.id[0].substr(0,7));
+    $("#lineid_td").val(info_json.id[0].substr(0,7));
     $("#pe1_td").append(info_json.pe[0]);
     $("#pe1_if_td").append(info_json.if[0]);
     $("#pe1_ip_td").append(info_json.ip[0]);
@@ -173,7 +239,7 @@ function fastip101sub(url){
   let wan1Provider = $("#wan1_provider_select").val();
 
   let version = $("#version_select").val();
-  let lineid = $("#lineid_td").html();
+  let lineid = $("#lineid_td").val();
   let cname = $("#cname_input").val();
   let area = $("#area_input").val();
   let local1dns = $("#local1_dns_input").val();

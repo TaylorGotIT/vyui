@@ -125,13 +125,21 @@ function fastip103getList() {
                     info_json.as.push(l1);
                     break;
                 default:
-                    console.log(l1)
-                    if(l1.search('.')!=-1){
-                        info_json.oversea.push(l1);
+                    let b = l1.replaceAll('-',',').replaceAll('_',',').split(',');
+                    if(ipv4_regex.test(b[0])){
+                        let ip_str = "";
+                        for(let i = 0; i < b.length/2; i++){
+                            if(i==b.length/2-1){
+                                ip_str += `${b[i*2+1]}-${b[i*2]};`;
+                            }else{
+                                ip_str += `${b[i*2+1]}-${b[i*2]},`;
+                            };
+                        };
+                        console.log(ip_str);
+                        info_json.oversea.push(ip_str);
                     }else{
                         info_json.other.push(l1);
-                    }
-
+                    };
             };
         }
     };

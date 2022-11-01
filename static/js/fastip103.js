@@ -1,13 +1,19 @@
 /* FastIP 假组网 Tiktok 单运营商 */
 const fastip103html = `<table border="1">
-<tr><td><select id="version_select">
+<tr>
+<td>LineID</td>
+<td><input id="lineid_input" placeholder="线路ID"></td>
+<td><select id="version_select">
 <option value="40" selected="selected">FnetOS[ 4.0 ]</option>
 <option value="32">FnetOS[ 3.2 ]</option>
 <option value="31">FnetOS[ 3.1 ]</option></select></td>
-<td><input id="lineid_input" placeholder="线路ID"></td></tr>
-<tr><td><input id="cname_input" placeholder="CompanyName[eg:Huawei]"></td>
+</tr>
+<tr>
+<td>Company</td>
+<td><input id="cname_input" placeholder="CompanyName[eg:Huawei]"></td>
 <td><input id="area_input" placeholder="Area[GZ,SZ,SH,etc...]"></td></tr>
-<tr><td><select id="wan1_select">
+<tr><td>WAN</td>
+<td><select id="wan1_select">
 <option value="eth0" selected="selected">WAN1-ETH0</option>
 <option value="eth1">WAN1-ETH1</option>
 <option value="br0">WAN1-BR0</option>
@@ -19,49 +25,60 @@ const fastip103html = `<table border="1">
 <td><select id="wan1_type_select" onchange=fastip103setWan(this.value)>
 <option value="dhcp" selected="selected">WAN Type[ DHCP ]</option>
 <option value="static">WAN Type[ Static ]</option>
-<option value="pppoe">WAN Type[ PPPoE ]</option></select></td></tr>
-<tr>
+<option value="pppoe">WAN Type[ PPPoE ]</option></select></td>
+</tr>
 <tr id="wan1_input_tr"></tr>
+<td>OverseaDNS</td>
 <td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]"></td>
 <td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]"></td>
 </tr>
 <tr>
+<td>PE</td>
 <td><input id="pe1_input" placeholder="PE1[eg:gzd-upe1]"></td>
 <td><input id="pe2_input" placeholder="PE2[eg:szd-upe2]"></td>
 </tr>
 <tr>
+<td>PE IF</td>
 <td><input id="pe1_if_input" placeholder="PE1IF[eg:Tunnel0/0/1]"></td>
 <td><input id="pe2_if_input" placeholder="PE2IF[eg:Tunnel0/0/2]"></td>
 </tr>
 <tr>
+<td>PE IP</td>
 <td><input id="pe1_ip_input" placeholder="PE1IP[eg:10.x.x.x/30]"></td>
 <td><input id="pe2_ip_input" placeholder="PE2IP[eg:10.x.x.x/30]"></td>
 </tr>
 <tr>
+<td>PE LO</td>
 <td><input id="pe1_lo_input" placeholder="PE1LO[eg:10.x.x.x/32]"></td>
 <td><input id="pe2_lo_input" placeholder="PE2LO[eg:10.x.x.x/32]"></td>
 </tr>
 <tr>
+<td>CE LO</td>
 <td><input id="ce1_lo_input" placeholder="CE1LO[eg:10.x.x.x/32]"></td>
 <td><input id="ce2_lo_input" placeholder="CE2LO[eg:10.x.x.x/32]"></td>
 </tr>
 <tr>
+<td>OverseaIP</td>
 <td><input id="pe1_oversea_input" placeholder="海外IP[eg:10.x.x.x-x.x.x.x]"></td>
 <td><input id="pe2_oversea_input" placeholder="海外IP[eg:10.x.x.x-x.x.x.x]"></td>
 </tr>
 <tr>
+<td>AC</td>
 <td><input id="ac1_input" placeholder="AC1[eg:gzd-acvpnpe1]"></td>
 <td><input id="ac2_input" placeholder="AC2[eg:szd-acvpnpe1]"></td>
 </tr>
 <tr>
+<td>AC IF</td>
 <td><input id="ac1_if_input" placeholder="AC1IF[eg:vtun1000]"></td>
 <td><input id="ac2_if_input" placeholder="AC2IF[eg:vtun2000]"></td>
 </tr>
 <tr>
+<td>AC IP</td>
 <td><input id="ac1_ip_input" placeholder="AC1IP[eg:10.x.x.x/30]"></td>
 <td><input id="ac2_ip_input" placeholder="AC2IP[eg:10.x.x.x/30]"></td>
 </tr>
 <tr>
+<td>AC Pub</td>
 <td><input id="ac1_pub_input" placeholder="AC1Pub[eg:x.x.x.x]"></td>
 <td><input id="ac2_pub_input" placeholder="AC2Pub[eg:x.x.x.x]"></td>
 </tr>
@@ -126,14 +143,22 @@ function fastip103getList() {
                     info_json.as.push(l1);
                     break;
                 default:
-                    console.log(l1)
-                    if(l1.search('.')!=-1){
-                        info_json.oversea.push(l1);
+                    let b = l1.replaceAll('-',',').replaceAll('_',',').split(',');
+                    if(ipv4_regex.test(b[0])){
+                        let ip_str = "";
+                        for(let i = 0; i < b.length/2; i++){
+                            if(i==b.length/2-1){
+                                ip_str += `${b[i*2+1]}-${b[i*2]};`;
+                            }else{
+                                ip_str += `${b[i*2+1]}-${b[i*2]},`;
+                            };
+                        };
+                        console.log(ip_str);
+                        info_json.oversea.push(ip_str);
                     }else{
                         info_json.other.push(l1);
-                    }
-
-            };
+                    };
+            }
         }
     };
     console.log(info_json);
@@ -144,6 +169,7 @@ function fastip103getList() {
     $("#pe1_lo_input").val(info_json.lo[0]);
     $("#ce1_lo_input").val(info_json.lo[1]);
     $("#pe1_oversea_input").val(info_json.oversea[0]);
+
     $("#pe1_as_input").val(info_json.as[1]);
     $("#ac1_input").val(info_json.ac[0]);
     $("#ac1_if_input").val(info_json.if[1]);
@@ -287,7 +313,7 @@ delete interface loopback lo
 delete firewall options interface
 delete nat
 delete protocols
-delete policyikkklggjkk'\['''''
+delete policy
 delete track
 delete smokeping
 delete traffic-policy
