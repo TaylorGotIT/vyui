@@ -102,12 +102,30 @@ function fastip203getList() {
                     info_json.as.push(l1);
                     break;
                 default:
-                    if(l1.search('.')!=-1){
-                        info_json.oversea.push(l1);
+                    let b = l1.replaceAll('-',',').replaceAll('_',',').split(',');
+                    if(ipv4_regex.test(b[0])){
+                        let ip_str = "";
+                        let h = b[0].split('.')[0];
+                        for(let i = 0; i < b.length/2; i++){
+                            if(h!=10&&h!=172&&h!=192){
+                                if(i==b.length/2-1){
+                                    ip_str += `${b[i*2+1]}-${b[i*2]};`;
+                                }else{
+                                    ip_str += `${b[i*2+1]}-${b[i*2]},`;
+                                };
+                            }else{
+                                if(i==b.length/2-1){
+                                    ip_str += `${b[i*2]}-${b[i*2+1]};`;
+                                }else{
+                                    ip_str += `${b[i*2]}-${b[i*2+1]},`;
+                                };
+                            }
+                        };
+                        console.log(ip_str);
+                        info_json.oversea.push(ip_str);
                     }else{
                         info_json.other.push(l1);
-                    }
-
+                    };
             };
         }
     };

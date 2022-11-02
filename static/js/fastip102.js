@@ -108,19 +108,27 @@ function fastip102getList() {
                     let b = l1.replaceAll('-',',').replaceAll('_',',').split(',');
                     if(ipv4_regex.test(b[0])){
                         let ip_str = "";
+                        let h = b[0].split('.')[0];
                         for(let i = 0; i < b.length/2; i++){
-                            if(i==b.length/2-1){
-                                ip_str += `${b[i*2+1]}-${b[i*2]};`;
+                            if(h!=10&&h!=172&&h!=192){
+                                if(i==b.length/2-1){
+                                    ip_str += `${b[i*2+1]}-${b[i*2]};`;
+                                }else{
+                                    ip_str += `${b[i*2+1]}-${b[i*2]},`;
+                                };
                             }else{
-                                ip_str += `${b[i*2+1]}-${b[i*2]},`;
-                            };
+                                if(i==b.length/2-1){
+                                    ip_str += `${b[i*2]}-${b[i*2+1]};`;
+                                }else{
+                                    ip_str += `${b[i*2]}-${b[i*2+1]},`;
+                                };
+                            }
                         };
                         console.log(ip_str);
                         info_json.oversea.push(ip_str);
                     }else{
                         info_json.other.push(l1);
                     };
-
             };
         }
     };
@@ -133,20 +141,19 @@ function fastip102getList() {
     $("#pe1_ip_td").append(info_json.ip[0]);
     $("#pe1_lo_td").append(info_json.lo[0]);
     $("#ce1_lo_td").append(info_json.lo[1]);
-    $("#pe1_oversea_td").append(info_json.oversea[1]);
+    $("#pe1_oversea_td").append(info_json.oversea[0]);
     $("#pe1_as_td").append(info_json.as[1]);
     $("#ac1_td").append(info_json.ac[0]);
     $("#ac1_if_td").append(info_json.if[1]);
     $("#ac1_ip_td").append(info_json.ip[1]);
     $("#ac1_pub_td").append(info_json.pub[0]);
-    $("#ac1_oversea_td").append(info_json.oversea[0]);
 
     $("#pe2_td").append(info_json.pe[1]);
     $("#pe2_if_td").append(info_json.if[2]);
     $("#pe2_ip_td").append(info_json.ip[2]);
     $("#pe2_lo_td").append(info_json.lo[2]);
     $("#ce2_lo_td").append(info_json.lo[3]);
-    $("#pe2_oversea_td").append(info_json.oversea[1]);
+    $("#pe2_oversea_td").append(info_json.oversea[0]);
     $("#pe2_as_td").append(info_json.as[1]);
     $("#ac2_td").append(info_json.ac[1]);
     $("#ac2_if_td").append(info_json.if[3]);
