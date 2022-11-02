@@ -98,12 +98,7 @@ function fastip201getList() {
                     info_json.id.push(l1);
                     break;
                 case 'pe':
-                    if(l1.includes('upe')){
-                        info_json.pe.push(l1);
-                    }else{
-                        info_json.ac.push(l1);
-                    };
-
+                    info_json.pe.push(l1);
                     break;
                 case 'tunnel':
                     info_json.if.push(l1);
@@ -112,7 +107,12 @@ function fastip201getList() {
                     info_json.ip.push(l1);
                     break;
                 case 'pe对接':
-                    info_json.pelo.push(l1);
+                    let a = l1.split('.')[0]
+                    if(a!=10&&a!=172&&a!=192){
+                        info_json.pub.push(l1);
+                    }else{
+                        info_json.pelo.push(l1);
+                    };
                     break;
                 case 'ce对接':
                     info_json.celo.push(l1);
@@ -175,7 +175,7 @@ function fastip201getList() {
     $("#pe2_ip_input").val(info_json.ip[1]);
     $("#pe2_lo_input").val(info_json.pelo[1]);
     $("#ce2_lo_input").val(info_json.celo[1]);
-    $("#pe2_oversea_input").val(info_json.oversea[1]);
+    $("#pe2_oversea_input").val(info_json.oversea[0]);
     $("#pe2_pub_input").val(info_json.pub[1]);
     $("#pe2_psk_input").val(info_json.psk[1]);
   };
