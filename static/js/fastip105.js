@@ -1,74 +1,122 @@
 /* FastIP 假组网 Tiktok 单运营商 */
-const fastip103html = `<table border="1">
-<tr><td><select id="version_select">
+const fastip105html = `<table border="1">
+<tr>
+<td>LineID</td>
+<td><input id="lineid_input" placeholder="线路ID"></td>
+<td><select id="version_select">
 <option value="40" selected="selected">FnetOS[ 4.0 ]</option>
 <option value="32">FnetOS[ 3.2 ]</option>
 <option value="31">FnetOS[ 3.1 ]</option></select></td>
-<td><input id="lineid_input" placeholder="Area[GZ,SZ,SH,etc...]"></td></tr>
-<tr><td><input id="cname_input" placeholder="CompanyName[eg:Huawei]"></td>
+</tr>
+<tr>
+<td>Company</td>
+<td><input id="cname_input" placeholder="CompanyName[eg:Huawei]"></td>
 <td><input id="area_input" placeholder="Area[GZ,SZ,SH,etc...]"></td></tr>
-<tr><td><select id="wan1_select">
+<tr><td>WAN</td>
+<td><select id="wan1_select">
 <option value="eth0" selected="selected">WAN1-ETH0</option>
 <option value="eth1">WAN1-ETH1</option>
 <option value="br0">WAN1-BR0</option>
 <option value="br1">WAN1-BR1</option></select>
 <select id="wan1_provider_select">
-<option value="CT" selected="selected">电信[CT]</option>
-<option value="CU">联通[CU]</option>
-<option value="CM">移动[CM]</option></select></td>
-<td><select id="wan1_type_select" onchange=fastip103setWan(this.value)>
+<option value="CT" selected="selected">电信</option>
+<option value="CU">联通</option>
+<option value="CM">移动</option></select></td>
+<td><select id="wan1_type_select" onchange=fastip105setWan(this.value)>
 <option value="dhcp" selected="selected">WAN Type[ DHCP ]</option>
 <option value="static">WAN Type[ Static ]</option>
-<option value="pppoe">WAN Type[ PPPoE ]</option></select></td></tr>
+<option value="pppoe">WAN Type[ PPPoE ]</option></select></td>
+</tr>
+<tr id="wan1_input_tr"></tr>
 <tr>
+<td>PE</td>
+<td><input id="pe1_input" placeholder="PE1[eg:gzd-upe1]"></td>
+<td><input id="pe2_input" placeholder="PE2[eg:szd-upe2]"></td>
+</tr>
+<tr>
+<td>PE IF</td>
+<td><input id="pe1_if_input" placeholder="PE1IF[eg:Tunnel0/0/1]"></td>
+<td><input id="pe2_if_input" placeholder="PE2IF[eg:Tunnel0/0/2]"></td>
+</tr>
+<tr>
+<td>PE IP</td>
+<td><input id="pe1_ip_input" placeholder="PE1IP[eg:10.x.x.x/30]"></td>
+<td><input id="pe2_ip_input" placeholder="PE2IP[eg:10.x.x.x/30]"></td>
+</tr>
+<tr>
+<td>PE LO</td>
+<td><input id="pe1_lo_input" placeholder="PE1LO[eg:10.x.x.x/32]"></td>
+<td><input id="pe2_lo_input" placeholder="PE2LO[eg:10.x.x.x/32]"></td>
+</tr>
+<tr>
+<td>CE LO</td>
+<td><input id="ce1_lo_input" placeholder="CE1LO[eg:10.x.x.x/32]"></td>
+<td><input id="ce2_lo_input" placeholder="CE2LO[eg:10.x.x.x/32]"></td>
+</tr>
+<tr>
+<td>AC</td>
+<td><input id="ac1_input" placeholder="AC1[eg:gzd-acvpnpe1]"></td>
+<td><input id="ac2_input" placeholder="AC2[eg:szd-acvpnpe1]"></td>
+</tr>
+<tr>
+<td>AC IF</td>
+<td><input id="ac1_if_input" placeholder="AC1IF[eg:vtun1000]"></td>
+<td><input id="ac2_if_input" placeholder="AC2IF[eg:vtun2000]"></td>
+</tr>
+<tr>
+<td>AC IP</td>
+<td><input id="ac1_ip_input" placeholder="AC1IP[eg:10.x.x.x/30]"></td>
+<td><input id="ac2_ip_input" placeholder="AC2IP[eg:10.x.x.x/30]"></td>
+</tr>
+<tr>
+<td>AC Pub</td>
+<td><input id="ac1_pub_input" placeholder="AC1Pub[eg:x.x.x.x]"></td>
+<td><input id="ac2_pub_input" placeholder="AC2Pub[eg:x.x.x.x]"></td>
+</tr>
+<tr>
+<td>NAT PE</td>
+<td><input id="natpe1_input" placeholder="NATPE1[eg:us1-natpe1]"></td>
+<td><input id="natpe2_input" placeholder="NATPE2[eg:uk1-natpe1]"></td>
+</tr>
+<tr>
+<td>NAT PE IF</td>
+<td><input id="natpe1_if_input" placeholder="NATPE1IF[eg:tun1000]"></td>
+<td><input id="natpe2_if_input" placeholder="NATPE2IF[eg:tun2000]"></td>
+</tr>
+<tr>
+<td>NAT PE IP</td>
+<td><input id="natpe1_ip_input" placeholder="NATPE1IP[eg:10.x.x.x/30]"></td>
+<td><input id="natpe2_ip_input" placeholder="NATPE2IP[eg:10.x.x.x/30]"></td>
+</tr>
+<tr>
+<td>NAT PE lo</td>
+<td><input id="natpe1_lo_input" placeholder="NATPE1LO[eg:10.x.x.x/32]"></td>
+<td><input id="natpe2_lo_input" placeholder="NATPE2LO[eg:10.x.x.x/32]"></td>
+</tr>
+<tr>
+<td>NAT CE lo</td>
+<td><input id="natce1_lo_input" placeholder="NATCE1LO[eg:10.x.x.x/32]"></td>
+<td><input id="natce2_lo_input" placeholder="NATCE2LO[eg:10.x.x.x/32]"></td>
+</tr>
+<tr>
+<td>OverseaIP</td>
+<td><input id="natpe1_oversea_input" placeholder="NATPE1Oversea[eg:10.x.x.x-x.x.x.x]"></td>
+<td><input id="natpe2_oversea_input" placeholder="NATPE2Oversea[eg:10.x.x.x-x.x.x.x]"></td>
+</tr>
+<tr>
+<td>OverseaDNS1</td>
 <td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]"></td>
 <td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]"></td>
 </tr>
-<tr>
-<td><input id="pe1_input"></td>
-<td><input id="pe2_input"></td>
-</tr>
-<tr>
-<td><input id="pe1_if_input"></td>
-<td><input id="pe2_if_input"></td>
-</tr>
-<tr>
-<td><input id="pe1_ip_input"></td>
-<td><input id="pe2_ip_input"></td>
-</tr>
-<tr>
-<td><input id="pe1_lo_input"></td>
-<td><input id="pe2_lo_input"></td>
-</tr>
-<tr>
-<td><input id="ce1_lo_input"></td>
-<td><input id="ce2_lo_input"></td>
-</tr>
-<tr>
-<td><input id="pe1_oversea_input"></td>
-<td><input id="pe2_oversea_input"></td>
-</tr>
-<tr>
-<td><input id="ac1_input"></td>
-<td><input id="ac2_input"></td>
-</tr>
-<tr>
-<td><input id="ac1_if_input"></td>
-<td><input id="ac2_if_input"></td>
-</tr>
-<tr>
-<td><input id="ac1_ip_input"></td>
-<td><input id="ac2_ip_input"></td>
-</tr>
-<tr>
-<td><input id="ac1_pub_input"></td>
-<td><input id="ac2_pub_input"></td>
+<td>OverseaDNS2</td>
+<td><input id="oversea3_dns_input" placeholder="海外DNS3[eg:8.8.8.8]"></td>
+<td><input id="oversea4_dns_input" placeholder="海外DNS4[eg:8.8.4.4]"></td>
 </tr>
 </table>
-<button type="button" onclick="fastip103sub('/config')">提交配置信息(Submit Config Info)</button>
+<button type="button" onclick="fastip105sub('/config')">提交配置信息(Submit Config Info)</button>
 `;
 
-function fastip103getList() {
+function fastip105getList() {
 //空格全角分号去除
     let str = $("#config_textarea").val().replaceAll(' ','').replaceAll('：',':').replaceAll(';','');
     if(str.length>32){
@@ -82,6 +130,7 @@ function fastip103getList() {
         "lo":[],
         "pub":[],
         "as":[],
+        "natpe":[],
         "oversea":[],
         "other":[],
     };
@@ -99,10 +148,17 @@ function fastip103getList() {
                 case 'pe':
                     if(l1.search('ac')!=-1){
                         info_json.ac.push(l1);
-                    }else{
+                    }else if(l1.search('pe')!=-1){
                         info_json.pe.push(l1);
+                    }else{
+                        info_json.lo.push(l1);
                     };
 
+                    break;
+                case 'ce':
+                    if(l1.search('.')!=-1){
+                        info_json.lo.push(l1);
+                    }
                     break;
                 case 'tunnel':
                     info_json.if.push(l1);
@@ -125,8 +181,15 @@ function fastip103getList() {
                     info_json.as.push(l1);
                     break;
                 default:
-                    let b = l1.replaceAll('-',',').replaceAll('_',',').split(',');
-                    if(ipv4_regex.test(b[0])){
+                    if(l1==undefined){
+                        console.log(l0);
+                        if(l0.search('natpe')!=-1){
+                            info_json.natpe.push(l0);
+                        }
+                        break;
+                    }
+                    if(l1.search('-')!=-1){
+                        let b = l1.replaceAll('-',',').replaceAll('_',',').split(',').filter(Boolean);
                         let ip_str = "";
                         let h = b[0].split('.')[0];
                         for(let i = 0; i < b.length/2; i++){
@@ -142,48 +205,57 @@ function fastip103getList() {
                                 }else{
                                     ip_str += `${b[i*2]}-${b[i*2+1]},`;
                                 };
-                            }
+                           }
                         };
-                        console.log(ip_str);
                         info_json.oversea.push(ip_str);
                     }else{
                         info_json.other.push(l1);
                     };
+            }
         }
     };
     console.log(info_json);
     $("#lineid_input").val(info_json.id[0].substr(0,7));
     $("#pe1_input").val(info_json.pe[0]);
-    $("#pe1_if_input").val(info_json.if[0]);
-    $("#pe1_ip_input").val(info_json.ip[0]);
-    $("#pe1_lo_input").val(info_json.lo[0]);
-    $("#ce1_lo_input").val(info_json.lo[1]);
-    $("#pe1_oversea_input").val(info_json.oversea[0]);
-    $("#pe1_as_input").val(info_json.as[1]);
-    $("#ac1_input").val(info_json.ac[0]);
-    $("#ac1_if_input").val(info_json.if[1]);
-    $("#ac1_ip_input").val(info_json.ip[1]);
-    $("#ac1_pub_input").val(info_json.pub[0]);
-
     $("#pe2_input").val(info_json.pe[1]);
+    $("#pe1_if_input").val(info_json.if[0]);
     $("#pe2_if_input").val(info_json.if[2]);
+    $("#pe1_ip_input").val(info_json.ip[0]);
     $("#pe2_ip_input").val(info_json.ip[2]);
+    $("#pe1_lo_input").val(info_json.lo[0]);
     $("#pe2_lo_input").val(info_json.lo[2]);
+    $("#ce1_lo_input").val(info_json.lo[1]);
     $("#ce2_lo_input").val(info_json.lo[3]);
-    $("#pe2_oversea_input").val(info_json.oversea[0]);
+    $("#pe1_as_input").val(info_json.as[1]);
     $("#pe2_as_input").val(info_json.as[1]);
+    $("#ac1_input").val(info_json.ac[0]);
     $("#ac2_input").val(info_json.ac[1]);
+    $("#ac1_if_input").val(info_json.if[1]);
     $("#ac2_if_input").val(info_json.if[3]);
+    $("#ac1_ip_input").val(info_json.ip[1]);
     $("#ac2_ip_input").val(info_json.ip[3]);
+    $("#ac1_pub_input").val(info_json.pub[0]);
     $("#ac2_pub_input").val(info_json.pub[1]);
+    $("#natpe1_input").val(info_json.natpe[0]);
+    $("#natpe2_input").val(info_json.natpe[1]);
+    $("#natpe1_if_input").val(info_json.if[4]);
+    $("#natpe2_if_input").val(info_json.if[5]);
+    $("#natpe1_ip_input").val(info_json.ip[4]);
+    $("#natpe2_ip_input").val(info_json.ip[5]);
+    $("#natpe1_lo_input").val(info_json.lo[5]);
+    $("#natpe2_lo_input").val(info_json.lo[7]);
+    $("#natce1_lo_input").val(info_json.lo[4]);
+    $("#natce2_lo_input").val(info_json.lo[6]);
+    $("#natpe1_oversea_input").val(info_json.oversea[0]);
+    $("#natpe2_oversea_input").val(info_json.oversea[1]);
   };
 };
 
-$("#service_dev").append(fastip103html);
+$("#service_dev").append(fastip105html);
 //加载测试资源的解析数据
-fastip103getList();
+fastip105getList();
 
-function fastip103setWan(value){
+function fastip105setWan(value){
     let html='';
     wan_input_tr = '#wan1_input_tr';
     switch(value){
@@ -203,7 +275,7 @@ function fastip103setWan(value){
     };
 }
 
-function fastip103sub(url){
+function fastip105sub(url){
   let user = $("#user_input").val();
   let time=getTime(new Date());
   let wan1 = $("#wan1_select").val();
@@ -214,10 +286,7 @@ function fastip103sub(url){
   let lineid = $("#lineid_input").val();
   let cname = $("#cname_input").val();
   let area = $("#area_input").val();
-  let oversea1dns = $("#oversea1_dns_input").val();
-  let oversea2dns = $("#oversea2_dns_input").val();
-  let oversea1ips = $("#pe1_oversea_input").val().split(',')[0];
-  let oversea1ip1 = oversea1ips.split(',')[0].split('-')[0];
+
 //获取主线参数
   let pe1 = $("#pe1_input").val();
   let pe1if = "tun"+$("#pe1_if_input").val().match(/[1-9]\d+/)[0];
@@ -250,6 +319,29 @@ function fastip103sub(url){
   let ac2ip1 = ac2ips[0];
   let ac2ip2 = ac2ips[1];
   let ac2remote = $("#ac2_pub_input").val();
+
+  let natpe1 = $("#natpe1_input").val();
+  let natpe2 = $("#natpe2_input").val();
+  let natpe1ips = ipNext($("#natpe1_ip_input").val().split('/')[0]);
+  let natpe1ip1 = natpe1ips[0];
+  let natpe1ip2 = natpe1ips[1];
+  let natpe2ips = ipNext($("#natpe2_ip_input").val().split('/')[0]);
+  let natpe2ip1 = natpe2ips[0];
+  let natpe2ip2 = natpe2ips[1];
+  let natpe1if = $("#natpe1_if_input").val();
+  let natpe2if = $("#natpe2_if_input").val();
+  let natpe1lo = $("#natpe1_lo_input").val();
+  let natpe2lo = $("#natpe2_lo_input").val();
+  let natce1lo = $("#natce1_lo_input").val();
+  let natce2lo = $("#natce2_lo_input").val();
+  let oversea1ips = $("#natpe1_oversea_input").val().split(',')[0];
+  let oversea2ips = $("#natpe2_oversea_input").val().split(',')[0];
+  let oversea1ip1 = oversea1ips[0].split('-')[0];
+  let oversea2ip1 = oversea2ips[0].split('-')[0];
+  let oversea1dns = $("#oversea1_dns_input").val();
+  let oversea2dns = $("#oversea2_dns_input").val();
+  let oversea3dns = $("#oversea3_dns_input").val();
+  let oversea4dns = $("#oversea4_dns_input").val();
 //差异化配置生成
 let wanTemp = '';
 switch(wan1Type){
@@ -278,7 +370,7 @@ set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
     break;
   };
 
-let fastip103fastipGreOverOpenvpn  =
+let fastip105fastipGreOverOpenvpn  =
 `#Fnet MPLS with GRE Over OpenVPN Tiktok Template.
 #操作人员：${user}
 #时间：${time.cn}
@@ -304,8 +396,24 @@ delete nat
 delete protocols
 delete policy
 delete track
+delete smokeping
+delete traffic-policy
 delete service dns
+delete service dhcp-server
+delete system name-server
+delete system flow-accounting
 set interfaces ethernet eth0 address dhcp
+commit
+exit
+###接网线下载镜像!!!
+echo '>>>升级到最新镜像<<<'
+curl http://202.104.174.189:18080/epochos/ | \
+grep vyos-epoch | \
+awk -F '"' '{print "http://192.168.75.15/epochos/"$2}' | \
+sed -n '$p' > img_list
+while read -r url; do wget "$url" done < img_list
+####等待下载完成后升级系统!!!
+while read -r img; do add system image "$img"; done < img_list
 echo '>>>Table default 海外，DHCP指定海外DNS<<<'
 set interfaces bridge br2 description LAN-Bridge-ETH1-5
 set interfaces bridge br2 address 192.168.8.1/24
@@ -325,6 +433,7 @@ save
 exit
 sudo curl -O https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py
 sudo chmod +x  speedtest.py
+conf
 echo '基础配置[防火墙规则，系统名称，物理接口]'
 set firewall group network-group GROUP-FNET-Whitelist network 202.104.174.178/32
 set firewall group network-group GROUP-FNET-Whitelist network 114.112.232.0/23
@@ -355,8 +464,10 @@ set firewall name VPN2LOCAL rule 4000 destination port '1723,3124,3127,3128,3389
 set firewall name VPN2LOCAL rule 4000 protocol 'tcp_udp'
 set interfaces ethernet eth0 firewall local name 'WAN2LOCAL'
 set interfaces ethernet eth1 firewall local name 'WAN2LOCAL'
-set interfaces tunnel ${pe1if} firewall local name 'VPN2LOCAL'
-set interfaces tunnel ${pe2if} firewall local name 'VPN2LOCAL'
+set interfaces tunnel ${pe1if} firewall local name 'WAN2LOCAL'
+set interfaces tunnel ${pe2if} firewall local name 'WAN2LOCAL'
+set interfaces tunnel ${natpe1if} firewall local name 'VPN2LOCAL'
+set interfaces tunnel ${natpe2if} firewall local name 'VPN2LOCAL'
 set system host-name ${lineid}-${cname}-${area}
 set service snmp community both-win authorization 'ro'
 set service smartping
@@ -413,11 +524,33 @@ set interfaces tunnel ${pe2if} remote ${pe2lo}
 set interfaces tunnel ${pe2if} encapsulation gre
 set interfaces tunnel ${pe2if} multicast disable
 set interfaces tunnel ${pe2if} parameters ip ttl 255
+echo '>>>GRE 配置[${natpe1}]<<<'
+set interfaces tunnel ${natpe1if} description ${natpe1}
+set interfaces tunnel ${natpe1if} address ${natpe1ip2}/30
+#[v3.2]set interfaces tunnel ${natpe1if} local-ip ${natce1lo}
+#[v3.2]set interfaces tunnel ${natpe1if} remote-ip ${natpe1lo}
+set interfaces tunnel ${natpe1if} source-address ${natce1lo}
+set interfaces tunnel ${natpe1if} remote ${natpe1lo}
+set interfaces tunnel ${natpe1if} encapsulation gre
+set interfaces tunnel ${natpe1if} multicast disable
+set interfaces tunnel ${natpe1if} parameters ip ttl 255
+echo '>>>GRE 配置[${natpe2}]<<<'
+set interfaces tunnel ${natpe2if} description ${natpe2}
+set interfaces tunnel ${natpe2if} address ${natpe2ip2}/30
+#[v3.2]set interfaces tunnel ${natpe2if} local-ip ${natce2lo}
+#[v3.2]set interfaces tunnel ${natpe2if} remote-ip ${natpe2lo}
+set interfaces tunnel ${natpe2if} source-address ${natce2lo}
+set interfaces tunnel ${natpe2if} remote ${natpe2lo}
+set interfaces tunnel ${natpe2if} encapsulation gre
+set interfaces tunnel ${natpe2if} multicast disable
+set interfaces tunnel ${natpe2if} parameters ip ttl 255
 echo '>>>MTU TCP-MSS配置[interface]<<<'
 set firewall options interface ${ac1if} adjust-mss 1300
 set firewall options interface ${ac2if} adjust-mss 1300
 set firewall options interface ${pe1if} adjust-mss 1300
 set firewall options interface ${pe2if} adjust-mss 1300
+set firewall options interface ${natpe1if} adjust-mss 1300
+set firewall options interface ${natpe2if} adjust-mss 1300
 echo '>>>路由配置[Track 默认路由，对接公网路由，内网路由]<<<'
 set protocols static route 114.114.114.114/32 next-hop 1.1.1.1
 set track name to-114 failure-count 2
@@ -437,6 +570,16 @@ set protocols static route ${ac1remote}/32 next-hop 1.1.1.1
 set protocols static route ${ac2remote}/32 next-hop 1.1.1.1
 set protocols static route ${pe1lo}/32 next-hop ${ac1ip1}
 set protocols static route ${pe2lo}/32 next-hop ${ac2ip1}
+set protocols static route ${natpe1lo} next-hop ${pe1ip1} track to-main
+set protocols static route ${natpe1lo} next-hop ${pe2ip1} distance 5
+set protocols static route ${natpe2lo} next-hop ${pe1ip1} track to-main
+set protocols static route ${natpe2lo} next-hop ${pe2ip1} distance 5
+set protocols static route ${oversea1dns}/32 next-hop ${natpe1ip1}
+set protocols static route ${oversea2dns}/32 next-hop ${natpe1ip1}
+set protocols static route ${oversea3dns}/32 next-hop ${natpe2ip1}
+set protocols static route ${oversea4dns}/32 next-hop ${natpe2ip1}
+set protocols static route 8.8.8.8/32 next-hop ${natpe1ip1}
+set protocols static route 8.8.4.4/32 next-hop ${natpe2ip1}
 set protocols static route 114.113.245.99/32 next-hop ${pe1ip1}
 set protocols static route 114.113.245.100/32 next-hop ${pe2ip1}
 set protocols static route 192.168.55.125/32 next-hop ${pe1ip1} track to-main
@@ -455,40 +598,40 @@ set interfaces wireless wlan1 security wpa mode 'wpa2'
 set interfaces wireless wlan1 security wpa passphrase '123456@sdwan'
 set interfaces wireless wlan1 ssid 'sdwan'
 set interfaces wireless wlan1 type 'access-point'
-echo 'LAN DHCP Server Range: 2-200'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 description 'br2_dhcp'
+echo 'LAN DHCP Server Range: 2-100'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 description 'dhcp_br2'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 default-router '192.168.8.1'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 lease '86400'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server ${oversea1dns}
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server ${oversea2dns}
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 start '192.168.8.2'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 stop '192.168.8.200'
-echo 'WIFI DHCP Server Range: 2-200'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 description 'wlan1_dhcp'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 stop '192.168.8.100'
+echo 'WIFI DHCP Server Range: 2-100'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 description 'dhcp_wlan1'
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 default-router '192.168.9.1'
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 lease '86400'
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 name-server ${oversea1dns}
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 name-server ${oversea2dns}
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 range 0 start '192.168.9.2'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 range 0 stop '192.168.9.200'
-echo '192.168.9.201  54:05:db:b4:4a:4f dhcp_wlan1  iPhone'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 201 ip-address '192.168.8.201'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 201 mac-address '54:05:db:b4:4a:4f'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 201 static-mapping-parameters 'option domain-name-servers ${oversea1dns}, ${oversea2dns};'
-echo '192.168.9.202  55:05:db:b4:4a:40 dhcp_br2  iPhone'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 202 ip-address '192.168.8.202'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 202 mac-address '55:05:db:b4:4a:40'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 202 static-mapping-parameters 'option domain-name-servers ${oversea1dns}, ${oversea2dns};'
-echo '策略路由匹配源IP走不通Table路由表，table 100 美国'
-set protocols static route 2.2.2.1/32 next-hop ${pe1ip1} track to-main
-set protocols static route 2.2.2.1/32 next-hop ${pe2ip1} distance 5
-set protocols static table 100 route 0.0.0.0/0 next-hop 2.2.2.1
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 range 0 stop '192.168.9.100'
+echo '192.168.9.101  54:05:db:b4:4a:41 dhcp_wlan1  iPhone'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 101 ip-address '192.168.9.101'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 101 mac-address '54:05:db:b4:4a:41'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 101 static-mapping-parameters 'option domain-name-servers ${oversea1dns}, ${oversea2dns};'
+echo '192.168.9.201  54:05:db:b4:4a:42 dhcp_wlan1  iPhone'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 202 ip-address '192.168.9.201'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 202 mac-address '54:05:db:b4:4a:42'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 202 static-mapping-parameters 'option domain-name-servers ${oversea3dns}, ${oversea4dns};'
+echo '192.168.8.101  55:05:db:b4:4a:40 dhcp_br2  iPhone'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 1101 ip-address '192.168.8.101'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 1101 mac-address '55:05:db:b4:4a:43'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 1101 static-mapping-parameters 'option domain-name-servers ${oversea1dns}, ${oversea2dns};'
+echo 'Table 100 to ${natpe1}'
+set protocols static table 100 route 0.0.0.0/0 next-hop ${natpe1ip1}
 set policy local-route rule 101 set table '100'
 set policy local-route rule 101 source '192.168.9.101'
-echo '策略路由匹配源IP走不通Table路由表，table 200 英国'
-set protocols static route 2.2.2.2/32 next-hop ${pe1ip1} track to-main
-set protocols static route 2.2.2.2/32 next-hop ${pe2ip1} distance 5
-set protocols static table 200 route 0.0.0.0/0 next-hop 2.2.2.2
+echo 'Table 200 to ${natpe2}'
+set protocols static table 200 route 0.0.0.0/0 next-hop ${natpe2ip1}
 set policy local-route rule 201 set table '200'
 set policy local-route rule 201 source '192.168.9.201'
 #
@@ -496,48 +639,63 @@ echo '>>>本地NAT<<<'
 set nat source rule 100 outbound-interface 'eth0'
 set nat source rule 100 translation address 'masquerade'
 echo '>>>MAC 绑定 NAT<<<'
-set nat source rule 1001 source address 192.168.9.201/32
-set nat source rule 1001 outbound-interface ${pe1if}
+set nat source rule 1001 source address 192.168.9.101/32
+set nat source rule 1001 outbound-interface ${natpe1if}
 set nat source rule 1001 translation address ${oversea1ip1}
-set nat source rule 2001 source address 192.168.9.201/32
-set nat source rule 2001 outbound-interface ${pe2if}
-set nat source rule 2001 translation address ${oversea1ip1}
+#
+set nat source rule 1002 source address 192.168.9.201/32
+set nat source rule 1002 outbound-interface ${natpe2if}
+set nat source rule 1002 translation address ${oversea2ip1}
+#
 echo '>>>Br2 NAT 192.168.8.0/24<<<'
 set nat source rule 1998 source address 192.168.8.0/24
-set nat source rule 1998 outbound-interface ${pe1if}
+set nat source rule 1998 outbound-interface ${natpe1if}
 set nat source rule 1998 translation address ${oversea1ip1}
 set nat source rule 2998 source address 192.168.8.0/24
-set nat source rule 2998 outbound-interface ${pe2if}
-set nat source rule 2998 translation address ${oversea1ip1}
+set nat source rule 2998 outbound-interface ${natpe2if}
+set nat source rule 2998 translation address ${oversea2ip1}
 echo '>>>Wlan1 NAT 192.168.9.0/24<<<'
 set nat source rule 1999 source address 192.168.9.0/24
-set nat source rule 1999 outbound-interface ${pe1if}
+set nat source rule 1999 outbound-interface ${natpe1if}
 set nat source rule 1999 translation address ${oversea1ip1}
 set nat source rule 2999 source address 192.168.9.0/24
-set nat source rule 2999 outbound-interface ${pe2if}
-set nat source rule 2999 translation address ${oversea1ip1}
+set nat source rule 2999 outbound-interface ${natpe2if}
+set nat source rule 2999 translation address ${oversea2ip1}
 echo '>>>Google DNS NAT 8.8.8.8/32<<<'
 set nat source rule 3000 destination address 8.8.8.8/32
-set nat source rule 3000 outbound-interface ${pe1if}
+set nat source rule 3000 outbound-interface ${natpe1if}
 set nat source rule 3000 translation address ${oversea1ip1}
-set nat source rule 4000 destination address 8.8.8.8/32
-set nat source rule 4000 outbound-interface ${pe2if}
-set nat source rule 4000 translation address ${oversea1ip1}
+echo '>>>Google DNS NAT 8.8.4.4/32<<<'
+set nat source rule 4000 destination address 8.8.4.4/32
+set nat source rule 4000 outbound-interface ${natpe2if}
+set nat source rule 4000 translation address ${oversea2ip1}
 echo '>>>海外DNS1 NAT ${oversea1dns}/32<<<'
 set nat source rule 3001 destination address ${oversea1dns}/32
-set nat source rule 3001 outbound-interface ${pe1if}
+set nat source rule 3001 outbound-interface ${natpe1if}
 set nat source rule 3001 translation address ${oversea1ip1}
-set nat source rule 4001 destination address ${oversea1dns}/32
-set nat source rule 4001 outbound-interface ${pe2if}
-set nat source rule 4001 translation address ${oversea1ip1}
 echo '>>>海外DNS2 NAT ${oversea2dns}/32<<<'
 set nat source rule 3002 destination address ${oversea2dns}/32
-set nat source rule 3002 outbound-interface ${pe1if}
+set nat source rule 3002 outbound-interface ${natpe1if}
 set nat source rule 3002 translation address ${oversea1ip1}
-set nat source rule 4002 destination address ${oversea2dns}/32
-set nat source rule 4002 outbound-interface ${pe2if}
-set nat source rule 4002 translation address ${oversea1ip1}
+echo '>>>海外DNS3 NAT ${oversea3dns}/32<<<'
+set nat source rule 4001 destination address ${oversea3dns}/32
+set nat source rule 4001 outbound-interface ${natpe2if}
+set nat source rule 4001 translation address ${oversea2ip1}
+echo '>>>海外DNS4 NAT ${oversea4dns}/32<<<'
+set nat source rule 4002 destination address ${oversea4dns}/32
+set nat source rule 4002 outbound-interface ${natpe2if}
+set nat source rule 4002 translation address ${oversea2ip1}
+echo '>>>系统DNS设置与客户端一致方便测试<<<'
+
 ################
+echo '>>>测试${natpe1}出口时更改为当地DNS<<<'
+delete system name-server
+set system name-server ${oversea1dns}
+set system name-server ${oversea2dns}
+echo '>>>测试${natpe2}出口时更改为当地DNS<<<'
+delete system name-server
+set system name-server ${oversea1dns}
+set system name-server ${oversea2dns}
 IP/环境监测
     IP当地
     IP类型     ISP > Business > hosting
@@ -547,7 +705,13 @@ IP/环境监测
 测试：
     大包测试
         openvpn     CMD: sudo ping x.x.x.x -s 1500
+            sudo ping ${ac1ip1} -i 0.1 -c 100 -s 1500
+            sudo ping ${ac2ip1} -i 0.1 -c 100 -s 1500
         tunnel      CMD: sudo ping x.x.x.x -s 1500
+            sudo ping ${pe1ip1} -i 0.1 -c 100 -s 1500
+            sudo ping ${pe2ip1} -i 0.1 -c 100 -s 1500
+            sudo ping ${natpe1ip1} -i 0.1 -c 100 -s 1500
+            sudo ping ${natpe2ip1} -i 0.1 -c 100 -s 1500
         pc          CMD: ping www.yahoo.com -l 1500
     网站测速
         speedtest   URL: <https://www.speedtest.net>
@@ -560,6 +724,8 @@ SmartPing监控：
     谷歌DNS：8.8.8.8
     主线Pub: ${ac1remote}
     备线Pub: ${ac2remote}
+    ${natpe1}: ${natpe1ip1}
+    ${natpe2}: ${natpe2ip1}
 ##############
 如果客户需要BGP分流
 echo '>>>动态路由配置[BGP]<<<'
@@ -659,8 +825,8 @@ set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-
 `;
   let filename = `${lineid}-Fast-SD-WAN-FastIP-GREOverOpenVPN-Config-${time.ez}-By-${user}`;
   let data = {};
-  console.log(fastip103fastipGreOverOpenvpn);
-  downloadConfig(filename, fastip103fastipGreOverOpenvpn);
+  console.log(fastip105fastipGreOverOpenvpn);
+  downloadConfig(filename, fastip105fastipGreOverOpenvpn);
   let type = 'post'
   let datatype = 'json';
   ajaxHandler(url,data,datatype,type);

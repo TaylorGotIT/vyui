@@ -14,27 +14,28 @@
     <textarea id="config_textarea" rows="8" cols="48" placeholder="输入NOC分配的配置信息"></textarea><br>
     <select id="service_select" onchange="getTempJS(this.value)">
             <option value="">请下拉选中一个服务模板[ 默认为空 ]</option>
-            <option value="fastip001">FastIP 单运营商[ fnetos ]</option>
-            <option value="fastip002">FastIP 双运营商[ fnetos ]</option>
-            <option value="fastip003">FastIP 单运营商[ huawei ]</option>
-            <option value="fastip004">FastIP 双运营商[ huawei ]</option>
-            <option value="fastip005">FastIP 单运营商[ Cisco ]</option>
-            <option value="fastip006">FastIP 单运营商[ Cisco ]</option>
-            <option value="fastip101">FastIP 假组网 单运营商[ fnetos ]</option>
-            <option value="fastip102">FastIP 假组网 双运营商[ fnetos ]</option>
-            <option value="fastip103">FastIP Tiktok单区域 单运营商[ fnetos ]</option>
-            <option value="fastip104">FastIP Tiktok单区域 双运营商[ fnetos ]</option>
-            <option value="fastip105">FastIP Tiktok多区域 双运营商[ fnetos ]</option>
-            <option value="fastip106">FastIP Tiktok多区域 双运营商[ fnetos ]</option>
-            <option value="fastip201">FastIP Tiktok单区域 单运营商[ huawei ]</option>
-            <option value="fastip202">FastIP 假组网模式[ centos gre]</option>
-            <option value="fastip203">FastIP 云主机模式[ centos fastip]</option>
-            <option value="fastip105">FastIP 白名单模式[ fnetos whitelist]</option>
-            <option value="sdwan001">华为SD-WAN子接口自环 单运营商[huawei]</option>
-            <option value="sdwan002">华为SD-WAN子接口自环 双运营商[huawei]</option>
-            <option value="sdwan003">华为SD-WAN子接口自环 双机[huawei]</option>
-            <option value="mpls001">组网 旁挂模式[ fnetos ]</option>
-            <option value="mpls002">组网 + FastIP 旁挂模式[ fnetos ]</option>
+            <option value="fastip001" class="on">FastIP 单运营商[ fnetos ]</option>
+            <option value="fastip002" class="on">FastIP 双运营商[ fnetos ]</option>
+            <option value="fastip003" class="on">FastIP 单运营商[ huawei ]</option>
+            <option value="fastip004" class="off">FastIP 双运营商[ huawei ]</option>
+            <option value="fastip005" class="off">FastIP 单运营商[ Cisco ]</option>
+            <option value="fastip006" class="off">FastIP 单运营商[ Cisco ]</option>
+            <option value="fastip101" class="on">FastIP 假组网 单运营商[ fnetos ]</option>
+            <option value="fastip102" class="on">FastIP 假组网 双运营商[ fnetos ]</option>
+            <option value="fastip103" class="on">FastIP Tiktok单区域 单运营商[ fnetos ]</option>
+            <option value="fastip104" class="off">FastIP Tiktok单区域 双运营商[ fnetos ]</option>
+            <option value="fastip105" class="on">FastIP Tiktok多区域 单运营商[ fnetos ]</option>
+            <option value="fastip106" class="off">FastIP Tiktok多区域 双运营商[ fnetos ]</option>
+            <option value="fastip201" class="on">FastIP Tiktok单区域 单运营商[ huawei ]</option>
+            <option value="fastip202" class="off">FastIP 假组网模式[ centos gre]</option>
+            <option value="fastip202" class="off">FastIP 假组网模式[ centos openvpn]</option>
+            <option value="fastip203" class="off">FastIP 云主机模式[ centos fastip]</option>
+            <option value="fastip105" class="off">FastIP 白名单模式[ fnetos whitelist]</option>
+            <option value="sdwan001" class="on">华为SD-WAN子接口自环 单运营商[huawei]</option>
+            <option value="sdwan002" class="on">华为SD-WAN子接口自环 双运营商[huawei]</option>
+            <option value="sdwan003" class="off">华为SD-WAN子接口自环 双机[huawei]</option>
+            <option value="mpls001" class="off">组网 旁挂模式[ fnetos ]</option>
+            <option value="mpls002" class="off">组网 + FastIP 旁挂模式[ fnetos ]</option>
     </select>
 
     <div id="info_dev">
@@ -43,4 +44,9 @@
 </body>
 <script type="text/javascript" src="/static/js/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" src="/static/js/autoScript.js"></script>
+<style type="text/css">
+.off {
+    background-color: black;
+}
+</style>
 </html>

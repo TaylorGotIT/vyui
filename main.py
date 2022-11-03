@@ -11,6 +11,7 @@ from tornado.template import Template, Loader
 import subprocess
 import platform
 
+
 class VYreq(RequestHandler):
     def get_current_user(self):
         return self.get_secure_cookie("user")
@@ -223,6 +224,16 @@ class VYExcel(VYreq):
         self.write_json(result)
 
 
+# Tiktok IP信息检查
+class VYIPCheck(VYreq):
+    @authed
+    def get(self):
+        self.render("temp/ipCheck.html", title="IPCheck")
+
+    @authed
+    def post(self):
+        self.render("temp/excelHandler.html", title="ExcelHandler")
+
 
 settings = {
     "cookie_secret": "__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__",
@@ -238,6 +249,7 @@ if __name__ == "__main__":
         (r"/config", VYConfig),
         (r"/wg", VYwg),
         (r"/excel", VYExcel),
+        (r"/ipCheck", VYIPCheck),
         (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), './static')}),
         (r'/temp/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), './temp')})
     ], **settings)

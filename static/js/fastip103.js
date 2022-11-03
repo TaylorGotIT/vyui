@@ -143,8 +143,15 @@ function fastip103getList() {
                     info_json.as.push(l1);
                     break;
                 default:
-                    let b = l1.replaceAll('-',',').replaceAll('_',',').split(',');
-                    if(ipv4_regex.test(b[0])){
+                    if(l1==undefined){
+                        console.log(l0);
+                        if(l0.search('natpe')!=-1){
+                            info_json.natpe.push(l0);
+                        }
+                        break;
+                    }
+                    if(l1.search('-')!=-1){
+                        let b = l1.replaceAll('-',',').replaceAll('_',',').split(',').filter(Boolean);
                         let ip_str = "";
                         let h = b[0].split('.')[0];
                         for(let i = 0; i < b.length/2; i++){
@@ -160,9 +167,8 @@ function fastip103getList() {
                                 }else{
                                     ip_str += `${b[i*2]}-${b[i*2+1]},`;
                                 };
-                            }
+                           }
                         };
-                        console.log(ip_str);
                         info_json.oversea.push(ip_str);
                     }else{
                         info_json.other.push(l1);
@@ -511,7 +517,7 @@ set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 nam
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 range 0 start '192.168.9.2'
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 range 0 stop '192.168.9.200'
 echo '192.168.9.201  54:05:db:b4:4a:4f dhcp_wlan1  iPhone'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 201 ip-address '192.168.8.201'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 201 ip-address '192.168.9.201'
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 201 mac-address '54:05:db:b4:4a:4f'
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 201 static-mapping-parameters 'option domain-name-servers ${oversea1dns}, ${oversea2dns};'
 echo '192.168.9.202  55:05:db:b4:4a:40 dhcp_br2  iPhone'
@@ -564,7 +570,12 @@ set nat source rule 3002 translation address ${oversea1ip1}
 set nat source rule 4002 destination address ${oversea2dns}/32
 set nat source rule 4002 outbound-interface ${pe2if}
 set nat source rule 4002 translation address ${oversea1ip1}
+echo '>>>系统DNS设置与客户端一致方便测试<<<'
+
 ################
+delete system name-server
+set system name-server ${oversea1dns}
+set system name-server ${oversea2dns}
 IP/环境监测
     IP当地
     IP类型     ISP > Business > hosting
@@ -574,7 +585,11 @@ IP/环境监测
 测试：
     大包测试
         openvpn     CMD: sudo ping x.x.x.x -s 1500
+            sudo ping ${ac1ip1} -i 0.1 -c 100 -s 1500
+            sudo ping ${ac2ip1} -i 0.1 -c 100 -s 1500
         tunnel      CMD: sudo ping x.x.x.x -s 1500
+            sudo ping ${pe1ip1} -i 0.1 -c 100 -s 1500
+            sudo ping ${pe2ip1} -i 0.1 -c 100 -s 1500
         pc          CMD: ping www.yahoo.com -l 1500
     网站测速
         speedtest   URL: <https://www.speedtest.net>

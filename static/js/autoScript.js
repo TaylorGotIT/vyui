@@ -233,7 +233,7 @@ function getTempJS(value){
                 if($.isFunction(fastip105sub)){
                     $("#service_dev").append(fastip105html);
                     fastip105getList();
-                    console.log("fastip102 已下载");
+                    console.log("fastip105 已下载");
                 };
             }catch(e){
                 js_path = "/static/js/"+ value + ".js";

@@ -124,8 +124,15 @@ function fastip201getList() {
                     info_json.as.push(l1);
                     break;
                 default:
-                    let b = l1.replaceAll('-',',').replaceAll('_',',').split(',');
-                    if(ipv4_regex.test(b[0])){
+                    if(l1==undefined){
+                        console.log(l0);
+                        if(l0.search('natpe')!=-1){
+                            info_json.natpe.push(l0);
+                        }
+                        break;
+                    }
+                    if(l1.search('-')!=-1){
+                        let b = l1.replaceAll('-',',').replaceAll('_',',').split(',').filter(Boolean);
                         let ip_str = "";
                         let h = b[0].split('.')[0];
                         for(let i = 0; i < b.length/2; i++){
@@ -141,9 +148,8 @@ function fastip201getList() {
                                 }else{
                                     ip_str += `${b[i*2]}-${b[i*2+1]},`;
                                 };
-                            }
+                           }
                         };
-                        console.log(ip_str);
                         info_json.oversea.push(ip_str);
                     }else{
                         info_json.other.push(l1);
