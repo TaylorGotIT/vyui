@@ -146,7 +146,7 @@ function fastip105getList() {
                     info_json.id.push(l1);
                     break;
                 case 'pe':
-                    if(l1.search('ac')!=-1){
+                    if(l1.search('ac')!=-1 | l1.search('gw')!=-1){
                         info_json.ac.push(l1);
                     }else if(l1.search('pe')!=-1){
                         info_json.pe.push(l1);
@@ -334,10 +334,53 @@ function fastip105sub(url){
   let natpe2lo = $("#natpe2_lo_input").val();
   let natce1lo = $("#natce1_lo_input").val();
   let natce2lo = $("#natce2_lo_input").val();
-  let oversea1ips = $("#natpe1_oversea_input").val().split(',')[0];
-  let oversea2ips = $("#natpe2_oversea_input").val().split(',')[0];
-  let oversea1ip1 = oversea1ips[0].split('-')[0];
-  let oversea2ip1 = oversea2ips[0].split('-')[0];
+
+  let oversea1ip = $("#natpe1_oversea_input").val();
+  let oversea2ip = $("#natpe2_oversea_input").val();
+  let oversea1ips = oversea1ip.split(',');
+  let oversea2ips = oversea2ip.split(',');
+console.log(oversea1ips);
+let oversea1ip1 = '';
+let oversea1ip2 = '';
+let oversea1ip3 = '';
+let oversea2ip1 = '';
+let oversea2ip2 = '';
+let oversea2ip3 = '';
+switch (oversea1ips.length){
+    case 1:
+        oversea1ip1 = oversea1ips[0].split('-')[0];
+    break;
+    case 2:
+        oversea1ip1 = oversea1ips[0].split('-')[0];
+        oversea1ip2 = oversea1ips[1].split('-')[0];
+    break;
+    case 3:
+        oversea1ip1 = oversea1ips[0].split('-')[0];
+        oversea1ip2 = oversea1ips[1].split('-')[0];
+        oversea1ip3 = oversea1ips[2].split('-')[0];
+    break;
+}
+
+switch (oversea2ips.length){
+    case 1:
+        oversea2ip1 = oversea2ips[0].split('-')[0];
+    break;
+    case 2:
+        oversea2ip1 = oversea2ips[0].split('-')[0];
+        oversea2ip2 = oversea2ips[1].split('-')[0];
+    break;
+    case 3:
+        oversea2ip1 = oversea2ips[0].split('-')[0];
+        oversea2ip2 = oversea2ips[1].split('-')[0];
+        oversea2ip3 = oversea2ips[2].split('-')[0];
+    break;
+}
+console.log(oversea1ip1);
+console.log(oversea1ip2);
+console.log(oversea1ip3);
+console.log(oversea2ip1);
+console.log(oversea2ip2);
+console.log(oversea2ip2);
   let oversea1dns = $("#oversea1_dns_input").val();
   let oversea2dns = $("#oversea2_dns_input").val();
   let oversea3dns = $("#oversea3_dns_input").val();
@@ -471,8 +514,15 @@ set interfaces tunnel ${natpe2if} firewall local name 'VPN2LOCAL'
 set system host-name ${lineid}-${cname}-${area}
 set service snmp community both-win authorization 'ro'
 set service smartping
+set interfaces loopback lo address ${natce1lo}/32
+set interfaces loopback lo address ${natce2lo}/32
 set interfaces loopback lo address ${oversea1ip1}/32
-set interfaces loopback lo description ${oversea1ips}
+set interfaces loopback lo address ${oversea1ip2}/32
+set interfaces loopback lo address ${oversea1ip3}/32
+set interfaces loopback lo address ${oversea2ip1}/32
+set interfaces loopback lo address ${oversea2ip2}/32
+set interfaces loopback lo address ${oversea2ip3}/32
+set interfaces loopback lo description ${oversea1ip}${oversea2ip}
 ${wanTemp}
 echo 'OpenVPN 接入配置[ac1]'
 set interfaces openvpn ${ac1if} description AC1_to_${ac1}
@@ -570,10 +620,10 @@ set protocols static route ${ac1remote}/32 next-hop 1.1.1.1
 set protocols static route ${ac2remote}/32 next-hop 1.1.1.1
 set protocols static route ${pe1lo}/32 next-hop ${ac1ip1}
 set protocols static route ${pe2lo}/32 next-hop ${ac2ip1}
-set protocols static route ${natpe1lo} next-hop ${pe1ip1} track to-main
-set protocols static route ${natpe1lo} next-hop ${pe2ip1} distance 5
-set protocols static route ${natpe2lo} next-hop ${pe1ip1} track to-main
-set protocols static route ${natpe2lo} next-hop ${pe2ip1} distance 5
+set protocols static route ${natpe1lo}/32 next-hop ${pe1ip1} track to-main
+set protocols static route ${natpe1lo}/32 next-hop ${pe2ip1} distance 5
+set protocols static route ${natpe2lo}/32 next-hop ${pe1ip1} track to-main
+set protocols static route ${natpe2lo}/32 next-hop ${pe2ip1} distance 5
 set protocols static route ${oversea1dns}/32 next-hop ${natpe1ip1}
 set protocols static route ${oversea2dns}/32 next-hop ${natpe1ip1}
 set protocols static route ${oversea3dns}/32 next-hop ${natpe2ip1}

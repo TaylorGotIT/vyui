@@ -163,9 +163,9 @@ function fastip101getList() {
                 default:
                     if(l1==undefined){
                         console.log(l0);
-                        if(l0.search('natpe')!=-1){
-                            info_json.natpe.push(l0);
-                        }
+                        //if(l0.search('natpe')!=-1){
+                          //  info_json.natpe.push(l0);
+                        //}
                         break;
                     }
                     if(l1.search('-')!=-1){
