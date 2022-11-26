@@ -131,10 +131,10 @@ function genWgConfig(d){
     for(var j=0;j<c.length;j++){
 let c_num = c_start + j;
 let s_peer =`
-set interfaces wireguard wg${i} peer ${c_desc}${c_num} allowed-ips ${c_ips[j]}
-set interfaces wireguard wg${i} peer ${c_desc}${c_num} persistent-keepalive ${c_keepalive}
-set interfaces wireguard wg${i} peer ${c_desc}${c_num} preshared-key ${p[j].PresharedKey}
-set interfaces wireguard wg${i} peer ${c_desc}${c_num} pubkey ${c[j].PublicKey }
+[peer]
+PublicKey = ${c[j].PublicKey}
+PresharedKey = ${p[j].PresharedKey}
+AllowedIPs = ${c_ips[j]}
 `;
 
 let c_if =
@@ -169,11 +169,11 @@ new QRCode(qrcode_dev, c_if);
     }
 
 let s_if =
-`#wg${ i }.conf
-set interfaces wireguard wg${i} description ${ s_desc }
-set interfaces wireguard wg${i} address ${ s_address }
-set interfaces wireguard wg${i} port ${ s_port }
-
+`#服务端配置
+[Interface]
+PrivateKey = 服务器私钥
+Address = ${s_address}
+ListenPort = ${s_port}
 ${ s_peers }
 `;
 let s_config_name = `wg${i}.conf`;
