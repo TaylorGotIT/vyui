@@ -1,4 +1,4 @@
-/* FastIP 假组网 Tiktok 单运营商 */
+/* FastIP 假组网 Tiktok 多运营商 */
 const fastip103html = `<table border="1">
 <tr><td><select id="version_select">
 <option value="40" selected="selected">FnetOS[ 4.0 ]</option>

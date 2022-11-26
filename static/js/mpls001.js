@@ -3,20 +3,27 @@
 const mpls001_version = 1;
 const mpls001html = `<table border="1">
 <tr>
+<td>LineID</td>
 <td><input id="lineid_input"></td>
-<td><input id="area_input" value="GZ"></td>
-</tr>
-
-<tr><td><input id="cname_input" placeholder="CompanyName[eg:Huawei]"></td>
-<td><input id="area_input" placeholder="Area[GZ,SZ,SH,etc...]"></td></tr>
-
-<tr><td><select id="version_select">
+<td><select id="version_select">
 <option value="40" selected="selected">[ v4.0 ]</option>
 <option value="32">[ v3.2 ]</option>
 <option value="31">[ v3.1 ]</option></select></td>
-<td><input id="subnet_input" placeholder="Subnet[eg:10.1.1.0/24]"></td></tr>
+</tr>
+<tr>
+<td>Company</td>
+<td><input id="cname_input" placeholder="CompanyName[eg:Huawei]"></td>
+<td><input id="area_input" placeholder="Area[GZ,SZ,SH,etc...]"></td>
+</tr>
+<tr>
+<td>Subnet</td>
+<td><input id="subnet1_input" placeholder="Subnet1[eg:10.1.1.0/24]"></td>
+<td><input id="subnet2_input" placeholder="Subnet2[eg:10.1.1.0/24]"></td>
+</tr>
 
-<tr><td><select id="wan1_select">
+<tr>
+<td>WAN</td>
+<td><select id="wan1_select">
 <option value="eth0" selected="selected">WAN1-ETH0</option>
 <option value="eth1">WAN1-ETH1</option>
 <option value="br0">WAN1-BR0</option>
@@ -32,56 +39,57 @@ const mpls001html = `<table border="1">
 <tr id="wan1_input_tr"></tr>
 
 <tr>
+<td>PE</td>
 <td><input id="pe1_input"></td>
 <td><input id="pe2_input"></td>
 </tr>
-
 <tr>
+<td>PE IF</td>
 <td><input id="pe1_if_input"></td>
 <td><input id="pe2_if_input"></td>
 </tr>
-
 <tr>
+<td>PE IP</td>
 <td><input id="pe1_ip_input"></td>
 <td><input id="pe2_ip_input"></td>
 </tr>
-
 <tr>
+<td>PE Lo</td>
 <td><input id="pe1_lo_input"></td>
 <td><input id="pe2_lo_input"></td>
 </tr>
-
 <tr>
+<td>CE Lo</td>
 <td><input id="ce1_lo_input"></td>
 <td><input id="ce2_lo_input"></td>
 </tr>
-
 <tr>
+<td>PE AS</td>
 <td><input id="pe1_as_input"></td>
 <td><input id="pe2_as_input"></td>
 </tr>
-
 <tr>
+<td>CE AS</td>
 <td><input id="ce1_as_input"></td>
 <td><input id="ce2_as_input"></td>
 </tr>
-
 <tr>
+<td>AC</td>
 <td><input id="ac1_input"></td>
 <td><input id="ac2_input"></td>
 </tr>
-
 <tr>
+<td>AC IF</td>
 <td><input id="ac1_if_input"></td>
 <td><input id="ac2_if_input"></td>
 </tr>
-
 <tr>
+<td>AC IP</td>
 <td><input id="ac1_ip_input"></td>
 <td><input id="ac2_ip_input"></td>
 </tr>
-
 <tr>
+<td>AC Pub</td>
 <td><input id="ac1_pub_input"></td>
 <td><input id="ac2_pub_input"></td>
 </tr>
@@ -117,7 +125,7 @@ function mpls001getList() {
                     info_json.id.push(l1);
                     break;
                 case 'pe':
-                    if(l1.search('pe')!=-1){
+                    if(l1.search('upe')!=-1){
                         info_json.pe.push(l1);
                     }else{
                         info_json.ac.push(l1);
@@ -195,12 +203,12 @@ function mpls001setWan(value){
         break;
         case "static":
             $(wan_input_tr).empty();
-            $(wan_input_tr).append(`<td><input id="wan1_ip_input" placeholder="IP[x.x.x.x/x]"></td>
+            $(wan_input_tr).append(`<td>Static</td><td><input id="wan1_ip_input" placeholder="IP[x.x.x.x/x]"></td>
             <td><input id="wan1_gw_input" placeholder="GW[x.x.x.x]"></td>`);
         break;
         case "pppoe":
             $(wan_input_tr).empty();
-            $(wan_input_tr).append(`<td><input id="pppoe1_user_input" placeholder="PPPoE[x.163.gd]"></td>
+            $(wan_input_tr).append(`<td>PPPoE</td><td><input id="pppoe1_user_input" placeholder="PPPoE[x.163.gd]"></td>
             <td><input id="pppoe1_pass_input" placeholder="PPPoE[******]"></td>`);
         break;
     };
@@ -215,7 +223,8 @@ function mpls001sub(url){
 
   let cname = $("#cname_input").val();
   let area = $("#area_input").val();
-  let subnet = $("#subnet_input").val();
+  let subnet1 = $("#subnet1_input").val();
+  let subnet2 = $("#subnet1_input").val();
 
   let lineid = $("#lineid_input").val();
   let cid = lineid.substr(0,6);
@@ -297,6 +306,12 @@ delete system host-name
 delete epoch controller
 sudo systemctl stop epoch-openvpnd
 rm /config/.initagentd.status
+delete interfaces ethernet eth0 address
+delete interfaces ethernet eth1 address
+delete interfaces ethernet eth2 address
+delete interfaces ethernet eth3 address
+delete interfaces ethernet eth4 address
+delete interfaces ethernet eth5 address
 delete interface openvpn
 delete interface tunnel
 delete interface loopback lo
@@ -305,7 +320,44 @@ delete nat
 delete protocols
 delete policy
 delete track
+delete smokeping
+delete traffic-policy
 delete service dns
+delete service dhcp-server
+delete system name-server
+delete system flow-accounting
+set interfaces ethernet eth0 address dhcp
+commit
+exit
+###接网线下载镜像!!!
+echo '>>>升级到最新镜像<<<'
+curl http://202.104.174.189:18080/epochos/ | \
+grep vyos-epoch | \
+awk -F '"' '{print "http://192.168.75.15/epochos/"$2}' | \
+sed -n '$p' > img_list
+while read -r url; do wget "$url" done < img_list
+####等待下载完成后升级系统!!!
+while read -r img; do add system image "$img"; done < img_list
+echo '>>>Table default 海外，DHCP指定海外DNS<<<'
+set interfaces bridge br2 description LAN-Bridge-ETH1-5
+set interfaces bridge br2 address 192.168.8.1/24
+set interfaces bridge br2 member interface eth1
+set interfaces bridge br2 member interface eth2
+set interfaces bridge br2 member interface eth3
+set interfaces bridge br2 member interface eth4
+set interfaces bridge br2 member interface eth5
+set system name-server 114.114.114.114
+set service ssh disable-host-validation
+set service ssh port 2707
+set system login user bothwin authentication encrypted-password '$6$v.wWSn9tGGGWzElK$qrB79AFWdg4lCtrbVNjea6Gs.oMGeQ8now53XO/h8V8DZ5yiqzv33h0rSMw8wWKTZXRFf6O8uRRCcPaIHsaiq0'
+set system time-zone Asia/Hong_Kong
+set service smartping
+commit
+save
+exit
+sudo curl -O https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py
+sudo chmod +x  speedtest.py
+conf
 echo '基础配置[防火墙规则，系统名称，物理接口]'
 set firewall group network-group GROUP-FNET-Whitelist network 202.104.174.178/32
 set firewall group network-group GROUP-FNET-Whitelist network 114.112.232.0/23
@@ -323,13 +375,15 @@ set firewall name WAN2LOCAL rule 2000 action 'drop'
 set firewall name WAN2LOCAL rule 2000 destination port '179,2707,53,161,123,8899'
 set firewall name WAN2LOCAL rule 2000 protocol 'tcp_udp'
 set interfaces ethernet eth0 firewall local name 'WAN2LOCAL'
-set interfaces ethernet eth1 firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe1if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe2if} firewall local name 'WAN2LOCAL'
 echo '基础配置[系统名称，物理接口]'
 set system host-name ${lineid}-${cname}-${area}
 set service snmp community both-win authorization 'ro'
 set service smartping
+set interfaces loopback lo address ${ce1lo}/32
+set interfaces loopback lo address ${ce2lo}/32
+set interfaces loopback lo description lo1-{ce1lo},lo2-{ce2lo}
 ${wanTemp}
 echo 'OpenVPN 接入配置[ac1]'
 set interfaces openvpn ${ac1if} description AC1_to_${ac1}
@@ -402,20 +456,22 @@ set protocols static route 192.168.55.250/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.250/32 next-hop ${pe2ip1} distance 5
 echo '>>>动态路由配置[BGP]<<<'
 set policy prefix-list Local-Route rule 10 action 'permit'
-set policy prefix-list Local-Route rule 10 prefix ${subnet}
+set policy prefix-list Local-Route rule 10 prefix ${subnet1}
+set policy prefix-list Local-Route rule 20 action 'permit'
+set policy prefix-list Local-Route rule 20 prefix ${subnet2}
 set policy route-map BGP rule 10 action 'permit'
 set policy route-map BGP rule 10 match ip address prefix-list 'Local-Route'
 set policy route-map BGP rule 999 action 'deny'
 
 set policy route-map bgp-from--Main rule 100 action 'permit'
-set policy route-map bgp-from--Main rule 100 description 'MAIN'
+set policy route-map bgp-from--Main rule 100 description 'Main'
 set policy route-map bgp-from--Main rule 100 match
 set policy route-map bgp-from--Main rule 100 set local-preference '150'
 set policy route-map bgp-from--Backup rule 100 action 'permit'
-set policy route-map bgp-from--Backup rule 100 description 'BK'
+set policy route-map bgp-from--Backup rule 100 description 'Backup'
 set policy route-map bgp-from--Backup rule 100 match
 set policy route-map bgp-from--Backup rule 100 set local-preference '50'
-
+#
 set protocols bgp 65000 address-family ipv4-unicast redistribute connected route-map 'BGP'
 set protocols bgp 65000 address-family ipv4-unicast redistribute static route-map 'BGP'
 set protocols bgp 65000 neighbor ${pe1ip1} address-family ipv4-unicast allowas-in
@@ -425,7 +481,7 @@ set protocols bgp 65000 neighbor ${pe1ip1} address-family ipv4-unicast soft-reco
 set protocols bgp 65000 neighbor ${pe1ip1} local-as ${ce1As}
 set protocols bgp 65000 neighbor ${pe1ip1} remote-as ${pe1As}
 set protocols bgp 65000 neighbor ${pe1ip1} update-source ${pe1ip2}
-
+#
 set protocols bgp 65000 neighbor ${pe2ip1} address-family ipv4-unicast allowas-in
 set protocols bgp 65000 neighbor ${pe2ip1} address-family ipv4-unicast prefix-list export 'Local-Route'
 set protocols bgp 65000 neighbor ${pe2ip1} address-family ipv4-unicast route-map import 'bgp-from--Backup'
@@ -433,7 +489,6 @@ set protocols bgp 65000 neighbor ${pe2ip1} address-family ipv4-unicast soft-reco
 set protocols bgp 65000 neighbor ${pe2ip1} local-as ${ce2As}
 set protocols bgp 65000 neighbor ${pe2ip1} remote-as ${pe2As}
 set protocols bgp 65000 neighbor ${pe2ip1} update-source ${pe2ip2}
-
 echo '>>>NetFlow<<<'
 set system flow-accounting interface tun1015
 set system flow-accounting interface tun1153
