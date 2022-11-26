@@ -199,12 +199,12 @@ function fastip103setWan(value){
         break;
         case "static":
             $(wan_input_tr).empty();
-            $(wan_input_tr).append(`<td><input id="wan1_ip_input" placeholder="IP[x.x.x.x/x]"></td>
+            $(wan_input_tr).append(`<td>Static</td><td><input id="wan1_ip_input" placeholder="IP[x.x.x.x/x]"></td>
             <td><input id="wan1_gw_input" placeholder="GW[x.x.x.x]"></td>`);
         break;
         case "pppoe":
             $(wan_input_tr).empty();
-            $(wan_input_tr).append(`<td><input id="pppoe1_user_input" placeholder="PPPoE[x.163.gd]"></td>
+            $(wan_input_tr).append(`<td>PPPoE</td><td><input id="pppoe1_user_input" placeholder="PPPoE[x.163.gd]"></td>
             <td><input id="pppoe1_pass_input" placeholder="PPPoE[******]"></td>`);
         break;
     };

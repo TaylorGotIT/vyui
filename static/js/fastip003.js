@@ -1,45 +1,98 @@
 /* FastIP 华为路由器 单运营商 */
 const fastip003html = `<table border="1">
 <tr>
-<td>基本信息</td>
-<td><textarea id="basic_textarea" rows="4" cols="21">
-area=gz
-cnameEN=fnetlink
-cnameCN=XX公司</textarea></td>
+<td>LineID</td>
+<td><input id="lineid_input" placeholder="线路ID"></td>
+<td><select id="version_select">
+<option value="40" selected="selected">FnetOS[ 4.0 ]</option>
+<option value="32">FnetOS[ 3.2 ]</option>
+<option value="31">FnetOS[ 3.1 ]</option></select></td>
 </tr>
 <tr>
-<td title="***示例***
----自动获取【DHCP】-----
-G0/0/10=dhcp
----手动设定【Static】---
-G0/0/10=192.168.1.254/24
-gw=192.168.1.1
----宽带拨号【PPPoE】----
-G0/0/10=pppoe
-user=account
-pass=password
-wwan0=">WAN接口</td>
-<td><textarea id="wan1_textarea" rows="2" cols="21" value="eth0">
-isp=ct
-eth0=dhcp</textarea></td>
+<td>Company</td>
+<td><input id="cname_input" placeholder="CompanyName[eg:Huawei]"></td>
+<td><input id="area_input" placeholder="Area[GZ,SZ,SH,etc...]"></td></tr>
+<tr>
+<td>WAN1</td>
+<td><select id="wan1_select">
+<option value="G0/0/8" selected="selected">WAN-G0/0/8</option>
+<option value="G0/0/9">WAN-G0/0/9</option>
+<option value="G0/0/10">WAN-G0/0/10</option></select>
+<select id="wan1_provider_select">
+<option value="CT" selected="selected">电信</option>
+<option value="CU">联通</option>
+<option value="CM">移动</option></select></td>
+<td><select id="wan1_type_select" onchange=fastip003setWan(this.value)>
+<option value="dhcp" selected="selected">WAN Type[ DHCP ]</option>
+<option value="static">WAN Type[ Static ]</option>
+<option value="pppoe">WAN Type[ PPPoE ]</option></select></td>
+</tr>
+<tr id="wan1_input_tr"></tr>
+<tr>
+<td>LocalDNS</td>
+<td><input id="local_dns1_input" placeholder="本地DNS1[eg:223.5.5.5]"></td>
+<td><input id="local_dns2_input" placeholder="本地DNS2[eg:223.6.6.6]"></td>
 </tr>
 <tr>
-<td title=
-"---Ethernet---
-G0/0/1=192.168.8.1/24
----Vlanif-----
-vlan1=192.168.8.1/24
-">内网LAN接口</td>
-<td><textarea id="lan1_input" rows="1" cols="21">
-G0/0/1=192.168.8.1/24</textarea></td>
+<td>OverseaDNS</td>
+<td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]"></td>
+<td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]"></td>
 </tr>
 <tr>
-<td title= "***示例***\nSmartDNS：smart-dns1=59.36.7.194\nsmart-dns2=59.37.126.146">SmartDNS</td>
-<td><textarea id="local_dns_textarea" rows="2" cols="21">dns1=59.36.7.194\ndns2=59.37.126.146</textarea></td>
+<td>BGPServerA</td>
+<td><input id="bgp_server1_input" value="10.10.99.200"></td>
+<td><input id="bgp_server2_input" value="10.10.99.202"></td>
 </tr>
-<td title= "由输入的NOC分配资源自动整理生成，可以手动修改，避免自动识别问题">NOC分配资源</td>
-<td><textarea id="resource_textarea" rows="15" cols="21"></textarea></td>
+<tr>
+<td>BGPServerB</td>
+<td><input id="bgp_server3_input" value="10.10.99.201"></td>
+<td><input id="bgp_server4_input" value="10.10.99.203"></td>
 </tr>
+<td>AC</td>
+<td><input id="ac1_input" placeholder="AC1[eg:gzd-acvpnpe1]"></td>
+<td><input id="ac2_input" placeholder="AC2[eg:szd-acvpnpe1]"></td>
+</tr>
+<tr>
+<td>AC IF</td>
+<td><input id="ac1_if_input" placeholder="AC1IF[eg:vtun1000]"></td>
+<td><input id="ac2_if_input" placeholder="AC2IF[eg:vtun2000]"></td>
+</tr>
+<tr>
+<td>AC IP</td>
+<td><input id="ac1_ip_input" placeholder="AC1IP[eg:10.x.x.x/30]"></td>
+<td><input id="ac2_ip_input" placeholder="AC2IP[eg:10.x.x.x/30]"></td>
+</tr>
+
+<td>PE Lo</td>
+<td><input id="pe1_lo_input" placeholder="PE1Lo[eg:x.x.x.x]"></td>
+<td><input id="pe2_lo_input" placeholder="PE2Lo[eg:x.x.x.x]"></td>
+</tr>
+<tr>
+<td>CE Lo</td>
+<td><input id="ce1_lo_input" placeholder="CE1Lo[eg:x.x.x.x]"></td>
+<td><input id="ce2_lo_input" placeholder="CE2Lo[eg:x.x.x.x]"></td>
+</tr>
+<tr>
+
+<tr>
+<td>AC Pub</td>
+<td><input id="ac1_pub_input" placeholder="AC1Pub[eg:x.x.x.x]"></td>
+<td><input id="ac2_pub_input" placeholder="AC2Pub[eg:x.x.x.x]"></td>
+</tr>
+<tr>
+
+<tr>
+<td>AC PSK</td>
+<td><input id="ac1_psk_input" placeholder="AC1Psk[eg:xxx]"></td>
+<td><input id="ac2_psk_input" placeholder="AC2Psk[eg:xxx]"></td>
+</tr>
+<tr>
+
+<td>OverseaIP</td>
+<td><input id="ac1_oversea_input" placeholder="海外IP[eg:10.x.x.x-x.x.x.x]"></td>
+<td><input id="ac2_oversea_input" placeholder="海外IP[eg:10.x.x.x-x.x.x.x]"></td>
+</tr>
+<tr>
 </table>
 <button type="button" onclick="fastip003sub('/config')">提交配置信息(Submit Config Info)</button>
 `;
@@ -54,8 +107,10 @@ function fastip003getList() {
                 "pe":[],
                 "if":[],
                 "ip":[],
-                "lo":[],
+                "pelo":[],
+                "celo":[],
                 "pub":[],
+                "psk":[],
                 "bgp":[],
                 "oversea":[],
                 "other":[],
@@ -77,23 +132,43 @@ function fastip003getList() {
                 case '主pe':
                     info_json.pe.push(l1);
                     break;
-                case 'wanip':
-                    info_json.ip.push(l1);
+                case 'pe对接':
+                    info_json.pelo.push(l1);
+                    break;
+                case 'pedocking':
+                    info_json.pelo.push(l1);
+                    break;
+                case 'cedocking':
+                    info_json.celo.push(l1);
+                    break;
+                case 'ce对接':
+                    info_json.celo.push(l1);
+                    break;
+                case 'celoip':
+                    info_json.celo.push(l1);
                     break;
                 case 'tunnel':
                     info_json.if.push(l1);
                     break;
-                case 'docking':
+                case 'wanip':
+                    info_json.ip.push(l1);
+                    break;
+                case '拨号ip':
                     info_json.pub.push(l1);
                     break;
-                case 'celoip':
-                    info_json.lo.push(l1);
+                case '秘钥':
+                    info_json.psk.push(l1);
+                    break;
+                case 'docking':
+                    info_json.pub.push(l1);
                     break;
                 case 'hkip':
                     info_json.oversea.push(l1);
                     break;
                 case 'bgpserverip':
-                    info_json.bgp.push(l1);
+                    let bgp = l1.split(",");
+                    info_json.bgp.push(bgp[0]);
+                    info_json.bgp.push(bgp[1]);
                     break;
                 default:
                     info_json.other.push(l1);
@@ -101,31 +176,51 @@ function fastip003getList() {
         }
     };
     console.log(info_json);
-let peers = (info_json.bgp[0]+","+info_json.bgp[1]).split(",");
-let resource_text =
-`id=${info_json.id[0]}
-ac1=${info_json.pe[0]}
-ac1if=${info_json.if[0]}
-ac1ip=${info_json.ip[0]}
-ac1pub=${info_json.pub[0]}
-ac2=${info_json.pe[1]}
-ac2if=${info_json.if[1]}
-ac2ip=${info_json.ip[1]}
-ac2pub=${info_json.pub[1]}
-loip=${info_json.lo[0]}
-peer1=${peers[0]}
-peer2=${peers[1]}
-peer3=${peers[2]}
-peer4=${peers[3]}
-oversea=${info_json.oversea[0]}`;
-console.log(resource_text);
-    $("#resource_textarea").val(resource_text);
+$("#lineid_input").val(info_json.id[0].substr(0,7));
+
+    $("#ac1_input").val(info_json.pe[0]);
+    $("#ac1_if_input").val(info_json.if[0]);
+    $("#ac1_ip_input").val(info_json.ip[0]);
+    $("#ac1_pub_input").val(info_json.pub[0]);
+    $("#ce1_lo_input").val(info_json.celo[0]);
+    $("#ac1_oversea_input").val(info_json.oversea[0]);
+    $("#bgp_server1_input").val(info_json.bgp[0]);
+    $("#bgp_server3_input").val(info_json.bgp[2]);
+
+    $("#ac2_input").val(info_json.pe[1]);
+    $("#ac2_if_input").val(info_json.if[1]);
+    $("#ac2_ip_input").val(info_json.ip[1]);
+    $("#ac2_pub_input").val(info_json.pub[1]);
+    $("#ce2_lo_input").val(info_json.celo[1]);
+    $("#ac2_oversea_input").val(info_json.oversea[0]);
+    $("#bgp_server2_input").val(info_json.bgp[1]);
+    $("#bgp_server4_input").val(info_json.bgp[3]);
   };
 };
 
 $("#service_dev").append(fastip003html);
 //加载测试资源的解析数据
 fastip003getList();
+
+function fastip003setWan(value){
+    let html='';
+    wan_input_tr = '#wan1_input_tr';
+    switch(value){
+        case "dhcp":
+            $(wan_input_tr).empty();
+        break;
+        case "static":
+            $(wan_input_tr).empty();
+            $(wan_input_tr).append(`<td>Static</td><td><input id="wan1_ip_input" placeholder="IP[x.x.x.x/x]"></td>
+            <td><input id="wan1_gw_input" placeholder="GW[x.x.x.x]"></td>`);
+        break;
+        case "pppoe":
+            $(wan_input_tr).empty();
+            $(wan_input_tr).append(`<td>PPPoE</td><td><input id="pppoe1_user_input" placeholder="PPPoE[x.163.gd]"></td>
+            <td><input id="pppoe1_pass_input" placeholder="PPPoE[******]"></td>`);
+        break;
+    };
+}
 
 function fastip003sub(url){
   let time = getTime(new Date());

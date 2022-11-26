@@ -798,7 +798,7 @@ set policy community-list 83 rule 10 regex '65000:9808'
 set policy route-map bgp-from--RSVR rule 100 action 'permit'
 set policy route-map bgp-from--RSVR rule 100 description 'to_hk'
 set policy route-map bgp-from--RSVR rule 100 match community community-list '80'
-set policy route-map bgp-from--RSVR rule 100 set ip-next-hop ${pe1ip1}
+set policy route-map bgp-from--RSVR rule 100 set ip-next-hop ${natpe1ip1}
 set policy route-map bgp-from--RSVR rule 200 action 'permit'
 set policy route-map bgp-from--RSVR rule 200 description 'to_ct'
 set policy route-map bgp-from--RSVR rule 200 match community community-list '81'
@@ -814,7 +814,7 @@ set policy route-map bgp-from--RSVR rule 400 set ip-next-hop 1.1.1.1
 set policy route-map bgp-from--RSVR2 rule 100 action 'permit'
 set policy route-map bgp-from--RSVR2 rule 100 description 'to_hk'
 set policy route-map bgp-from--RSVR2 rule 100 match community community-list '80'
-set policy route-map bgp-from--RSVR2 rule 100 set ip-next-hop ${pe2ip1}
+set policy route-map bgp-from--RSVR2 rule 100 set ip-next-hop ${natpe2ip1}
 set policy route-map bgp-from--RSVR2 rule 100 set local-preference '50'
 set policy route-map bgp-from--RSVR2 rule 200 action 'permit'
 set policy route-map bgp-from--RSVR2 rule 200 description 'to_ct'
@@ -835,7 +835,7 @@ set protocols bgp 65000 neighbor 10.10.99.200 peer-group 'RSVR'
 set protocols bgp 65000 neighbor 10.10.99.201 peer-group 'RSVR'
 set protocols bgp 65000 neighbor 10.10.99.202 peer-group 'RSVR2'
 set protocols bgp 65000 neighbor 10.10.99.203 peer-group 'RSVR2'
-set protocols bgp 65000 parameters router-id 10.20.108.119
+set protocols bgp 65000 parameters router-id ${pe1ip2}
 set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast route-map import 'bgp-from--RSVR'
 set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast soft-reconfiguration inbound
 set protocols bgp 65000 peer-group RSVR remote-as '65000'
