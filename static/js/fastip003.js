@@ -22,7 +22,7 @@ const fastip003html = `<table border="1">
 <option value="CT" selected="selected">电信</option>
 <option value="CU">联通</option>
 <option value="CM">移动</option></select></td>
-<td><select id="wan1_type_select" onchange=fastip003setWan(this.value)>
+<td><select id="wan1_type_select" onchange=fastip003setWan1(this.value)>
 <option value="dhcp" selected="selected">WAN Type[ DHCP ]</option>
 <option value="static">WAN Type[ Static ]</option>
 <option value="pppoe">WAN Type[ PPPoE ]</option></select></td>
@@ -202,7 +202,7 @@ $("#service_dev").append(fastip003html);
 //加载测试资源的解析数据
 fastip003getList();
 
-function fastip003setWan(value){
+function fastip003setWan1(value){
     let html='';
     wan_input_tr = '#wan1_input_tr';
     switch(value){

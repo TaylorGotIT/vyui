@@ -68,7 +68,7 @@ const fastip103html = `<table border="1">
 <button type="button" onclick="fastip103sub('/config')">提交配置信息(Submit Config Info)</button>
 `;
 
-function fastip103getList() {
+function fastip104getList() {
 //空格全角分号去除
     let str = $("#config_textarea").val().replaceAll(' ','').replaceAll('：',':').replaceAll(';','');
     if(str.length>32){
@@ -97,10 +97,12 @@ function fastip103getList() {
                     info_json.id.push(l1);
                     break;
                 case 'pe':
-                    if(l1.search('ac')!=-1){
+                    if(l1.search('ac')!=-1 | l1.search('gw')!=-1){
                         info_json.ac.push(l1);
-                    }else{
+                    }else if(l1.search('pe')!=-1){
                         info_json.pe.push(l1);
+                    }else{
+                        info_json.lo.push(l1);
                     };
 
                     break;
@@ -240,7 +242,7 @@ function fastip103sub(url){
   let ac1ips = ipNext($("#ac1_ip_input").val().split('/')[0]);
   let ac1ip1 = ac1ips[0];
   let ac1ip2 = ac1ips[1];
-  let ac1remote = $("#ac1_pub_input").val();
+  let ac1pub = $("#ac1_pub_input").val();
 
 //获取备线参数
   let pe2 = $("#pe2_input").val();
@@ -256,7 +258,7 @@ function fastip103sub(url){
   let ac2ips = ipNext($("#ac2_ip_input").val().split('/')[0]);
   let ac2ip1 = ac2ips[0];
   let ac2ip2 = ac2ips[1];
-  let ac2remote = $("#ac2_pub_input").val();
+  let ac2pub = $("#ac2_pub_input").val();
 //差异化配置生成
 let wanTemp = '';
 switch(wan1Type){
@@ -374,7 +376,7 @@ echo 'OpenVPN 接入配置[ac1]'
 set interfaces openvpn ${ac1if} description AC1_to_${ac1}
 set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
 set interfaces openvpn ${ac1if} remote-address ${ac1ip1}
-set interfaces openvpn ${ac1if} remote-host ${ac1remote}
+set interfaces openvpn ${ac1if} remote-host ${ac1pub}
 set interfaces openvpn ${ac1if} remote-port ${ac1port}
 set interfaces openvpn ${ac1if} mode site-to-site
 set interfaces openvpn ${ac1if} protocol udp
@@ -389,7 +391,7 @@ echo 'OpenVPN 接入配置[ac2]'
 set interfaces openvpn ${ac2if} description AC2_to_${ac2}
 set interfaces openvpn ${ac2if} local-address ${ac2ip2} subnet-mask 255.255.255.252
 set interfaces openvpn ${ac2if} remote-address ${ac2ip1}
-set interfaces openvpn ${ac2if} remote-host ${ac2remote}
+set interfaces openvpn ${ac2if} remote-host ${ac2pub}
 set interfaces openvpn ${ac2if} remote-port ${ac2port}
 set interfaces openvpn ${ac2if} mode site-to-site
 set interfaces openvpn ${ac2if} protocol udp
@@ -440,8 +442,8 @@ set track name to-main test 10 target ${pe1ip1}
 set track name to-main test 10 ttl-limit 1
 set track name to-main test 10 type ping
 echo '>>>静态路由配置[Static]<<<'
-set protocols static route ${ac1remote}/32 next-hop 1.1.1.1
-set protocols static route ${ac2remote}/32 next-hop 1.1.1.1
+set protocols static route ${ac1pub}/32 next-hop 1.1.1.1
+set protocols static route ${ac2pub}/32 next-hop 1.1.1.1
 set protocols static route ${pe1lo}/32 next-hop ${ac1ip1}
 set protocols static route ${pe2lo}/32 next-hop ${ac2ip1}
 set protocols static route 114.113.245.99/32 next-hop ${pe1ip1}
@@ -626,7 +628,7 @@ set protocols bgp 65000 neighbor 10.10.99.200 peer-group 'RSVR'
 set protocols bgp 65000 neighbor 10.10.99.201 peer-group 'RSVR'
 set protocols bgp 65000 neighbor 10.10.99.202 peer-group 'RSVR2'
 set protocols bgp 65000 neighbor 10.10.99.203 peer-group 'RSVR2'
-set protocols bgp 65000 parameters router-id 10.20.108.119
+set protocols bgp 65000 parameters router-id ${pe1ip2}
 set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast route-map import 'bgp-from--RSVR'
 set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast soft-reconfiguration inbound
 set protocols bgp 65000 peer-group RSVR remote-as '65000'

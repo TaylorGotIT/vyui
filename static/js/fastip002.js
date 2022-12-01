@@ -16,8 +16,7 @@ const fastip002html = `<table border="1">
 <td>WAN1</td>
 <td><select id="wan1_select">
 <option value="eth0" selected="selected">WAN1-ETH0</option>
-<option value="br0">WAN1-BR0</option>
-<option value="br1">WAN1-BR1</option></select>
+<option value="br0">WAN1-BR0</option></select>
 <select id="wan1_provider_select">
 <option value="CT" selected="selected">电信</option>
 <option value="CU">联通</option>
@@ -33,7 +32,6 @@ const fastip002html = `<table border="1">
 <td>WAN2</td>
 <td><select id="wan2_select">
 <option value="eth1" selected="selected">WAN2-ETH1</option>
-<option value="br0">WAN2-BR0</option>
 <option value="br1">WAN2-BR1</option></select>
 <select id="wan2_provider_select">
 <option value="CT" selected="selected">电信</option>
@@ -43,7 +41,6 @@ const fastip002html = `<table border="1">
 <option value="dhcp" selected="selected">WAN Type[ DHCP ]</option>
 <option value="static">WAN Type[ Static ]</option>
 <option value="pppoe">WAN Type[ PPPoE ]</option></select></td>
-</tr>
 </tr>
 <tr id="wan2_input_tr"></tr>
 <tr>
@@ -296,6 +293,7 @@ function fastip002sub(url){
   let ac2pub = $("#ac2_pub_input").val();
 //差异化配置生成
 let wan1Temp = '';
+if(wan1=="eth0"){
 switch(wan1Type){
     case "dhcp":
         wan1Temp += `set interfaces ethernet ${wan1} description WAN1-${wan1Provider}-DHCP
@@ -321,8 +319,42 @@ set interfaces ethernet ${wan1} pppoe 1 user-id ${pppoe1pass}
 set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
     break;
   };
+}else if(wan1=="br0"){
+switch(wan1Type){
+    case "dhcp":
+        wan1Temp += `set interfaces bridge ${wan1} description WAN1-${wan1Provider}-DHCP
+set interfaces bridge ${wan1} address dhcp
+set interfaces bridge ${wan1} member interface eth0
+set interfaces bridge ${wan1} member interface eth1
+set protocols static route 1.1.1.1/32 dhcp-interface ${wan1}`;
+    break;
+    case "static":
+        let wan1ip = $("#wan1_ip_input").val();
+        let wan1gw = $("#wan1_gw_input").val();
+        wan1Temp += `set interfaces bridge ${wan1} description WAN1-${wan1Provider}-GW-${wan1gw}
+set interfaces bridge ${wan1} address ${wan1ip}
+set interfaces bridge ${wan1} member interface eth0
+set interfaces bridge ${wan1} member interface eth1
+set protocols static route 1.1.1.1/32 next-hop ${wan1gw}`;
+    break;
+    case "pppoe":
+        let pppoe1user = $("#pppoe1_user_input").val();
+        let pppoe1pass = $("#pppoe1_pass_input").val();
+        wan1Temp += `set interfaces bridge ${wan1} description WAN1_${wan1Provider}_${pppoe1user}/${pppoe1pass}
+set interfaces bridge ${wan1} pppoe 1 default-route 'none'
+set interfaces bridge ${wan1} pppoe 1 mtu '1492'
+set interfaces bridge ${wan1} pppoe 1 name-server 'none'
+set interfaces bridge ${wan1} pppoe 1 password ${pppoe1user}
+set interfaces bridge ${wan1} pppoe 1 user-id ${pppoe1pass}
+set interfaces bridge ${wan1} member interface eth0
+set interfaces bridge ${wan1} member interface eth1
+set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
+    break;
+  };
+}
 
 let wan2Temp = '';
+if(wan2=="eth1"){
 switch(wan2Type){
     case "dhcp":
         wan2Temp += `set interfaces ethernet ${wan2} description WAN2-${wan2Provider}-DHCP
@@ -348,6 +380,40 @@ set interfaces ethernet ${wan2} pppoe 1 user-id ${pppoe2pass}
 set protocols static interface-route 1.1.1.2/32 next-hop-interface pppoe2`;
     break;
   };
+}else if(wan2=="br1"){
+switch(wan2Type){
+    case "dhcp":
+        wan2Temp += `set interfaces bridge ${wan2} description WAN2-${wan2Provider}-DHCP
+set interfaces bridge ${wan2} address dhcp
+set interfaces bridge ${wan1} member interface eth2
+set interfaces bridge ${wan1} member interface eth3
+set protocols static route 1.1.1.2/32 dhcp-interface ${wan2}`;
+    break;
+    case "static":
+        let wan2ip = $("#wan2_ip_input").val();
+        let wan2gw = $("#wan2_gw_input").val();
+        wan2Temp += `set interfaces bridge ${wan1} description WAN2-${wan2Provider}-GW-${wan2gw}
+set interfaces bridge ${wan2} address ${wan2ip}
+set interfaces bridge ${wan1} member interface eth2
+set interfaces bridge ${wan1} member interface eth3
+set protocols static route 1.1.1.2/32 next-hop ${wan2gw}`;
+    break;
+    case "pppoe":
+        let pppoe1user = $("#pppoe2_user_input").val();
+        let pppoe1pass = $("#pppoe2_pass_input").val();
+        wan2Temp += `set interfaces bridge ${wan2} description WAN2_${wan2Provider}_${pppoe2user}/${pppoe2pass}
+set interfaces bridge ${wan2} pppoe 1 default-route 'none'
+set interfaces bridge ${wan2} pppoe 1 mtu '1492'
+set interfaces bridge ${wan2} pppoe 1 name-server 'none'
+set interfaces bridge ${wan2} pppoe 1 password ${pppoe2user}
+set interfaces bridge ${wan2} pppoe 1 user-id ${pppoe2pass}
+set interfaces bridge ${wan1} member interface eth2
+set interfaces bridge ${wan1} member interface eth3
+set protocols static interface-route 1.1.1.2/32 next-hop-interface pppoe2`;
+    break;
+  };
+}
+
 
 let smartdns = '';
 switch(version){
@@ -476,8 +542,8 @@ set firewall name WAN2LOCAL rule 1000 source group network-group 'GROUP-FNET-Whi
 set firewall name WAN2LOCAL rule 2000 action 'drop'
 set firewall name WAN2LOCAL rule 2000 destination port '179,2707,53,161,123,8899'
 set firewall name WAN2LOCAL rule 2000 protocol 'tcp_udp'
-set interfaces ethernet eth0 firewall local name 'WAN2LOCAL'
-set interfaces ethernet eth1 firewall local name 'WAN2LOCAL'
+set interfaces ethernet ${wan1} firewall local name 'WAN2LOCAL'
+set interfaces ethernet ${wan2} firewall local name 'WAN2LOCAL'
 set interfaces openvpn ${ac1if} firewall local name 'WAN2LOCAL'
 set interfaces openvpn ${ac2if} firewall local name 'WAN2LOCAL'
 set system host-name ${lineid}-${cnameEN}-${area}
@@ -486,7 +552,7 @@ set service snmp community both-win authorization 'ro'
 set interfaces loopback lo address ${ce1lo}/32
 set interfaces loopback lo address ${ce2lo}/32
 set interfaces loopback lo address ${oversea1ip1}/32
-set interfaces loopback lo description ${oversea1ips}
+set interfaces loopback lo description ${ce1lo},${oversea1ips}
 ${wan1Temp}
 ${wan2Temp}
 echo 'OpenVPN 接入配置[ac1]'
@@ -544,7 +610,6 @@ set track name to-main test 10 target 10.30.20.129
 set track name to-main test 10 ttl-limit 1
 set track name to-main test 10 type ping
 echo '>>>静态路由配置[Static]<<<'
-set protocols static route 0.0.0.0/0 next-hop 1.1.1.1 track to-114
 set protocols static route 0.0.0.0/0 next-hop 1.1.1.1 distance 220
 set protocols static route 0.0.0.0/0 next-hop 1.1.1.2 distance 230
 set protocols static route ${ac1pub}/32 next-hop 1.1.1.1
@@ -625,6 +690,11 @@ set protocols bgp 65000 peer-group RSVR2 remote-as '65000'
 set protocols bgp 65000 peer-group RSVR2 update-source ${ce2lo}
 set protocols bgp 65000 timers holdtime '15'
 set protocols bgp 65000 timers keepalive '60'
+#需要更换BGP Server时使用
+#set protocols bgp 65000 neighbor 10.10.99.200 peer-group 'RSVR'
+#set protocols bgp 65000 neighbor 10.10.99.201 peer-group 'RSVR'
+#set protocols bgp 65000 neighbor 10.10.99.202 peer-group 'RSVR2'
+#set protocols bgp 65000 neighbor 10.10.99.203 peer-group 'RSVR2'
 echo '>>>DNS劫持<<<'
 set nat destination rule 50 destination port 53
 set nat destination rule 50 inbound-interface ${wan1}

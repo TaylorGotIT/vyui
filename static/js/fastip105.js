@@ -29,6 +29,15 @@ const fastip105html = `<table border="1">
 </tr>
 <tr id="wan1_input_tr"></tr>
 <tr>
+<td>OverseaDNS1</td>
+<td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]"></td>
+<td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]"></td>
+</tr>
+<td>OverseaDNS2</td>
+<td><input id="oversea3_dns_input" placeholder="海外DNS3[eg:8.8.8.8]"></td>
+<td><input id="oversea4_dns_input" placeholder="海外DNS4[eg:8.8.4.4]"></td>
+</tr>
+<tr>
 <td>PE</td>
 <td><input id="pe1_input" placeholder="PE1[eg:gzd-upe1]"></td>
 <td><input id="pe2_input" placeholder="PE2[eg:szd-upe2]"></td>
@@ -102,15 +111,6 @@ const fastip105html = `<table border="1">
 <td>OverseaIP</td>
 <td><input id="natpe1_oversea_input" placeholder="NATPE1Oversea[eg:10.x.x.x-x.x.x.x]"></td>
 <td><input id="natpe2_oversea_input" placeholder="NATPE2Oversea[eg:10.x.x.x-x.x.x.x]"></td>
-</tr>
-<tr>
-<td>OverseaDNS1</td>
-<td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]"></td>
-<td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]"></td>
-</tr>
-<td>OverseaDNS2</td>
-<td><input id="oversea3_dns_input" placeholder="海外DNS3[eg:8.8.8.8]"></td>
-<td><input id="oversea4_dns_input" placeholder="海外DNS4[eg:8.8.4.4]"></td>
 </tr>
 </table>
 <button type="button" onclick="fastip105sub('/config')">提交配置信息(Submit Config Info)</button>
@@ -302,7 +302,7 @@ function fastip105sub(url){
   let ac1ips = ipNext($("#ac1_ip_input").val().split('/')[0]);
   let ac1ip1 = ac1ips[0];
   let ac1ip2 = ac1ips[1];
-  let ac1remote = $("#ac1_pub_input").val();
+  let ac1pub = $("#ac1_pub_input").val();
 
 //获取备线参数
   let pe2 = $("#pe2_input").val();
@@ -318,7 +318,7 @@ function fastip105sub(url){
   let ac2ips = ipNext($("#ac2_ip_input").val().split('/')[0]);
   let ac2ip1 = ac2ips[0];
   let ac2ip2 = ac2ips[1];
-  let ac2remote = $("#ac2_pub_input").val();
+  let ac2pub = $("#ac2_pub_input").val();
 
   let natpe1 = $("#natpe1_input").val();
   let natpe2 = $("#natpe2_input").val();
@@ -505,8 +505,7 @@ set firewall name VPN2LOCAL rule 3000 protocol 'tcp_udp'
 set firewall name VPN2LOCAL rule 4000 action 'drop'
 set firewall name VPN2LOCAL rule 4000 destination port '1723,3124,3127,3128,3389,5000,8080,31337'
 set firewall name VPN2LOCAL rule 4000 protocol 'tcp_udp'
-set interfaces ethernet eth0 firewall local name 'WAN2LOCAL'
-set interfaces ethernet eth1 firewall local name 'WAN2LOCAL'
+set interfaces ethernet ${wan1} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe1if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe2if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${natpe1if} firewall local name 'VPN2LOCAL'
@@ -528,7 +527,7 @@ echo 'OpenVPN 接入配置[ac1]'
 set interfaces openvpn ${ac1if} description AC1_to_${ac1}
 set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
 set interfaces openvpn ${ac1if} remote-address ${ac1ip1}
-set interfaces openvpn ${ac1if} remote-host ${ac1remote}
+set interfaces openvpn ${ac1if} remote-host ${ac1pub}
 set interfaces openvpn ${ac1if} remote-port ${ac1port}
 set interfaces openvpn ${ac1if} mode site-to-site
 set interfaces openvpn ${ac1if} protocol udp
@@ -543,7 +542,7 @@ echo 'OpenVPN 接入配置[ac2]'
 set interfaces openvpn ${ac2if} description AC2_to_${ac2}
 set interfaces openvpn ${ac2if} local-address ${ac2ip2} subnet-mask 255.255.255.252
 set interfaces openvpn ${ac2if} remote-address ${ac2ip1}
-set interfaces openvpn ${ac2if} remote-host ${ac2remote}
+set interfaces openvpn ${ac2if} remote-host ${ac2pub}
 set interfaces openvpn ${ac2if} remote-port ${ac2port}
 set interfaces openvpn ${ac2if} mode site-to-site
 set interfaces openvpn ${ac2if} protocol udp
@@ -616,8 +615,8 @@ set track name to-main test 10 target ${pe1ip1}
 set track name to-main test 10 ttl-limit 1
 set track name to-main test 10 type ping
 echo '>>>静态路由配置[Static]<<<'
-set protocols static route ${ac1remote}/32 next-hop 1.1.1.1
-set protocols static route ${ac2remote}/32 next-hop 1.1.1.1
+set protocols static route ${ac1pub}/32 next-hop 1.1.1.1
+set protocols static route ${ac2pub}/32 next-hop 1.1.1.1
 set protocols static route ${pe1lo}/32 next-hop ${ac1ip1}
 set protocols static route ${pe2lo}/32 next-hop ${ac2ip1}
 set protocols static route ${natpe1lo}/32 next-hop ${pe1ip1} track to-main
@@ -772,8 +771,8 @@ IP/环境监测
 SmartPing监控：
     阿里DNS：114.114.114.114
     谷歌DNS：8.8.8.8
-    主线Pub: ${ac1remote}
-    备线Pub: ${ac2remote}
+    主线Pub: ${ac1pub}
+    备线Pub: ${ac2pub}
     ${natpe1}: ${natpe1ip1}
     ${natpe2}: ${natpe2ip1}
 ##############
