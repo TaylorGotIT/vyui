@@ -772,7 +772,7 @@ SmartPing监控：
     主线Pub: ${ac1ip1}
     备线Pub: ${ac2ip1}
 `;
-  let filename = `${cnameEN}-Fastip-${lineid}-ConfigBy${user}-${time.ez}`;
+  let filename = `${lineid}-FastIP-HK-${lineid}-ConfigBy${user}-${time.ez}`;
   let data = {};
   downloadConfig(filename, fastip002fastipOpenvpn);
   let type = 'post'
