@@ -691,10 +691,10 @@ set protocols bgp 65000 peer-group RSVR2 update-source ${ce2lo}
 set protocols bgp 65000 timers holdtime '15'
 set protocols bgp 65000 timers keepalive '60'
 #需要更换BGP Server时使用
-#set protocols bgp 65000 neighbor 10.10.99.200 peer-group 'RSVR'
-#set protocols bgp 65000 neighbor 10.10.99.201 peer-group 'RSVR'
-#set protocols bgp 65000 neighbor 10.10.99.202 peer-group 'RSVR2'
-#set protocols bgp 65000 neighbor 10.10.99.203 peer-group 'RSVR2'
+#set protocols bgp 65000 neighbor ${bgp1server1} peer-group 'RSVR'
+#set protocols bgp 65000 neighbor ${bgp1server2} peer-group 'RSVR'
+#set protocols bgp 65000 neighbor ${bgp1server3} peer-group 'RSVR2'
+#set protocols bgp 65000 neighbor ${bgp1server4} peer-group 'RSVR2'
 echo '>>>DNS劫持<<<'
 set nat destination rule 50 destination port 53
 set nat destination rule 50 inbound-interface ${wan1}
@@ -772,7 +772,7 @@ SmartPing监控：
     主线Pub: ${ac1ip1}
     备线Pub: ${ac2ip1}
 `;
-  let filename = `${lineid}-FastIP-HK-${lineid}-ConfigBy${user}-${time.ez}`;
+  let filename = `${lineid}-FastIP-HK-FnetOS-ConfigBy${user}-${time.ez}`;
   let data = {};
   downloadConfig(filename, fastip002fastipOpenvpn);
   let type = 'post'

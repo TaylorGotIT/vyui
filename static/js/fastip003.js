@@ -23,8 +23,8 @@ const fastip003html = `<table border="1">
 <option value="CU">联通</option>
 <option value="CM">移动</option></select></td>
 <td><select id="wan1_type_select" onchange=fastip003setWan1(this.value)>
-<option value="dhcp" selected="selected">WAN Type[ DHCP ]</option>
-<option value="static">WAN Type[ Static ]</option>
+<option value="static" selected="selected">WAN Type[ Static ]</option>
+<option value="dhcp">WAN Type[ DHCP ]</option>
 <option value="pppoe">WAN Type[ PPPoE ]</option></select></td>
 </tr>
 <tr id="wan1_input_tr"></tr>
@@ -48,21 +48,21 @@ const fastip003html = `<table border="1">
 <td><input id="bgp_server3_input" value="10.10.99.201"></td>
 <td><input id="bgp_server4_input" value="10.10.99.203"></td>
 </tr>
-<td>AC</td>
-<td><input id="ac1_input" placeholder="AC1[eg:gzd-acvpnpe1]"></td>
-<td><input id="ac2_input" placeholder="AC2[eg:szd-acvpnpe1]"></td>
+<td>PE</td>
+<td><input id="pe1_input" placeholder="PE1[eg:gzd-acvpnpe1]"></td>
+<td><input id="pe2_input" placeholder="PE2[eg:szd-acvpnpe1]"></td>
 </tr>
 <tr>
-<td>AC IF</td>
-<td><input id="ac1_if_input" placeholder="AC1IF[eg:vtun1000]"></td>
-<td><input id="ac2_if_input" placeholder="AC2IF[eg:vtun2000]"></td>
+<td>PE IF</td>
+<td><input id="pe1_if_input" placeholder="PE1IF[eg:vtun1000]"></td>
+<td><input id="pe2_if_input" placeholder="PE2IF[eg:vtun2000]"></td>
 </tr>
 <tr>
-<td>AC IP</td>
-<td><input id="ac1_ip_input" placeholder="AC1IP[eg:10.x.x.x/30]"></td>
-<td><input id="ac2_ip_input" placeholder="AC2IP[eg:10.x.x.x/30]"></td>
+<td>PE IP</td>
+<td><input id="pe1_ip_input" placeholder="PE1IP[eg:10.x.x.x/30]"></td>
+<td><input id="pe2_ip_input" placeholder="PE2IP[eg:10.x.x.x/30]"></td>
 </tr>
-
+<tr>
 <td>PE Lo</td>
 <td><input id="pe1_lo_input" placeholder="PE1Lo[eg:x.x.x.x]"></td>
 <td><input id="pe2_lo_input" placeholder="PE2Lo[eg:x.x.x.x]"></td>
@@ -73,14 +73,19 @@ const fastip003html = `<table border="1">
 <td><input id="ce2_lo_input" placeholder="CE2Lo[eg:x.x.x.x]"></td>
 </tr>
 <tr>
-
+<td>BGP Lo</td>
+<td><input id="bgp1_lo_input" placeholder="CE1Lo[eg:x.x.x.x]"></td>
+<td><input id="bgp2_lo_input" placeholder="CE2Lo[eg:x.x.x.x]"></td>
+</tr>
+<td>OverseaIP</td>
+<td><input id="pe1_oversea_input" placeholder="海外IP[eg:10.x.x.x-x.x.x.x]"></td>
+<td><input id="pe2_oversea_input" placeholder="海外IP[eg:10.x.x.x-x.x.x.x]"></td>
+</tr>
 <tr>
 <td>AC Pub</td>
 <td><input id="ac1_pub_input" placeholder="AC1Pub[eg:x.x.x.x]"></td>
 <td><input id="ac2_pub_input" placeholder="AC2Pub[eg:x.x.x.x]"></td>
 </tr>
-<tr>
-
 <tr>
 <td>AC PSK</td>
 <td><input id="ac1_psk_input" placeholder="AC1Psk[eg:xxx]"></td>
@@ -88,11 +93,6 @@ const fastip003html = `<table border="1">
 </tr>
 <tr>
 
-<td>OverseaIP</td>
-<td><input id="ac1_oversea_input" placeholder="海外IP[eg:10.x.x.x-x.x.x.x]"></td>
-<td><input id="ac2_oversea_input" placeholder="海外IP[eg:10.x.x.x-x.x.x.x]"></td>
-</tr>
-<tr>
 </table>
 <button type="button" onclick="fastip003sub('/config')">提交配置信息(Submit Config Info)</button>
 `;
@@ -109,6 +109,7 @@ function fastip003getList() {
                 "ip":[],
                 "pelo":[],
                 "celo":[],
+                "bgplo":[],
                 "pub":[],
                 "psk":[],
                 "bgp":[],
@@ -145,7 +146,7 @@ function fastip003getList() {
                     info_json.celo.push(l1);
                     break;
                 case 'celoip':
-                    info_json.celo.push(l1);
+                    info_json.bgplo.push(l1);
                     break;
                 case 'tunnel':
                     info_json.if.push(l1);
@@ -154,6 +155,9 @@ function fastip003getList() {
                     info_json.ip.push(l1);
                     break;
                 case '拨号ip':
+                    info_json.pub.push(l1);
+                    break;
+                case '拨号':
                     info_json.pub.push(l1);
                     break;
                 case '秘钥':
@@ -176,25 +180,30 @@ function fastip003getList() {
         }
     };
     console.log(info_json);
-$("#lineid_input").val(info_json.id[0].substr(0,7));
-
-    $("#ac1_input").val(info_json.pe[0]);
-    $("#ac1_if_input").val(info_json.if[0]);
-    $("#ac1_ip_input").val(info_json.ip[0]);
-    $("#ac1_pub_input").val(info_json.pub[0]);
+    $("#lineid_input").val(info_json.id[0].substr(0,7));
+    $("#pe1_input").val(info_json.pe[0]);
+    $("#pe1_if_input").val(info_json.if[0]);
+    $("#pe1_ip_input").val(info_json.ip[0]);
+    $("#pe1_lo_input").val(info_json.pelo[0]);
     $("#ce1_lo_input").val(info_json.celo[0]);
-    $("#ac1_oversea_input").val(info_json.oversea[0]);
-    $("#bgp_server1_input").val(info_json.bgp[0]);
-    $("#bgp_server3_input").val(info_json.bgp[2]);
+    $("#bgp1_lo_input").val(info_json.bgplo[0]);
+    $("#pe1_oversea_input").val(info_json.oversea[0]);
+    $("#ac1_input").val(info_json.pe[1]);
+    $("#ac1_if_input").val(info_json.if[1]);
+    $("#ac1_ip_input").val(info_json.ip[1]);
+    $("#ac1_pub_input").val(info_json.pub[0]);
 
-    $("#ac2_input").val(info_json.pe[1]);
-    $("#ac2_if_input").val(info_json.if[1]);
-    $("#ac2_ip_input").val(info_json.ip[1]);
+    $("#pe2_input").val(info_json.pe[2]);
+    $("#pe2_if_input").val(info_json.if[1]);
+    $("#pe2_ip_input").val(info_json.ip[1]);
+    $("#pe2_lo_input").val(info_json.pelo[2]);
+    $("#ce2_lo_input").val(info_json.celo[3]);
+    $("#bgp2_lo_input").val(info_json.bgplo[1]);
+    $("#pe2_oversea_input").val(info_json.oversea[0]);
+    $("#ac2_input").val(info_json.pe[3]);
+    $("#ac2_if_input").val(info_json.if[3]);
+    $("#ac2_ip_input").val(info_json.ip[3]);
     $("#ac2_pub_input").val(info_json.pub[1]);
-    $("#ce2_lo_input").val(info_json.celo[1]);
-    $("#ac2_oversea_input").val(info_json.oversea[0]);
-    $("#bgp_server2_input").val(info_json.bgp[1]);
-    $("#bgp_server4_input").val(info_json.bgp[3]);
   };
 };
 
@@ -225,53 +234,84 @@ function fastip003setWan1(value){
 function fastip003sub(url){
   let time = getTime(new Date());
   let user = $("#user_input").val();
-  let bas = $("#basic_textarea").val().split('\n');
-  let src =  $("#resource_textarea").val().split('\n')
+  let wan1 = $("#wan1_select").val();
+  let wan1Type = $("#wan1_type_select").val();
+  let wan1Provider = $("#wan1_provider_select").val();
 
-  let wan1list = $("#wan1_textarea").val().split('\n');
-  let wan1isp = wan1list[0].split('=')[1].toUpperCase();
-  let wan1 = wan1list[1].split('=')[0];
-  let wan1str = wan1list[1].split('=')[1]
-
-  let wlan = $("#wlan0_textarea").val().split('\n');
-
-  let version = bas[0].split('=')[1];
-  let area = bas[1].split('=')[1].toUpperCase();
-  let cnameEN = bas[2].split('=')[1];
-  let cnameCN = bas[3].split('=')[1];
-  let wlan0ip = wlan[0].split('=')[1];
-
-  let lineid = src[0].split('=')[1];
-//获取主线参数
-  let ac1 = src[1].split('=')[1];
-  let ac1if = src[2].split('=')[1];
-  let ac1port = ac1if.replace('vtun','');
-  let ac1ips = ipNext(src[3].split('=')[1].split('/')[0]);
-  let ac1ip1 = ac1ips[0];
-  let ac1ip2 = ac1ips[1];
-  let ac1pub = src[4].split('=')[1];
-//获取备线参数
-  let ac2 = src[5].split('=')[1];
-  let ac2if = src[6].split('=')[1];
-  let ac2port = ac2if.replace('vtun','');
-  let ac2ips = ipNext(src[7].split('=')[1].split('/')[0]);
-  let ac2ip1 = ac2ips[0];
-  let ac2ip2 = ac2ips[1];
-  let ac2pub = src[8].split('=')[1];
-  let loip = src[9].split('=')[1];
-  let bgp1server1 = src[10].split('=')[1];
-  let bgp1server2 = src[11].split('=')[1];
-  let bgp1server3 = src[12].split('=')[1];
-  let bgp1server4 = src[13].split('=')[1];
-  let oversea1ips = src[14].split('=')[1];
+  let version = $("#version_select").val();
+  let lineid = $("#lineid_input").val();
+  let cnameEN = $("#cname_input").val();
+  let area = $("#area_input").val();
+  let local1dns = $("#local1_dns_input").val();
+  let local2dns = $("#local2_dns_input").val();
+  let oversea1dns = $("#oversea1_dns_input").val();
+  let oversea2dns = $("#oversea2_dns_input").val();
+  let bpg1lo = $("#bgp1_lo_input").val();
+  let bgp1server1 = $("#bgp_server1_input").val();
+  let bgp1server2 = $("#bgp_server2_input").val();
+  let bgp1server3 = $("#bgp_server3_input").val();
+  let bgp1server4 = $("#bgp_server4_input").val();
+  let oversea1ips = $("#pe1_oversea_input").val().split(',')[0];
   let oversea1ip1 = oversea1ips.split(',')[0].split('-')[0];
-//获取DNS
-  let dnss1 = $("#local_dns_textarea").val().split('\n');
-  let dnss2 = $("#oversea_dns_textarea").val().split('\n');
-  let local1dns = dnss1[0].split('=')[1];
-  let local2dns = dnss1[1].split('=')[1];
-  let oversea1dns = dnss2[0].split('=')[1];
-  let oversea2dns = dnss2[1].split('=')[1];
+
+  let pe1 = $("#pe1_input").val();
+  let pe1if = $("#pe1_if_input").val();
+  let pe1ips = ipNext($("#pe1_ip_input").val().split('/')[0]);
+  let pe1ip1 = pe1ips[0];
+  let pe1ip2 = pe1ips[1];
+  let pe1lo = $("#pe1_lo_input").val();
+  let ce1lo = $("#ce1_lo_input").val();
+  let ac1 = $("#ac1_input").val();
+  let ac1pub = $("#ac1_pub_input").val();
+  let ac1psk = $("#ac1_psk_input").val();
+
+  let pe2 = $("#pe2_input").val();
+  let pe2if = $("#pe2_if_input").val();
+  let pe2ips = ipNext($("#pe2_ip_input").val().split('/')[0]);
+  let pe2ip1 = pe2ips[0];
+  let pe2ip2 = pe2ips[1];
+  let pe2lo = $("#pe2_lo_input").val();
+  let ce2lo = $("#ce2_lo_input").val();
+  let ac2 = $("#ac2_input").val();
+  let ac2pub = $("#ac2_pub_input").val();
+  let ac2psk = $("#ac2_psk_input").val();
+//差异化配置生成
+let wan1Temp = '';
+switch(wan1Type){
+    case "dhcp":
+        wan1Temp += `interface ${wan1}
+description WAN1-${wan1Provider}
+ip address dhcp
+undo ipv6 enable`;
+    break;
+    case "static":
+        let wan1ip = $("#wan1_ip_input").val();
+        let wan1gw = $("#wan1_gw_input").val();
+        wan1Temp += `interface ${wan1}
+description WAN1-${wan1Provider}
+ip address ${wan1ip}
+undo ipv6 enable
+ip route-static ${ac1pub} 32 ${wan1gw}
+ip route-static ${ac2pub} 32 ${wan1gw}
+ip route-static ${pe1lo} 32 ${wan1gw}
+ip route-static ${pe2lo} 32 ${wan1gw}
+ip route-static 0.0.0.0 0.0.0.0 ${wan1gw} preference 220`;
+    break;
+    case "pppoe":
+        let pppoe1user = $("#pppoe1_user_input").val();
+        let pppoe1pass = $("#pppoe1_pass_input").val();
+        wan1Temp += `interface ${wan1}
+description WAN1-${wan1Provider}
+ip address ${wan1ip}
+undo ipv6 enable
+ip route-static ${ac1pub} 32 ${wan1gw}
+ip route-static ${ac2pub} 32 ${wan1gw}
+ip route-static ${pe1lo} 32 ${wan1gw}
+ip route-static ${pe2lo} 32 ${wan1gw}
+ip route-static 0.0.0.0 0.0.0.0 ${wan1gw} preference 220`;
+    break;
+  };
+
 
 let fastip003fastipOpenvpn  =
 `#Fnetlink FastIP Template.
@@ -371,43 +411,33 @@ nqa test-instance pe pe1
  probe-count 1
  start now
 #
-interface ${wan1}
-description WAN1-${wan1isp}
-ip address ${wan1ip}
-undo ipv6 enable
+${wan1Temp}
 #
 interface vlan 1
 description LAN1
-ip address ${lan1ip}
+ip address 192.168.8.1/24
 #
 interface LoopBack0
 description bgp-loip
-ip address ${loip} 32
+ip address ${bpg1lo} 32
 #
 interface LoopBack1
 description main-loip
-ip address ${ce1loip} 32
+ip address ${ce1lo} 32
 
 interface LoopBack2
 description backup-loip
-ip address ${ce2loip} 32
+ip address ${ce2lo} 32
 
 interface LoopBack100
 description hkip
 ip address ${oversea1ip1} 32
 
 acl number 3333
-rule 1 permit ip source ${ce1loip} 0 destination ${pe1loip} 0
+rule 1 permit ip source ${ce1lo} 0 destination ${pe1lo} 0
 
 acl number 3334
-rule 1 permit ip source ${ce2loip} 0 destination ${pe2loip} 0
-
-ip route-static ${pe1pub} 32 ${wan1gw}
-ip route-static ${pe2pub} 32 ${wan1gw}
-ip route-static ${pe1loip} 32 ${wan1gw}
-ip route-static ${pe2loip} 32 ${wan1gw}
-ip route-static 0.0.0.0 0.0.0.0 ${wan1gw} preference 220
-#测试用 DNS路由 ip route-static 192.168.55.105 32 ${wan1gw}
+rule 1 permit ip source ${ce2lo} 0 destination ${pe2lo} 0
 #
 # IPSEC
 ipsec proposal ipsectran1
@@ -427,7 +457,7 @@ ike peer main
  undo version 2
  pre-shared-key cipher both-win
  ike-proposal 10
- remote-address ${pe1pub}
+ remote-address ${ac1pub}
  rsa encryption-padding oaep
  rsa signature-padding pss
  ikev2 authentication sign-hash sha2-256
@@ -436,7 +466,7 @@ ike peer backup
  undo version 2
  pre-shared-key cipher both-win
  ike-proposal 10
- remote-address ${pe2pub}
+ remote-address ${ac2pub}
  rsa encryption-padding oaep
  rsa signature-padding pss
  ikev2 authentication sign-hash sha2-256
@@ -462,15 +492,15 @@ interface Tunnel0/0/100
  ip address ${pe1ip2} 30
  tunnel-protocol gre
  source LoopBack1
- destination ${pe1loip}
+ destination ${pe1lo}
 
 interface Tunnel0/0/200
  description "backup-${pe2}-${pe2if}"
  tcp adjust-mss 1300
- ip address ${pe2loip} 30
+ ip address ${pe2lo} 30
  tunnel-protocol gre
  source LoopBack2
- destination ${pe2loip}
+ destination ${pe2lo}
 #
 #MPLS监控路由
 ip route-static 114.113.245.99 32 10.40.45.69 track nqa pe pe1
@@ -479,10 +509,10 @@ ip route-static 114.113.245.100 32 10.41.45.69 preference 70
 ip route-static 192.168.55.250 32 10.40.45.69 track nqa pe pe1
 ip route-static 192.168.55.250 32 10.41.45.69 preference 70
 #BGP Server
-ip route-static 10.10.99.168 32 ${pe1ip1}
-ip route-static 10.10.99.169 32 ${pe1ip1}
-ip route-static 10.10.99.198 32 ${pe2ip1}
-ip route-static 10.10.99.199 32 ${pe2ip1}
+ip route-static ${bgp1server1} 32 ${pe1ip1}
+ip route-static ${bgp1server2} 32 ${pe1ip1}
+ip route-static ${bgp1server3} 32 ${pe2ip1}
+ip route-static ${bgp1server4} 32 ${pe2ip1}
 #
 # 缺省情况下，BGP本地优先级的值为100。
 # 该值越大则实际的优先级越高
@@ -499,15 +529,15 @@ route-policy bgp-from--RSVR permit node 100
 route-policy bgp-from--RSVR permit node 200
  description To-CT
  if-match community-filter 81
- apply ip-address next-hop ${wan1gw}
+ apply ip-address next-hop 1.1.1.1
 route-policy bgp-from--RSVR permit node 300
  description To-CNC
  if-match community-filter 82
- apply ip-address next-hop ${wan1gw}
+ apply ip-address next-hop 1.1.1.1
 route-policy bgp-from--RSVR permit node 400
  description To-CN-Other
  if-match community-filter 83
- apply ip-address next-hop ${wan1gw}
+ apply ip-address next-hop 1.1.1.1
 #
 route-policy bgp-from--RSVR2 permit node 100
  description To-HK
@@ -517,31 +547,31 @@ route-policy bgp-from--RSVR2 permit node 100
 route-policy bgp-from--RSVR2 permit node 200
  description To-CT
  if-match community-filter 81
- apply ip-address next-hop ${wan1gw}
+ apply ip-address next-hop 1.1.1.1
  apply local-preference 210
 route-policy bgp-from--RSVR2 permit node 300
  description To-CNC
  if-match community-filter 82
- apply ip-address next-hop ${wan1gw}
+ apply ip-address next-hop 1.1.1.1
  apply local-preference 210
 route-policy bgp-from--RSVR2 permit node 400
  description To-CN-Other
  if-match community-filter 83
- apply ip-address next-hop ${wan1gw}
+ apply ip-address next-hop 1.1.1.1
  apply local-preference 210
 #
 # 主线 默认200 备线设置 210  逃生默认路由220
 # ebgp 20 ibgp 200 local 200
 #
 bgp 65000
-router-id ${loip}
+router-id ${bpg1lo}
 preference 20 200 200
 group RSVR internal
 group RSVR2 internal
-peer 10.10.99.168 group RSVR
-peer 10.10.99.169 group RSVR
-peer 10.10.99.198 group RSVR2
-peer 10.10.99.199 group RSVR2
+peer ${bgp1server1} group RSVR
+peer ${bgp1server2} group RSVR
+peer ${bgp1server3} group RSVR2
+peer ${bgp1server4} group RSVR2
 ipv4-family unicast
 undo synchronization
 peer RSVR  enable
@@ -551,7 +581,9 @@ peer RSVR2 route-policy bgp-from--RSVR2 import
 #
 # Local NAT
 acl number 3999
- rule 1 permit ip source 192.168.0.0 0.0.255.255
+ rule 10 permit ip source 10.0.0.0 0.0.0.255
+ rule 20 permit ip source 172.16.0.0 0.0.240.255
+ rule 30 permit ip source 192.168.0.0 0.0.255.255
 interface ${wan1}
  nat outbound 3999
 #
@@ -567,7 +599,7 @@ nat outbound 3998 interface LoopBack 100
 1、HKIP配置到接口，只能做一个NAT
 interface LoopBack100
 description hkip
-ip address 103.141.236.115 255.255.255.255
+ip address ${oversea1ip1} 255.255.255.255
 #
 interface Tunnel0/0/200
 nat outbound 3999 interface LoopBack 100
@@ -580,7 +612,7 @@ nat outbound 3999 address-group 0
 # SmartDNS 需要向NOC申请放通客户出口公网IP
 # 如果公网IP不固定，可以直接使用公司内网SmartDNS【192.168.55.105】
 `;
-  let filename = `${cnameCN}-Fastip-${lineid}-ConfigBy${user}-${time.ez}`;
+  let filename = `${lineid}-Fastip-HK-Huawei-ConfigBy${user}-${time.ez}`;
   let data = {};
   downloadConfig(filename, fastip003fastipOpenvpn);
   let type = 'post'
