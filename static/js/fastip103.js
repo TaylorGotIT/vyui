@@ -30,8 +30,8 @@ const fastip103html = `<table border="1">
 <tr id="wan1_input_tr"></tr>
 <tr>
 <td>OverseaDNS</td>
-<td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]"></td>
-<td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]"></td>
+<td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]" value="8.8.8.8"></td>
+<td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]" value="8.8.4.4"></td>
 </tr>
 <tr>
 <td>PE</td>

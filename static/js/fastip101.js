@@ -32,23 +32,23 @@ const fastip101html = `<table border="1">
 </tr>
 <tr>
 <td>LocalDNS</td>
-<td><input id="local1_dns_input" placeholder="本地DNS1[eg:223.5.5.5]"></td>
-<td><input id="local2_dns_input" placeholder="本地DNS2[eg:223.6.6.6]"></td>
+<td><input id="local1_dns_input" placeholder="本地DNS1[eg:223.5.5.5]" value="223.5.5.5"></td>
+<td><input id="local2_dns_input" placeholder="本地DNS2[eg:223.6.6.6]" value="223.6.6.6"></td>
 </tr>
 <tr>
 <td>OverseaDNS</td>
-<td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]"></td>
-<td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]"></td>
+<td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]" value="8.8.8.8"></td>
+<td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]" value="8.8.4.4"></td>
 </tr>
 <tr>
 <td>BGPServerA</td>
-<td><input id="bgp_server1_input" value="10.10.99.200"></td>
-<td><input id="bgp_server2_input" value="10.10.99.202"></td>
+<td><input id="bgp_server1_input" placeholder="BGP Server1" value="10.10.99.200"></td>
+<td><input id="bgp_server2_input" placeholder="BGP Server2" value="10.10.99.202"></td>
 </tr>
 <tr>
 <td>BGPServerB</td>
-<td><input id="bgp_server3_input" value="10.10.99.201"></td>
-<td><input id="bgp_server4_input" value="10.10.99.203"></td>
+<td><input id="bgp_server3_input" placeholder="BGP Server3" value="10.10.99.201"></td>
+<td><input id="bgp_server4_input" placeholder="BGP Server4" value="10.10.99.203"></td>
 </tr>
 <tr>
 <td>PE</td>

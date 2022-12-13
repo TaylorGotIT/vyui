@@ -27,6 +27,11 @@ const fastip201html = `<table border="1">
 <option value="pppoe">WAN Type[ PPPoE ]</option></select></td></tr>
 <tr id="wan1_input_tr"></tr>
 <tr>
+<td>OverseaDNS</td>
+<td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]" value="8.8.8.8"></td>
+<td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]" value="8.8.4.4"></td>
+</tr>
+<tr>
 <td>PE</td>
 <td><input id="pe1_input"></td>
 <td><input id="pe2_input"></td>
@@ -224,6 +229,8 @@ function fastip201sub(url){
   let wan1 =  $("#wan1_select").val();
   let wan1Type = $("#wan1_type_select").val();
   let wan1Provider =  $("#wan1_provider_select").val();
+  let oversea1dns =  $("#oversea1_dns_input").val();
+  let oversea2dns =  $("#oversea2_dns_input").val();
 //获取主线参数
   let pe1 = $("#pe1_input").val();
   let pe1if = $("#pe1_if_input").val();
@@ -328,7 +335,8 @@ dhcp select interface
 dhcp client expected-lease 7200
 dhcp client client-id sdwan
 dhcp server gateway-list 192.168.8.1
-dhcp server dns-list 8.8.8.8
+dhcp server dns-list ${oversea1dns}
+dhcp server dns-list ${oversea2dns}
 dhcp server ip-range 192.168.8.2 192.168.8.254
 dhcp server mask 255.255.255.0
 dhcp server logging

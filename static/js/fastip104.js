@@ -21,8 +21,8 @@ const fastip103html = `<table border="1">
 <option value="static">WAN Type[ Static ]</option>
 <option value="pppoe">WAN Type[ PPPoE ]</option></select></td></tr>
 <tr>
-<td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]"></td>
-<td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]"></td>
+<td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]" value="8.8.8.8"></td>
+<td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]" value="8.8.4.4"></td>
 </tr>
 <tr>
 <td><input id="pe1_input"></td>
