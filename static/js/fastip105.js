@@ -242,10 +242,10 @@ function fastip105getList() {
     $("#natpe2_if_input").val(info_json.if[5]);
     $("#natpe1_ip_input").val(info_json.ip[4]);
     $("#natpe2_ip_input").val(info_json.ip[5]);
-    $("#natpe1_lo_input").val(info_json.lo[5]);
-    $("#natpe2_lo_input").val(info_json.lo[7]);
-    $("#natce1_lo_input").val(info_json.lo[4]);
-    $("#natce2_lo_input").val(info_json.lo[6]);
+    $("#natpe1_lo_input").val(info_json.lo[4]);
+    $("#natce1_lo_input").val(info_json.lo[5]);
+    $("#natpe2_lo_input").val(info_json.lo[6]);
+    $("#natce2_lo_input").val(info_json.lo[7]);
     $("#natpe1_oversea_input").val(info_json.oversea[0]);
     $("#natpe2_oversea_input").val(info_json.oversea[1]);
   };
@@ -619,16 +619,17 @@ set protocols static route ${ac1pub}/32 next-hop 1.1.1.1
 set protocols static route ${ac2pub}/32 next-hop 1.1.1.1
 set protocols static route ${pe1lo}/32 next-hop ${ac1ip1}
 set protocols static route ${pe2lo}/32 next-hop ${ac2ip1}
+echo '>>>二次GRE路由1<<<'
 set protocols static route ${natpe1lo}/32 next-hop ${pe1ip1} track to-main
 set protocols static route ${natpe1lo}/32 next-hop ${pe2ip1} distance 5
 set protocols static route ${natpe2lo}/32 next-hop ${pe1ip1} track to-main
 set protocols static route ${natpe2lo}/32 next-hop ${pe2ip1} distance 5
+echo '>>>海外DNS路由<<<'
 set protocols static route ${oversea1dns}/32 next-hop ${natpe1ip1}
 set protocols static route ${oversea2dns}/32 next-hop ${natpe1ip1}
 set protocols static route ${oversea3dns}/32 next-hop ${natpe2ip1}
 set protocols static route ${oversea4dns}/32 next-hop ${natpe2ip1}
-set protocols static route 8.8.8.8/32 next-hop ${natpe1ip1}
-set protocols static route 8.8.4.4/32 next-hop ${natpe2ip1}
+
 set protocols static route 114.113.245.99/32 next-hop ${pe1ip1}
 set protocols static route 114.113.245.100/32 next-hop ${pe2ip1}
 set protocols static route 192.168.55.125/32 next-hop ${pe1ip1} track to-main
@@ -688,13 +689,13 @@ echo '>>>本地NAT<<<'
 set nat source rule 100 outbound-interface 'eth0'
 set nat source rule 100 translation address 'masquerade'
 echo '>>>MAC 绑定 NAT<<<'
-set nat source rule 1001 source address 192.168.9.101/32
-set nat source rule 1001 outbound-interface ${natpe1if}
-set nat source rule 1001 translation address ${oversea1ip1}
+set nat source rule 101 source address 192.168.9.101/32
+set nat source rule 101 outbound-interface ${natpe1if}
+set nat source rule 101 translation address ${oversea1ip1}
 #
-set nat source rule 1002 source address 192.168.9.201/32
-set nat source rule 1002 outbound-interface ${natpe2if}
-set nat source rule 1002 translation address ${oversea2ip1}
+set nat source rule 201 source address 192.168.9.201/32
+set nat source rule 201 outbound-interface ${natpe2if}
+set nat source rule 201 translation address ${oversea2ip1}
 #
 echo '>>>Br2 NAT 192.168.8.0/24<<<'
 set nat source rule 1998 source address 192.168.8.0/24
@@ -710,14 +711,6 @@ set nat source rule 1999 translation address ${oversea1ip1}
 set nat source rule 2999 source address 192.168.9.0/24
 set nat source rule 2999 outbound-interface ${natpe2if}
 set nat source rule 2999 translation address ${oversea2ip1}
-echo '>>>Google DNS NAT 8.8.8.8/32<<<'
-set nat source rule 3000 destination address 8.8.8.8/32
-set nat source rule 3000 outbound-interface ${natpe1if}
-set nat source rule 3000 translation address ${oversea1ip1}
-echo '>>>Google DNS NAT 8.8.4.4/32<<<'
-set nat source rule 4000 destination address 8.8.4.4/32
-set nat source rule 4000 outbound-interface ${natpe2if}
-set nat source rule 4000 translation address ${oversea2ip1}
 echo '>>>海外DNS1 NAT ${oversea1dns}/32<<<'
 set nat source rule 3001 destination address ${oversea1dns}/32
 set nat source rule 3001 outbound-interface ${natpe1if}
@@ -735,8 +728,6 @@ set nat source rule 4002 destination address ${oversea4dns}/32
 set nat source rule 4002 outbound-interface ${natpe2if}
 set nat source rule 4002 translation address ${oversea2ip1}
 echo '>>>系统DNS设置与客户端一致方便测试<<<'
-
-################
 echo '>>>测试${natpe1}出口时更改为当地DNS<<<'
 delete system name-server
 set system name-server ${oversea1dns}
@@ -746,28 +737,40 @@ delete system name-server
 set system name-server ${oversea1dns}
 set system name-server ${oversea2dns}
 IP/环境监测
-    IP当地
-    IP类型     ISP > Business > hosting
-    AS号当地   URL: <https://bgp.he.net>
-    whoer.net 100%  URL: <https://whoer.net>
-    污染度     < 50% URL: <https://scamalytics.com>
+    区域
+    https://ipinfo.io/${oversea1ip1}
+    https://ipinfo.io/${oversea2ip1}
+    类型
+    ISP > Business > hosting
+    AS号
+    https://bgp.he.net
+    whoer.net 100%
+    https://whoer.net
+    污染度     < 50%
+    https://scamalytics.com
 测试：
     大包测试
-        openvpn     CMD: sudo ping x.x.x.x -s 1500
+        openvpn
             sudo ping ${ac1ip1} -i 0.1 -c 100 -s 1500
             sudo ping ${ac2ip1} -i 0.1 -c 100 -s 1500
-        tunnel      CMD: sudo ping x.x.x.x -s 1500
+        tunnel
             sudo ping ${pe1ip1} -i 0.1 -c 100 -s 1500
             sudo ping ${pe2ip1} -i 0.1 -c 100 -s 1500
             sudo ping ${natpe1ip1} -i 0.1 -c 100 -s 1500
             sudo ping ${natpe2ip1} -i 0.1 -c 100 -s 1500
-        pc          CMD: ping www.yahoo.com -l 1500
+        域名
+            ping www.yahoo.com -l 1500
     网站测速
-        speedtest   URL: <https://www.speedtest.net>
-        Fast        URL: <https://fast.com>
-        ATT         URL: <https://www.att.com/support/speedtest>
-        泰国         URL: <https://speedtest.adslthailand.com>
-    谷歌云盘上传下载测速
+        speedtest
+            https://www.speedtest.net
+        Fast
+            https://fast.com
+        ATT
+            https://www.att.com/support/speedtest
+        泰国
+            https://speedtest.adslthailand.com
+        谷歌云盘上传下载测速
+            https://drive.google.com/drive/my-drive
 SmartPing监控：
     阿里DNS：114.114.114.114
     谷歌DNS：8.8.8.8
