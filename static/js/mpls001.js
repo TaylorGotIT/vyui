@@ -224,7 +224,7 @@ function mpls001sub(url){
   let cname = $("#cname_input").val();
   let area = $("#area_input").val();
   let subnet1 = $("#subnet1_input").val();
-  let subnet2 = $("#subnet1_input").val();
+  let subnet2 = $("#subnet2_input").val();
 
   let lineid = $("#lineid_input").val();
   let cid = lineid.substr(0,6);
@@ -267,24 +267,25 @@ function mpls001sub(url){
   let ce2As = $("#ce2_as_input").val();
 
 //差异化配置生成
-let wanTemp = '';
+let wan1Temp = '';
+if(wan1=="eth0" || wan1=="eth1"){
 switch(wan1Type){
     case "dhcp":
-        wanTemp += `set interfaces ethernet ${wan1} description WAN1-${wan1Provider}-DHCP
+        wan1Temp += `set interfaces ethernet ${wan1} description WAN1-${wan1Provider}-DHCP
 set interfaces ethernet ${wan1} address dhcp
 set protocols static route 1.1.1.1/32 dhcp-interface ${wan1}`;
     break;
     case "static":
         let wan1ip = $("#wan1_ip_input").val();
         let wan1gw = $("#wan1_gw_input").val();
-        wanTemp += `set interfaces ethernet ${wan1} description WAN1-${wan1Provider}-GW-${wan1gw}
+        wan1Temp += `set interfaces ethernet ${wan1} description WAN1-${wan1Provider}-GW-${wan1gw}
 set interfaces ethernet ${wan1} address ${wan1ip}
 set protocols static route 1.1.1.1/32 next-hop ${wan1gw}`;
     break;
     case "pppoe":
         let pppoe1user = $("#pppoe1_user_input").val();
         let pppoe1pass = $("#pppoe1_pass_input").val();
-        wanTemp += `set interfaces ethernet ${wan1} description WAN1_${wan1Provider}_${pppoe1user}/${pppoe1pass}
+        wan1Temp += `set interfaces ethernet ${wan1} description WAN1_${wan1Provider}_${pppoe1user}/${pppoe1pass}
 set interfaces ethernet ${wan1} pppoe 1 default-route 'none'
 set interfaces ethernet ${wan1} pppoe 1 mtu '1492'
 set interfaces ethernet ${wan1} pppoe 1 name-server 'none'
@@ -293,11 +294,44 @@ set interfaces ethernet ${wan1} pppoe 1 user-id ${pppoe1pass}
 set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
     break;
   };
+}else if(wan1=="br0" || wan1=="br1"){
+switch(wan1Type){
+    case "dhcp":
+        wan1Temp += `set interfaces bridge ${wan1} description WAN1-${wan1Provider}-DHCP
+set interfaces bridge ${wan1} address dhcp
+set interfaces bridge ${wan1} member interface eth0
+set interfaces bridge ${wan1} member interface eth1
+set protocols static route 1.1.1.1/32 dhcp-interface ${wan1}`;
+    break;
+    case "static":
+        let wan1ip = $("#wan1_ip_input").val();
+        let wan1gw = $("#wan1_gw_input").val();
+        wan1Temp += `set interfaces bridge ${wan1} description WAN1-${wan1Provider}-GW-${wan1gw}
+set interfaces bridge ${wan1} address ${wan1ip}
+set interfaces bridge ${wan1} member interface eth0
+set interfaces bridge ${wan1} member interface eth1
+set protocols static route 1.1.1.1/32 next-hop ${wan1gw}`;
+    break;
+    case "pppoe":
+        let pppoe1user = $("#pppoe1_user_input").val();
+        let pppoe1pass = $("#pppoe1_pass_input").val();
+        wan1Temp += `set interfaces bridge ${wan1} description WAN1_${wan1Provider}_${pppoe1user}/${pppoe1pass}
+set interfaces bridge ${wan1} pppoe 1 default-route 'none'
+set interfaces bridge ${wan1} pppoe 1 mtu '1492'
+set interfaces bridge ${wan1} pppoe 1 name-server 'none'
+set interfaces bridge ${wan1} pppoe 1 password ${pppoe1user}
+set interfaces bridge ${wan1} pppoe 1 user-id ${pppoe1pass}
+set interfaces bridge ${wan1} member interface eth0
+set interfaces bridge ${wan1} member interface eth1
+set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
+    break;
+  };
+}
 
 let mpls001MPLSGreOverOpenvpn  =
 `#Fnet MPLS with GRE Over OpenVPN Template.
 #操作人员：${user}
-#时间：${time}
+#时间：${time.cn}
 #系统：vyui-v1
 #vyos version >= 1.28.
 +++++++++++++++++++++++++++++++++++++++++++
@@ -381,10 +415,7 @@ echo '基础配置[系统名称，物理接口]'
 set system host-name ${lineid}-${cname}-${area}
 set service snmp community both-win authorization 'ro'
 set service smartping
-set interfaces loopback lo address ${ce1lo}/32
-set interfaces loopback lo address ${ce2lo}/32
-set interfaces loopback lo description lo1-{ce1lo},lo2-{ce2lo}
-${wanTemp}
+${wan1Temp}
 echo 'OpenVPN 接入配置[ac1]'
 set interfaces openvpn ${ac1if} description AC1_to_${ac1}
 set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
@@ -397,6 +428,7 @@ set interfaces openvpn ${ac1if} openvpn-option '--nobind'
 set interfaces openvpn ${ac1if} openvpn-option '--ping 10'
 set interfaces openvpn ${ac1if} openvpn-option '--ping-restart 60'
 set interfaces openvpn ${ac1if} openvpn-option '--persist-tun'
+#set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300’
 set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
 echo 'OpenVPN 接入配置[ac2]'
 set interfaces openvpn ${ac2if} description AC2_to_${ac2}
@@ -410,6 +442,7 @@ set interfaces openvpn ${ac2if} openvpn-option '--nobind'
 set interfaces openvpn ${ac2if} openvpn-option '--ping 10'
 set interfaces openvpn ${ac2if} openvpn-option '--ping-restart 60'
 set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
+#set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300’
 set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'
 echo '>>>GRE 配置[Main]<<<'
 set interfaces tunnel ${pe1if} description PE1_${pe1}

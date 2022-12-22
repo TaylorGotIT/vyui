@@ -52,7 +52,7 @@ function getTime(d) {
     let t = {
         "cn": yyyy + "年" + MM + "月" + dd + "日  " + hh + ":" + mm,
         "en": yyyy + "/" + MM + "/" + dd + " " + hh + ":" + mm,
-        "ez": yyyy + MM + dd + hh + mm,
+        "ez": yyyy + "" + MM + "" + dd + "" + hh + "" + mm,
     }
     return t;
 };
