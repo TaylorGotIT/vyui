@@ -25,6 +25,16 @@ const fastip103html = `<table border="1">
 <td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]" value="8.8.4.4"></td>
 </tr>
 <tr>
+<td>BGPServerA</td>
+<td><input id="bgp_server1_input" placeholder="BGP Server1" value="10.10.99.200"></td>
+<td><input id="bgp_server2_input" placeholder="BGP Server2" value="10.10.99.202"></td>
+</tr>
+<tr>
+<td>BGPServerB</td>
+<td><input id="bgp_server3_input" placeholder="BGP Server3" value="10.10.99.201"></td>
+<td><input id="bgp_server4_input" placeholder="BGP Server4" value="10.10.99.203"></td>
+</tr>
+<tr>
 <td><input id="pe1_input"></td>
 <td><input id="pe2_input"></td>
 </tr>
@@ -227,6 +237,10 @@ function fastip103sub(url){
   let oversea2dns = $("#oversea2_dns_input").val();
   let oversea1ips = $("#pe1_oversea_input").val().split(',')[0];
   let oversea1ip1 = oversea1ips.split(',')[0].split('-')[0];
+  let bgp1server1 = $("#bgp_server1_input").val();
+  let bgp1server2 = $("#bgp_server2_input").val();
+  let bgp1server3 = $("#bgp_server3_input").val();
+  let bgp1server4 = $("#bgp_server4_input").val();
 //获取主线参数
   let pe1 = $("#pe1_input").val();
   let pe1if = "tun"+$("#pe1_if_input").val().match(/[1-9]\d+/)[0];
@@ -294,6 +308,20 @@ let fastip103fastipGreOverOpenvpn  =
 #系统：vyui-v2
 #FnetOS Version ${version}
 +++++++++++++++++++++++++++++++++++++++++++
+echo '>>>升级到最新镜像<<<'
+conf
+delete interfaces bridge
+delete interfaces ethernet
+set interfaces ethernet eth0 address dhcp
+set system name-server 114.114.114.114
+commit
+exit
+curl http://202.104.174.189:18080/epochos/ | \
+grep vyos-epoch | \
+awk -F '"' '{print $2}' | \
+sed -n '$p' > img_list
+while read -r img; do wget "http://192.168.75.15/epochos/$img"; done < img_list
+while read -r img; do add system image "$img"; done < img_list
 echo '初始化设备'
 delete system host-name
 delete epoch controller
@@ -314,7 +342,6 @@ delete protocols
 delete policy
 delete track
 delete service dns
-set interfaces ethernet eth0 address dhcp
 echo '>>>Table default 海外，DHCP指定海外DNS<<<'
 set interfaces bridge br2 description LAN-Bridge-ETH1-5
 set interfaces bridge br2 address 192.168.8.1/24

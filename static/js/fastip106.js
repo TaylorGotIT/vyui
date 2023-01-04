@@ -1,5 +1,5 @@
-/* FastIP 假组网 Tiktok 多区域 单运营商 */
-const fastip105html = `<table border="1">
+/* FastIP Tiktok 单个二次GRE 单运营商 */
+const fastip106html = `<table border="1">
 <tr>
 <td>LineID</td>
 <td><input id="lineid_input" placeholder="线路ID"></td>
@@ -22,20 +22,16 @@ const fastip105html = `<table border="1">
 <option value="CT" selected="selected">电信</option>
 <option value="CU">联通</option>
 <option value="CM">移动</option></select></td>
-<td><select id="wan1_type_select" onchange=fastip105setWan(this.value)>
+<td><select id="wan1_type_select" onchange=fastip106setWan(this.value)>
 <option value="dhcp" selected="selected">WAN Type[ DHCP ]</option>
 <option value="static">WAN Type[ Static ]</option>
 <option value="pppoe">WAN Type[ PPPoE ]</option></select></td>
 </tr>
 <tr id="wan1_input_tr"></tr>
 <tr>
-<td>OverseaDNS1</td>
-<td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]"></td>
-<td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]"></td>
-</tr>
-<td>OverseaDNS2</td>
-<td><input id="oversea3_dns_input" placeholder="海外DNS3[eg:8.8.8.8]"></td>
-<td><input id="oversea4_dns_input" placeholder="海外DNS4[eg:8.8.4.4]"></td>
+<td>OverseaDNS</td>
+<td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]" value="8.8.8.8"></td>
+<td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]" value="8.8.4.4"></td>
 </tr>
 <tr>
 <td>BGPServerA</td>
@@ -95,38 +91,38 @@ const fastip105html = `<table border="1">
 <tr>
 <td>NAT PE</td>
 <td><input id="natpe1_input" placeholder="NATPE1[eg:us1-natpe1]"></td>
-<td><input id="natpe2_input" placeholder="NATPE2[eg:uk1-natpe1]"></td>
+<td></td>
 </tr>
 <tr>
 <td>NAT PE IF</td>
 <td><input id="natpe1_if_input" placeholder="NATPE1IF[eg:tun1000]"></td>
-<td><input id="natpe2_if_input" placeholder="NATPE2IF[eg:tun2000]"></td>
+<td></td>
 </tr>
 <tr>
 <td>NAT PE IP</td>
 <td><input id="natpe1_ip_input" placeholder="NATPE1IP[eg:10.x.x.x/30]"></td>
-<td><input id="natpe2_ip_input" placeholder="NATPE2IP[eg:10.x.x.x/30]"></td>
+<td></td>
 </tr>
 <tr>
 <td>NAT PE lo</td>
 <td><input id="natpe1_lo_input" placeholder="NATPE1LO[eg:10.x.x.x/32]"></td>
-<td><input id="natpe2_lo_input" placeholder="NATPE2LO[eg:10.x.x.x/32]"></td>
+<td></td>
 </tr>
 <tr>
 <td>NAT CE lo</td>
 <td><input id="natce1_lo_input" placeholder="NATCE1LO[eg:10.x.x.x/32]"></td>
-<td><input id="natce2_lo_input" placeholder="NATCE2LO[eg:10.x.x.x/32]"></td>
+<td></td>
 </tr>
 <tr>
 <td>OverseaIP</td>
 <td><input id="natpe1_oversea_input" placeholder="NATPE1Oversea[eg:10.x.x.x-x.x.x.x]"></td>
-<td><input id="natpe2_oversea_input" placeholder="NATPE2Oversea[eg:10.x.x.x-x.x.x.x]"></td>
+<td></td>
 </tr>
 </table>
-<button type="button" onclick="fastip105sub('/config')">提交配置信息(Submit Config Info)</button>
+<button type="button" onclick="fastip106sub('/config')">提交配置信息(Submit Config Info)</button>
 `;
 
-function fastip105getList() {
+function fastip106getList() {
 //空格全角分号去除
     let str = $("#config_textarea").val().replaceAll(' ','').replaceAll('：',':').replaceAll(';','');
     if(str.length>32){
@@ -247,25 +243,19 @@ function fastip105getList() {
     $("#ac1_pub_input").val(info_json.pub[0]);
     $("#ac2_pub_input").val(info_json.pub[1]);
     $("#natpe1_input").val(info_json.natpe[0]);
-    $("#natpe2_input").val(info_json.natpe[1]);
     $("#natpe1_if_input").val(info_json.if[4]);
-    $("#natpe2_if_input").val(info_json.if[5]);
     $("#natpe1_ip_input").val(info_json.ip[4]);
-    $("#natpe2_ip_input").val(info_json.ip[5]);
     $("#natpe1_lo_input").val(info_json.lo[4]);
     $("#natce1_lo_input").val(info_json.lo[5]);
-    $("#natpe2_lo_input").val(info_json.lo[6]);
-    $("#natce2_lo_input").val(info_json.lo[7]);
     $("#natpe1_oversea_input").val(info_json.oversea[0]);
-    $("#natpe2_oversea_input").val(info_json.oversea[1]);
   };
 };
 
-$("#service_dev").append(fastip105html);
+$("#service_dev").append(fastip106html);
 //加载测试资源的解析数据
-fastip105getList();
+fastip106getList();
 
-function fastip105setWan(value){
+function fastip106setWan(value){
     let html='';
     wan_input_tr = '#wan1_input_tr';
     switch(value){
@@ -285,7 +275,7 @@ function fastip105setWan(value){
     };
 }
 
-function fastip105sub(url){
+function fastip106sub(url){
   let user = $("#user_input").val();
   let time=getTime(new Date());
   let wan1 = $("#wan1_select").val();
@@ -331,31 +321,19 @@ function fastip105sub(url){
   let ac2pub = $("#ac2_pub_input").val();
 
   let natpe1 = $("#natpe1_input").val();
-  let natpe2 = $("#natpe2_input").val();
   let natpe1ips = ipNext($("#natpe1_ip_input").val().split('/')[0]);
   let natpe1ip1 = natpe1ips[0];
   let natpe1ip2 = natpe1ips[1];
-  let natpe2ips = ipNext($("#natpe2_ip_input").val().split('/')[0]);
-  let natpe2ip1 = natpe2ips[0];
-  let natpe2ip2 = natpe2ips[1];
   let natpe1if = $("#natpe1_if_input").val();
-  let natpe2if = $("#natpe2_if_input").val();
   let natpe1lo = $("#natpe1_lo_input").val();
-  let natpe2lo = $("#natpe2_lo_input").val();
   let natce1lo = $("#natce1_lo_input").val();
-  let natce2lo = $("#natce2_lo_input").val();
-
   let oversea1ip = $("#natpe1_oversea_input").val();
-  let oversea2ip = $("#natpe2_oversea_input").val();
   let oversea1ips = oversea1ip.split(',');
-  let oversea2ips = oversea2ip.split(',');
+
 console.log(oversea1ips);
 let oversea1ip1 = '';
 let oversea1ip2 = '';
 let oversea1ip3 = '';
-let oversea2ip1 = '';
-let oversea2ip2 = '';
-let oversea2ip3 = '';
 switch (oversea1ips.length){
     case 1:
         oversea1ip1 = oversea1ips[0].split('-')[0];
@@ -370,30 +348,11 @@ switch (oversea1ips.length){
         oversea1ip3 = oversea1ips[2].split('-')[0];
     break;
 }
-switch (oversea2ips.length){
-    case 1:
-        oversea2ip1 = oversea2ips[0].split('-')[0];
-    break;
-    case 2:
-        oversea2ip1 = oversea2ips[0].split('-')[0];
-        oversea2ip2 = oversea2ips[1].split('-')[0];
-    break;
-    case 3:
-        oversea2ip1 = oversea2ips[0].split('-')[0];
-        oversea2ip2 = oversea2ips[1].split('-')[0];
-        oversea2ip3 = oversea2ips[2].split('-')[0];
-    break;
-}
 console.log(oversea1ip1);
 console.log(oversea1ip2);
 console.log(oversea1ip3);
-console.log(oversea2ip1);
-console.log(oversea2ip2);
-console.log(oversea2ip2);
 let oversea1dns = $("#oversea1_dns_input").val();
 let oversea2dns = $("#oversea2_dns_input").val();
-let oversea3dns = $("#oversea3_dns_input").val();
-let oversea4dns = $("#oversea4_dns_input").val();
 let bgp1server1 = $("#bgp_server1_input").val();
 let bgp1server2 = $("#bgp_server2_input").val();
 let bgp1server3 = $("#bgp_server3_input").val();
@@ -426,7 +385,7 @@ set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
     break;
   };
 
-let fastip105fastipGreOverOpenvpn  =
+let fastip106fastipGreOverOpenvpn  =
 `#Fnet MPLS with GRE Over OpenVPN Tiktok Template.
 #操作人员：${user}
 #时间：${time.cn}
@@ -792,10 +751,10 @@ SmartPing监控：
 ##############
 如果客户需要BGP分流
 echo '>>>动态路由配置[BGP]<<<'
-set protocols static route 10.10.99.200/32 next-hop ${pe1ip1}
-set protocols static route 10.10.99.202/32 next-hop ${pe1ip1}
-set protocols static route 10.10.99.201/32 next-hop ${pe2ip1}
-set protocols static route 10.10.99.203/32 next-hop ${pe2ip1}
+set protocols static route ${bgp1server1}/32 next-hop ${pe1ip1}
+set protocols static route ${bgp1server2}/32 next-hop ${pe1ip1}
+set protocols static route ${bgp1server3}/32 next-hop ${pe2ip1}
+set protocols static route ${bgp1server4}/32 next-hop ${pe2ip1}
 set policy community-list 80 rule 10 action 'permit'
 set policy community-list 80 rule 10 description 'to_hk'
 set policy community-list 80 rule 10 regex '65000:9939'
@@ -844,10 +803,10 @@ set policy route-map bgp-from--RSVR2 rule 400 description 'to_cn_other'
 set policy route-map bgp-from--RSVR2 rule 400 match community community-list '83'
 set policy route-map bgp-from--RSVR2 rule 400 set ip-next-hop 1.1.1.1
 set policy route-map bgp-from--RSVR2 rule 400 set local-preference '50'
-set protocols bgp 65000 neighbor 10.10.99.200 peer-group 'RSVR'
-set protocols bgp 65000 neighbor 10.10.99.201 peer-group 'RSVR'
-set protocols bgp 65000 neighbor 10.10.99.202 peer-group 'RSVR2'
-set protocols bgp 65000 neighbor 10.10.99.203 peer-group 'RSVR2'
+set protocols bgp 65000 neighbor ${bgp1server1} peer-group 'RSVR'
+set protocols bgp 65000 neighbor ${bgp1server2} peer-group 'RSVR'
+set protocols bgp 65000 neighbor ${bgp1server3} peer-group 'RSVR2'
+set protocols bgp 65000 neighbor ${bgp1server4} peer-group 'RSVR2'
 set protocols bgp 65000 parameters router-id ${pe1ip2}
 set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast route-map import 'bgp-from--RSVR'
 set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast soft-reconfiguration inbound
@@ -888,8 +847,8 @@ set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-
 `;
   let filename = `${lineid}-Fast-SD-WAN-FastIP-GREOverOpenVPN-Config-${time.ez}-By-${user}`;
   let data = {};
-  console.log(fastip105fastipGreOverOpenvpn);
-  downloadConfig(filename, fastip105fastipGreOverOpenvpn);
+  console.log(fastip106fastipGreOverOpenvpn);
+  downloadConfig(filename, fastip106fastipGreOverOpenvpn);
   let type = 'post'
   let datatype = 'json';
   ajaxHandler(url,data,datatype,type);
