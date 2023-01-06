@@ -342,7 +342,10 @@ awk -F '"' '{print $2}' | \
 sed -n '$p' > img_list
 while read -r img; do wget "http://192.168.75.15/epochos/$img"; done < img_list
 while read -r img; do add system image "$img"; done < img_list
-echo '初始化设备'
+#
+#安装完成后 reboot
+#
+echo '>>>初始化设备<<<'
 delete system host-name
 delete epoch controller
 sudo systemctl stop epoch-openvpnd
@@ -369,16 +372,6 @@ delete system name-server
 delete system flow-accounting
 set interfaces ethernet eth0 address dhcp
 commit
-exit
-###接网线下载镜像!!!
-echo '>>>升级到最新镜像<<<'
-curl http://202.104.174.189:18080/epochos/ | \
-grep vyos-epoch | \
-awk -F '"' '{print "http://192.168.75.15/epochos/"$2}' | \
-sed -n '$p' > img_list
-while read -r url; do wget "$url" done < img_list
-####等待下载完成后升级系统!!!
-while read -r img; do add system image "$img"; done < img_list
 echo '>>>Table default 海外，DHCP指定海外DNS<<<'
 set interfaces bridge br2 description LAN-Bridge-ETH1-5
 set interfaces bridge br2 address 192.168.8.1/24

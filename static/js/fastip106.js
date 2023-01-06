@@ -154,6 +154,8 @@ function fastip106getList() {
                 case 'pe':
                     if(l1.search('ac')!=-1 | l1.search('gw')!=-1){
                         info_json.ac.push(l1);
+                    }else if(l1.search('nat')!=-1){
+                        info_json.natpe.push(l1);
                     }else if(l1.search('pe')!=-1){
                         info_json.pe.push(l1);
                     }else{
@@ -479,19 +481,13 @@ set interfaces ethernet ${wan1} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe1if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe2if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${natpe1if} firewall local name 'VPN2LOCAL'
-set interfaces tunnel ${natpe2if} firewall local name 'VPN2LOCAL'
 set system host-name ${lineid}-${cname}-${area}
 set service snmp community both-win authorization 'ro'
 set service smartping
 set interfaces loopback lo address ${natce1lo}/32
-set interfaces loopback lo address ${natce2lo}/32
 set interfaces loopback lo address ${oversea1ip1}/32
 set interfaces loopback lo address ${oversea1ip2}/32
 set interfaces loopback lo address ${oversea1ip3}/32
-set interfaces loopback lo address ${oversea2ip1}/32
-set interfaces loopback lo address ${oversea2ip2}/32
-set interfaces loopback lo address ${oversea2ip3}/32
-set interfaces loopback lo description ${oversea1ip}${oversea2ip}
 ${wanTemp}
 echo 'OpenVPN 接入配置[ac1]'
 set interfaces openvpn ${ac1if} description AC1_to_${ac1}
@@ -553,23 +549,12 @@ set interfaces tunnel ${natpe1if} remote ${natpe1lo}
 set interfaces tunnel ${natpe1if} encapsulation gre
 set interfaces tunnel ${natpe1if} multicast disable
 set interfaces tunnel ${natpe1if} parameters ip ttl 255
-echo '>>>GRE 配置[${natpe2}]<<<'
-set interfaces tunnel ${natpe2if} description ${natpe2}
-set interfaces tunnel ${natpe2if} address ${natpe2ip2}/30
-#[v3.2]set interfaces tunnel ${natpe2if} local-ip ${natce2lo}
-#[v3.2]set interfaces tunnel ${natpe2if} remote-ip ${natpe2lo}
-set interfaces tunnel ${natpe2if} source-address ${natce2lo}
-set interfaces tunnel ${natpe2if} remote ${natpe2lo}
-set interfaces tunnel ${natpe2if} encapsulation gre
-set interfaces tunnel ${natpe2if} multicast disable
-set interfaces tunnel ${natpe2if} parameters ip ttl 255
 echo '>>>MTU TCP-MSS配置[interface]<<<'
 set firewall options interface ${ac1if} adjust-mss 1300
 set firewall options interface ${ac2if} adjust-mss 1300
 set firewall options interface ${pe1if} adjust-mss 1300
 set firewall options interface ${pe2if} adjust-mss 1300
 set firewall options interface ${natpe1if} adjust-mss 1300
-set firewall options interface ${natpe2if} adjust-mss 1300
 echo '>>>路由配置[Track 默认路由，对接公网路由，内网路由]<<<'
 set protocols static route 114.114.114.114/32 next-hop 1.1.1.1
 set track name to-114 failure-count 2
@@ -592,13 +577,9 @@ set protocols static route ${pe2lo}/32 next-hop ${ac2ip1}
 echo '>>>二次GRE路由1<<<'
 set protocols static route ${natpe1lo}/32 next-hop ${pe1ip1} track to-main
 set protocols static route ${natpe1lo}/32 next-hop ${pe2ip1} distance 5
-set protocols static route ${natpe2lo}/32 next-hop ${pe1ip1} track to-main
-set protocols static route ${natpe2lo}/32 next-hop ${pe2ip1} distance 5
 echo '>>>海外DNS路由<<<'
 set protocols static route ${oversea1dns}/32 next-hop ${natpe1ip1}
 set protocols static route ${oversea2dns}/32 next-hop ${natpe1ip1}
-set protocols static route ${oversea3dns}/32 next-hop ${natpe2ip1}
-set protocols static route ${oversea4dns}/32 next-hop ${natpe2ip1}
 
 set protocols static route 114.113.245.99/32 next-hop ${pe1ip1}
 set protocols static route 114.113.245.100/32 next-hop ${pe2ip1}
@@ -638,10 +619,6 @@ echo '192.168.9.101  54:05:db:b4:4a:41 dhcp_wlan1  iPhone'
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 101 ip-address '192.168.9.101'
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 101 mac-address '54:05:db:b4:4a:41'
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 101 static-mapping-parameters 'option domain-name-servers ${oversea1dns}, ${oversea2dns};'
-echo '192.168.9.201  54:05:db:b4:4a:42 dhcp_wlan1  iPhone'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 202 ip-address '192.168.9.201'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 202 mac-address '54:05:db:b4:4a:42'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 202 static-mapping-parameters 'option domain-name-servers ${oversea3dns}, ${oversea4dns};'
 echo '192.168.8.101  55:05:db:b4:4a:40 dhcp_br2  iPhone'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 1101 ip-address '192.168.8.101'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 1101 mac-address '55:05:db:b4:4a:43'
@@ -650,10 +627,6 @@ echo 'Table 100 to ${natpe1}'
 set protocols static table 100 route 0.0.0.0/0 next-hop ${natpe1ip1}
 set policy local-route rule 101 set table '100'
 set policy local-route rule 101 source '192.168.9.101'
-echo 'Table 200 to ${natpe2}'
-set protocols static table 200 route 0.0.0.0/0 next-hop ${natpe2ip1}
-set policy local-route rule 201 set table '200'
-set policy local-route rule 201 source '192.168.9.201'
 #
 echo '>>>本地NAT<<<'
 set nat source rule 100 outbound-interface 'eth0'
@@ -663,24 +636,14 @@ set nat source rule 101 source address 192.168.9.101/32
 set nat source rule 101 outbound-interface ${natpe1if}
 set nat source rule 101 translation address ${oversea1ip1}
 #
-set nat source rule 201 source address 192.168.9.201/32
-set nat source rule 201 outbound-interface ${natpe2if}
-set nat source rule 201 translation address ${oversea2ip1}
-#
 echo '>>>Br2 NAT 192.168.8.0/24<<<'
 set nat source rule 1998 source address 192.168.8.0/24
 set nat source rule 1998 outbound-interface ${natpe1if}
 set nat source rule 1998 translation address ${oversea1ip1}
-set nat source rule 2998 source address 192.168.8.0/24
-set nat source rule 2998 outbound-interface ${natpe2if}
-set nat source rule 2998 translation address ${oversea2ip1}
 echo '>>>Wlan1 NAT 192.168.9.0/24<<<'
 set nat source rule 1999 source address 192.168.9.0/24
 set nat source rule 1999 outbound-interface ${natpe1if}
 set nat source rule 1999 translation address ${oversea1ip1}
-set nat source rule 2999 source address 192.168.9.0/24
-set nat source rule 2999 outbound-interface ${natpe2if}
-set nat source rule 2999 translation address ${oversea2ip1}
 echo '>>>海外DNS1 NAT ${oversea1dns}/32<<<'
 set nat source rule 3001 destination address ${oversea1dns}/32
 set nat source rule 3001 outbound-interface ${natpe1if}
@@ -689,27 +652,14 @@ echo '>>>海外DNS2 NAT ${oversea2dns}/32<<<'
 set nat source rule 3002 destination address ${oversea2dns}/32
 set nat source rule 3002 outbound-interface ${natpe1if}
 set nat source rule 3002 translation address ${oversea1ip1}
-echo '>>>海外DNS3 NAT ${oversea3dns}/32<<<'
-set nat source rule 4001 destination address ${oversea3dns}/32
-set nat source rule 4001 outbound-interface ${natpe2if}
-set nat source rule 4001 translation address ${oversea2ip1}
-echo '>>>海外DNS4 NAT ${oversea4dns}/32<<<'
-set nat source rule 4002 destination address ${oversea4dns}/32
-set nat source rule 4002 outbound-interface ${natpe2if}
-set nat source rule 4002 translation address ${oversea2ip1}
 echo '>>>系统DNS设置与客户端一致方便测试<<<'
 echo '>>>测试${natpe1}出口时更改为当地DNS<<<'
-delete system name-server
-set system name-server ${oversea1dns}
-set system name-server ${oversea2dns}
-echo '>>>测试${natpe2}出口时更改为当地DNS<<<'
 delete system name-server
 set system name-server ${oversea1dns}
 set system name-server ${oversea2dns}
 IP/环境监测
     区域
     https://ipinfo.io/${oversea1ip1}
-    https://ipinfo.io/${oversea2ip1}
     类型
     ISP > Business > hosting
     AS号
@@ -727,7 +677,6 @@ IP/环境监测
             sudo ping ${pe1ip1} -i 0.1 -c 100 -s 1500
             sudo ping ${pe2ip1} -i 0.1 -c 100 -s 1500
             sudo ping ${natpe1ip1} -i 0.1 -c 100 -s 1500
-            sudo ping ${natpe2ip1} -i 0.1 -c 100 -s 1500
         域名
             ping www.yahoo.com -l 1500
     网站测速
@@ -747,7 +696,6 @@ SmartPing监控：
     主线Pub: ${ac1pub}
     备线Pub: ${ac2pub}
     ${natpe1}: ${natpe1ip1}
-    ${natpe2}: ${natpe2ip1}
 ##############
 如果客户需要BGP分流
 echo '>>>动态路由配置[BGP]<<<'
@@ -845,7 +793,7 @@ delete service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 na
 delete service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server ${oversea2dns}
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server 192.168.8.1
 `;
-  let filename = `${lineid}-Fast-SD-WAN-FastIP-GREOverOpenVPN-Config-${time.ez}-By-${user}`;
+  let filename = `${lineid}-Fast-SD-WAN-GREOverGRE-Config-${time.ez}-By-${user}`;
   let data = {};
   console.log(fastip106fastipGreOverOpenvpn);
   downloadConfig(filename, fastip106fastipGreOverOpenvpn);
