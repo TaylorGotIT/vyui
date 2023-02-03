@@ -455,13 +455,13 @@ set firewall options interface ${ac2if} adjust-mss 1300
 set firewall options interface ${pe1if} adjust-mss 1300
 set firewall options interface ${pe2if} adjust-mss 1300
 echo '>>>路由配置[Track 默认路由，对接公网路由，内网路由]<<<'
-set protocols static route 114.114.114.114/32 next-hop 1.1.1.1
-set track name to-114 failure-count 2
-set track name to-114 success-count 2
-set track name to-114 test 10 resp-time 5
-set track name to-114 test 10 target 114.114.114.114
-set track name to-114 test 10 ttl-limit 1
-set track name to-114 test 10 type ping
+set protocols static route 223.5.5.5/32 next-hop 1.1.1.1
+set track name to-223 failure-count 2
+set track name to-223 success-count 2
+set track name to-223 test 10 resp-time 5
+set track name to-223 test 10 target 223.5.5.5
+set track name to-223 test 10 ttl-limit 1
+set track name to-223 test 10 type ping
 set track name to-main failure-count 2
 set track name to-main success-count 2
 set track name to-main test 10 resp-time 5
