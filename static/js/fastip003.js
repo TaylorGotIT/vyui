@@ -422,22 +422,22 @@ description bgp-loip
 ip address ${bpg1lo} 32
 #
 interface LoopBack1
-description main-loip
-ip address ${ce1lo} 32
-
+ description main-loip
+ ip address ${ce1lo} 32
+#
 interface LoopBack2
-description backup-loip
-ip address ${ce2lo} 32
-
+ description backup-loip
+ ip address ${ce2lo} 32
+#
 interface LoopBack100
-description hkip
-ip address ${oversea1ip1} 32
-
+ description hkip
+ ip address ${oversea1ip1} 32
+#
 acl number 3333
-rule 1 permit ip source ${ce1lo} 0 destination ${pe1lo} 0
-
+ rule 1 permit ip source ${ce1lo} 0 destination ${pe1lo} 0
+#
 acl number 3334
-rule 1 permit ip source ${ce2lo} 0 destination ${pe2lo} 0
+ rule 1 permit ip source ${ce2lo} 0 destination ${pe2lo} 0
 #
 # IPSEC
 ipsec proposal ipsectran1
@@ -455,6 +455,7 @@ ike proposal 10
 #
 ike peer main
  undo version 2
+ version 1
  pre-shared-key cipher both-win
  ike-proposal 10
  remote-address ${ac1pub}
@@ -464,6 +465,7 @@ ike peer main
 #
 ike peer backup
  undo version 2
+ version 1
  pre-shared-key cipher both-win
  ike-proposal 10
  remote-address ${ac2pub}
@@ -581,6 +583,8 @@ peer RSVR2 route-policy bgp-from--RSVR2 import
 #
 # Local NAT
 acl number 3999
+ rule 1 deny ip source ${ce1lo} 0 destination ${pe1lo} 0
+ rule 2 deny ip source ${ce1lo} 0 destination ${pe1lo} 0
  rule 10 permit ip source 10.0.0.0 0.0.0.255
  rule 20 permit ip source 172.16.0.0 0.0.240.255
  rule 30 permit ip source 192.168.0.0 0.0.255.255
