@@ -535,7 +535,7 @@ set interfaces loopback lo address ${oversea2ip3}/32
 set interfaces loopback lo description ${oversea1ip}${oversea2ip}
 ${wanTemp}
 echo 'OpenVPN 接入配置[ac1]'
-set interfaces openvpn ${ac1if} description AC1_to_${ac1}
+set interfaces openvpn ${ac1if} description AC1_${ac1}
 set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
 set interfaces openvpn ${ac1if} remote-address ${ac1ip1}
 set interfaces openvpn ${ac1if} remote-host ${ac1pub}
@@ -550,7 +550,7 @@ echo 'OpeVPN无法过大包1500的时候，PE/CE同时增加fragment参数<<<'
 #set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300’
 set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
 echo 'OpenVPN 接入配置[ac2]'
-set interfaces openvpn ${ac2if} description AC2_to_${ac2}
+set interfaces openvpn ${ac2if} description AC2_${ac2}
 set interfaces openvpn ${ac2if} local-address ${ac2ip2} subnet-mask 255.255.255.252
 set interfaces openvpn ${ac2if} remote-address ${ac2ip1}
 set interfaces openvpn ${ac2if} remote-host ${ac2pub}

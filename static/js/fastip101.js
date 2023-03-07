@@ -1,4 +1,4 @@
-/* FastIP 假组网 双运营商 */
+/* FastIP 假组网 FnetOS 单运营商 */
 const fastip101html = `<table border="1">
 <tr>
 <td>LineID</td>
@@ -16,10 +16,10 @@ const fastip101html = `<table border="1">
 <tr>
 <td>WAN</td>
 <td><select id="wan1_select">
-<option value="eth0" selected="selected">WAN1-ETH0</option>
-<option value="eth1">WAN1-ETH1</option>
-<option value="br0">WAN1-BR0</option>
-<option value="br1">WAN1-BR1</option></select>
+<option value="eth0" selected="selected">ETH0</option>
+<option value="eth1">ETH1</option>
+<option value="br0">BR0</option>
+<option value="br1">BR1</option></select>
 <select id="wan1_provider_select">
 <option value="CT" selected="selected">电信[CT]</option>
 <option value="CU">联通[CU]</option>
@@ -360,9 +360,57 @@ set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
     break;
   };
 }
+let openvpnTemp = '';
+let greTemp = '';
 let smartdns = '';
 switch(version){
     case "40":
+greTemp += `echo '>>>GRE 配置[Main]<<<'
+set interfaces tunnel ${pe1if} description PE1_${pe1}
+set interfaces tunnel ${pe1if} address ${pe1ip2}/30
+set interfaces tunnel ${pe1if} source-address ${ac1ip2}
+set interfaces tunnel ${pe1if} remote ${pe1lo}
+set interfaces tunnel ${pe1if} encapsulation gre
+set interfaces tunnel ${pe1if} multicast disable
+set interfaces tunnel ${pe1if} parameters ip ttl 255
+echo '>>>GRE 配置[Backup]<<<'
+set interfaces tunnel ${pe2if} description PE2_${pe2}
+set interfaces tunnel ${pe2if} address ${pe2ip2}/30
+set interfaces tunnel ${pe2if} source-address ${ac2ip2}
+set interfaces tunnel ${pe2if} remote ${pe2lo}
+set interfaces tunnel ${pe2if} encapsulation gre
+set interfaces tunnel ${pe2if} multicast disable
+set interfaces tunnel ${pe2if} parameters ip ttl 255`;
+
+openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
+set interfaces openvpn ${ac1if} description AC1_${ac1}
+set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
+set interfaces openvpn ${ac1if} remote-address ${ac1ip1}
+set interfaces openvpn ${ac1if} remote-host ${ac1pub}
+set interfaces openvpn ${ac1if} remote-port ${ac1port}
+set interfaces openvpn ${ac1if} mode site-to-site
+set interfaces openvpn ${ac1if} protocol udp
+set interfaces openvpn ${ac1if} openvpn-option '--nobind'
+set interfaces openvpn ${ac1if} openvpn-option '--ping 10'
+set interfaces openvpn ${ac1if} openvpn-option '--ping-restart 60'
+set interfaces openvpn ${ac1if} openvpn-option '--persist-tun'
+#set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300’
+set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
+echo 'OpenVPN 接入配置[ac2]'
+set interfaces openvpn ${ac2if} description AC2_${ac2}
+set interfaces openvpn ${ac2if} local-address ${ac2ip2} subnet-mask 255.255.255.252
+set interfaces openvpn ${ac2if} remote-address ${ac2ip1}
+set interfaces openvpn ${ac2if} remote-host ${ac2pub}
+set interfaces openvpn ${ac2if} remote-port ${ac2port}
+set interfaces openvpn ${ac2if} mode site-to-site
+set interfaces openvpn ${ac2if} protocol udp
+set interfaces openvpn ${ac2if} openvpn-option '--nobind'
+set interfaces openvpn ${ac2if} openvpn-option '--ping 10'
+set interfaces openvpn ${ac2if} openvpn-option '--ping-restart 60'
+set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
+#set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300’
+set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
+
 smartdns += `set epoch file-sync task 1 local '/opt/cn.txt'
 set epoch file-sync task 1 remote 'http://59.37.126.146:1909/f32x/domainlist/cn_domainlist.last'
 set epoch file-sync task 2 local '/opt/oversea.txt'
@@ -384,6 +432,52 @@ set service dns forwarding name-server ${oversea1dns}
 set service dns forwarding name-server ${oversea2dns}`;
     break;
     case "32":
+greTemp += `echo '>>>GRE 配置[Main]<<<'
+set interfaces tunnel ${pe1if} description PE1_${pe1}
+set interfaces tunnel ${pe1if} address ${pe1ip2}/30
+set interfaces tunnel ${pe1if} source-address ${ac1ip2}
+set interfaces tunnel ${pe1if} remote ${pe1lo}
+set interfaces tunnel ${pe1if} encapsulation gre
+set interfaces tunnel ${pe1if} multicast disable
+set interfaces tunnel ${pe1if} parameters ip ttl 255
+echo '>>>GRE 配置[Backup]<<<'
+set interfaces tunnel ${pe2if} description PE2_${pe2}
+set interfaces tunnel ${pe2if} address ${pe2ip2}/30
+set interfaces tunnel ${pe2if} source-address ${ac2ip2}
+set interfaces tunnel ${pe2if} remote ${pe2lo}
+set interfaces tunnel ${pe2if} encapsulation gre
+set interfaces tunnel ${pe2if} multicast disable
+set interfaces tunnel ${pe2if} parameters ip ttl 255`;
+
+openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
+set interfaces openvpn ${ac1if} description AC1_${ac1}
+set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
+set interfaces openvpn ${ac1if} remote-address ${ac1ip1}
+set interfaces openvpn ${ac1if} remote-host ${ac1pub}
+set interfaces openvpn ${ac1if} remote-port ${ac1port}
+set interfaces openvpn ${ac1if} mode site-to-site
+set interfaces openvpn ${ac1if} protocol udp
+set interfaces openvpn ${ac1if} openvpn-option '--nobind'
+set interfaces openvpn ${ac1if} openvpn-option '--ping 10'
+set interfaces openvpn ${ac1if} openvpn-option '--ping-restart 60'
+set interfaces openvpn ${ac1if} openvpn-option '--persist-tun'
+#set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300’
+set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
+echo 'OpenVPN 接入配置[ac2]'
+set interfaces openvpn ${ac2if} description AC2_${ac2}
+set interfaces openvpn ${ac2if} local-address ${ac2ip2} subnet-mask 255.255.255.252
+set interfaces openvpn ${ac2if} remote-address ${ac2ip1}
+set interfaces openvpn ${ac2if} remote-host ${ac2pub}
+set interfaces openvpn ${ac2if} remote-port ${ac2port}
+set interfaces openvpn ${ac2if} mode site-to-site
+set interfaces openvpn ${ac2if} protocol udp
+set interfaces openvpn ${ac2if} openvpn-option '--nobind'
+set interfaces openvpn ${ac2if} openvpn-option '--ping 10'
+set interfaces openvpn ${ac2if} openvpn-option '--ping-restart 60'
+set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
+#set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300’
+set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
+
 smartdns +=`set service dns dnsmasq cache-size '9999'
 set service dns dnsmasq fnetlink-dns enable
 set service dns dnsmasq fnetlink-dns local-isp-dns ${local1dns}
@@ -394,6 +488,48 @@ set service dns dnsmasq name-server ${oversea1dns}
 set service dns dnsmasq name-server ${oversea2dns}`;
     break;
     case "31":
+greTemp += `echo '>>>GRE 配置[Main]<<<'
+set interfaces tunnel ${pe1if} description PE1_${pe1}
+set interfaces tunnel ${pe1if} address ${pe1ip2}/30
+set interfaces tunnel ${pe1if} local-ip ${ac1ip2}
+set interfaces tunnel ${pe1if} remote-ip ${pe1lo}
+set interfaces tunnel ${pe1if} encapsulation gre
+set interfaces tunnel ${pe1if} multicast disable
+set interfaces tunnel ${pe1if} parameters ip ttl 255
+echo '>>>GRE 配置[Backup]<<<'
+set interfaces tunnel ${pe2if} description PE2_${pe2}
+set interfaces tunnel ${pe2if} address ${pe2ip2}/30
+set interfaces tunnel ${pe2if} local-ip ${ac2ip2}
+set interfaces tunnel ${pe2if} remote-ip ${pe2lo}
+set interfaces tunnel ${pe2if} encapsulation gre
+set interfaces tunnel ${pe2if} multicast disable
+set interfaces tunnel ${pe2if} parameters ip ttl 255`;
+
+openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
+set interfaces openvpn ${ac1if} description AC1_${ac1}
+set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
+set interfaces openvpn ${ac1if} remote-address ${ac1ip1}
+set interfaces openvpn ${ac1if} remote-host ${ac1pub}
+set interfaces openvpn ${ac1if} remote-port ${ac1port}
+set interfaces openvpn ${ac1if} mode site-to-site-client
+set interfaces openvpn ${ac1if} protocol udp
+set interfaces openvpn ${ac1if} openvpn-option 'persist-tun'
+set interfaces openvpn ${ac1if} openvpn-option '--persist-tun'
+#set interfaces openvpn ${ac1if} openvpn-option 'tun-mtu 1420'
+set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
+echo 'OpenVPN 接入配置[ac2]'
+set interfaces openvpn ${ac2if} description AC2_${ac2}
+set interfaces openvpn ${ac2if} local-address ${ac2ip2} subnet-mask 255.255.255.252
+set interfaces openvpn ${ac2if} remote-address ${ac2ip1}
+set interfaces openvpn ${ac2if} remote-host ${ac2pub}
+set interfaces openvpn ${ac2if} remote-port ${ac2port}
+set interfaces openvpn ${ac1if} mode site-to-site-client
+set interfaces openvpn ${ac2if} protocol udp
+set interfaces openvpn ${ac2if} openvpn-option 'persist-tun'
+set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
+#set interfaces openvpn ${ac2if} openvpn-option 'tun-mtu 1420'
+set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
+
 smartdns +=`set service dns forwarding cache-size '9999'
 set service dns forwarding fnetlink-dns 'enable'
 set service dns forwarding fnetlink-dns local-isp-dns ${local1dns}
@@ -455,7 +591,7 @@ delete system flow-accounting
 echo '>>>Table default 海外，DHCP指定海外DNS<<<'
 set interfaces bridge br2 description LAN-Bridge-ETH1-5
 set interfaces bridge br2 address 192.168.8.1/24
-set interfaces bridge br2 member interface eth1
+set interfaces bridge br2 member interface eth1set interfaces bridge br2 member interface eth1
 set interfaces bridge br2 member interface eth2
 set interfaces bridge br2 member interface eth3
 set interfaces bridge br2 member interface eth4
@@ -497,54 +633,8 @@ set service smartping
 set interfaces loopback lo address ${oversea1ip1}/32
 set interfaces loopback lo description ${oversea1ips}
 ${wan1Temp}
-echo 'OpenVPN 接入配置[ac1]'
-set interfaces openvpn ${ac1if} description AC1_to_${ac1}
-set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
-set interfaces openvpn ${ac1if} remote-address ${ac1ip1}
-set interfaces openvpn ${ac1if} remote-host ${ac1pub}
-set interfaces openvpn ${ac1if} remote-port ${ac1port}
-set interfaces openvpn ${ac1if} mode site-to-site
-set interfaces openvpn ${ac1if} protocol udp
-set interfaces openvpn ${ac1if} openvpn-option '--nobind'
-set interfaces openvpn ${ac1if} openvpn-option '--ping 10'
-set interfaces openvpn ${ac1if} openvpn-option '--ping-restart 60'
-set interfaces openvpn ${ac1if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300’
-set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
-echo 'OpenVPN 接入配置[ac2]'
-set interfaces openvpn ${ac2if} description AC2_to_${ac2}
-set interfaces openvpn ${ac2if} local-address ${ac2ip2} subnet-mask 255.255.255.252
-set interfaces openvpn ${ac2if} remote-address ${ac2ip1}
-set interfaces openvpn ${ac2if} remote-host ${ac2pub}
-set interfaces openvpn ${ac2if} remote-port ${ac2port}
-set interfaces openvpn ${ac2if} mode site-to-site
-set interfaces openvpn ${ac2if} protocol udp
-set interfaces openvpn ${ac2if} openvpn-option '--nobind'
-set interfaces openvpn ${ac2if} openvpn-option '--ping 10'
-set interfaces openvpn ${ac2if} openvpn-option '--ping-restart 60'
-set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300’
-set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'
-echo '>>>GRE 配置[Main]<<<'
-set interfaces tunnel ${pe1if} description PE1_${pe1}
-set interfaces tunnel ${pe1if} address ${pe1ip2}/30
-#[v3.2]set interfaces tunnel ${pe1if} local-ip ${ac1ip2}
-#[v3.2]set interfaces tunnel ${pe1if} remote-ip ${pe1lo}
-set interfaces tunnel ${pe1if} source-address ${ac1ip2}
-set interfaces tunnel ${pe1if} remote ${pe1lo}
-set interfaces tunnel ${pe1if} encapsulation gre
-set interfaces tunnel ${pe1if} multicast disable
-set interfaces tunnel ${pe1if} parameters ip ttl 255
-echo '>>>GRE 配置[Backup]<<<'
-set interfaces tunnel ${pe2if} description PE2_${pe2}
-set interfaces tunnel ${pe2if} address ${pe2ip2}/30
-#[v3.2]set interfaces tunnel ${pe2if} local-ip ${ac2ip2}
-#[v3.2]set interfaces tunnel ${pe2if} remote-ip ${pe2lo}
-set interfaces tunnel ${pe2if} source-address ${ac2ip2}
-set interfaces tunnel ${pe2if} remote ${pe2lo}
-set interfaces tunnel ${pe2if} encapsulation gre
-set interfaces tunnel ${pe2if} multicast disable
-set interfaces tunnel ${pe2if} parameters ip ttl 255
+${openvpnTemp}
+${greTemp}
 echo '>>>MTU TCP-MSS配置[interface]<<<'
 set firewall options interface ${ac1if} adjust-mss 1300
 set firewall options interface ${ac2if} adjust-mss 1300
