@@ -50,6 +50,20 @@ const fastip301html = `<table border="1">
 <td><input id="pe1_pub_input" placeholder="PE1Pub[eg:x.x.x.x]"></td>
 <td><input id="pe2_pub_input" placeholder="PE2Pub[eg:x.x.x.x]"></td>
 </tr>
+<tr>
+<td>CE Pub</td>
+<td><input id="ce1_pub_input" placeholder="CE1Pub[eg:x.x.x.x]"></td>
+<td><input id="ce2_pub_input" placeholder="CE2Pub[eg:x.x.x.x]"></td>
+</tr>
+<tr>
+<td>PE AS</td>
+<td><input id="pe1_as_input" placeholder="PE1AS[eg:x.x.x.x]"></td>
+<td><input id="pe2_as_input" placeholder="PE2AS[eg:x.x.x.x]"></td>
+</tr>
+<td>CE AS</td>
+<td><input id="ce1_as_input" placeholder="CE1AS[eg:x.x.x.x]"></td>
+<td><input id="ce2_as_input" placeholder="CE2AS[eg:x.x.x.x]"></td>
+</tr>
 </table>
 <button type="button" onclick="fastip301sub('/config')">提交配置信息(Submit Config Info)</button>
 `;
@@ -98,17 +112,15 @@ function fastip301getList() {
                     info_json.ip.push(l1);
                     break;
                 case 'pe对接':
-                    let a = l1.split('.')[0]
-                    if(a!=10&&a!=172&&a!=192){
-                        info_json.pub.push(l1);
-                    }else{
-                        info_json.lo.push(l1);
-                    };
+                    info_json.pub.push(l1);
                     break;
                 case 'ce对接':
-                    info_json.lo.push(l1);
+                    info_json.pub.push(l1);
                     break;
                 case 'peas号':
+                    info_json.as.push(l1);
+                    break;
+                case 'ceas号':
                     info_json.as.push(l1);
                     break;
                 default:
@@ -150,13 +162,18 @@ function fastip301getList() {
     $("#pe1_input").val(info_json.pe[0]);
     $("#pe1_if_input").val(info_json.if[0]);
     $("#pe1_ip_input").val(info_json.ip[0]);
-    $("#pe1_as_input").val(info_json.as[1]);
+    $("#pe1_pub_input").val(info_json.pub[0]);
+    $("#ce1_pub_input").val(info_json.pub[1]);
+    $("#pe1_as_input").val(info_json.as[0]);
+    $("#ce1_as_input").val(info_json.as[1]);
 
     $("#pe2_input").val(info_json.pe[1]);
-    $("#pe2_if_input").val(info_json.if[2]);
-    $("#pe2_ip_input").val(info_json.ip[2]);
-    $("#pe2_as_input").val(info_json.as[1]);
-    $("#ac2_pub_input").val(info_json.pub[1]);
+    $("#pe2_if_input").val(info_json.if[1]);
+    $("#pe2_ip_input").val(info_json.ip[1]);
+    $("#pe2_pub_input").val(info_json.pub[2]);
+    $("#ce2_pub_input").val(info_json.pub[3]);
+    $("#pe2_as_input").val(info_json.as[2]);
+    $("#ce2_as_input").val(info_json.as[3]);
   };
 };
 
@@ -195,16 +212,6 @@ function fastip301sub(url){
   let lineid = $("#lineid_input").val();
   let cname = $("#cname_input").val();
   let area = $("#area_input").val();
-  let local1dns = $("#local1_dns_input").val();
-  let local2dns = $("#local2_dns_input").val();
-  let oversea1dns = $("#oversea1_dns_input").val();
-  let oversea2dns = $("#oversea2_dns_input").val();
-  let bgp1server1 = $("#bgp_server1_input").val();
-  let bgp1server2 = $("#bgp_server2_input").val();
-  let bgp1server3 = $("#bgp_server3_input").val();
-  let bgp1server4 = $("#bgp_server4_input").val();
-  let oversea1ips = $("#pe1_oversea_input").val().split(',')[0];
-  let oversea1ip1 = oversea1ips.split(',')[0].split('-')[0];
 //获取主线参数
   let pe1 = $("#pe1_input").val();
   let pe1if = "tun"+$("#pe1_if_input").val().match(/[1-9]\d+/)[0];
@@ -212,6 +219,9 @@ function fastip301sub(url){
   let pe1ip1 = pe1ips[0];
   let pe1ip2 = pe1ips[1];
   let pe1pub = $("#pe1_pub_input").val();
+  let ce1pub = $("#ce1_pub_input").val();
+  let pe1as = $("#pe1_as_input").val();
+  let ce1as = $("#ce1_as_input").val();
 
 //获取备线参数
   let pe2 = $("#pe2_input").val();
@@ -220,6 +230,10 @@ function fastip301sub(url){
   let pe2ip1 = pe2ips[0];
   let pe2ip2 = pe2ips[1];
   let pe2pub = $("#pe2_pub_input").val();
+  let ce2pub = $("#ce2_pub_input").val();
+  let pe2as = $("#pe2_as_input").val();
+  let ce2as = $("#ce2_as_input").val();
+
 //差异化配置生成
 let wan1Temp = '';
 if(wan1=="eth0" || wan1=="eth1"){
@@ -294,20 +308,22 @@ switch(version){
     break;
   };
 let fastip301centosGre  =
-`#Fnet MPLS with GRE Over OpenVPN Template.
+`#CentOS ${version} MPLS GRE Template.
 #操作人员：${user}
 #时间：${time.cn}
 #系统：vyui-v1
-#CentOS version = 7.9
+#CentOS${version}
 +++++++++++++++++++++++++++++++++++++++++++
 echo '>>>更改主机名称'
-hostnamectl set-hostname ${lineid}-${cnameEN}-${area}
-echo '关闭SELinux和防火墙'
+hostnamectl set-hostname ${lineid}-${cname}-${area}
+
+echo '>>>关闭SELinux和防火墙'
 sed -i "s/SELINUX=enforcing/SELINUX=disabled/g" /etc/selinux/config
 sed -i "s/SELINUX=permissive/SELINUX=disabled/g" /etc/selinux/config
 setenforce 0
 systemctl stop firewalld
 systemctl disable firewalld
+
 echo '>>>安装epel yum仓库、frr'
 yum update -y
 yum install -y epel-release
@@ -315,7 +331,8 @@ FRRVER="frr-stable"
 curl -O https://rpm.frrouting.org/repo/$FRRVER-repo-1-0.el7.noarch.rpm
 sudo yum install ./$FRRVER* -y
 sudo yum install frr frr-pythontools -y
-###初始化FRR配置###
+
+echo '>>>初始化FRR配置'
 sed -i "s/net.ipv4.ip_forward = 1/net.ipv4.ip_forward = 0/g" /etc/sysctl.conf
 sysctl -p
 sed -i "s/bgpd=no/bgpd=yes/g" /etc/frr/daemons
@@ -323,7 +340,7 @@ sed -i "s/pathd=no/pathd=no\nservice integrated-vtysh-config/g" /etc/frr/daemons
 systemctl restart frr
 systemctl enable frr
 
-###PE1###
+echo '>>>PE1 ${pe1if}'
 echo -e '#PE1-${pe1}-${pe1if}
 DEVICE=${pe1if}
 BOOTPROTO=static
@@ -331,10 +348,11 @@ ONBOOT=yes
 DEVICETYPE=tunnel
 TYPE=GRE
 PEER_INNER_IPADDR=${pe1ip1}/30
-PEER_OUTER_IPADDR=${pe1lo}
+PEER_OUTER_IPADDR=${pe1pub}
 MY_INNER_IPADDR=${pe1ip2}/30
-MY_OUTER_IPADDR=${ac1ip2}' > /etc/sysconfig/network-scripts/ifcfg-${pe1if}
-###PE2###
+MY_OUTER_IPADDR=${ce1pub}' > /etc/sysconfig/network-scripts/ifcfg-${pe1if}
+
+echo '>>>PE2 ${pe2if}'
 echo -e '#PE2-${pe2}-${pe2if}
 DEVICE=${pe2if}
 BOOTPROTO=static
@@ -342,20 +360,18 @@ ONBOOT=yes
 DEVICETYPE=tunnel
 TYPE=GRE
 PEER_INNER_IPADDR=${pe1ip1}/30
-PEER_OUTER_IPADDR=${pe2lo}
+PEER_OUTER_IPADDR=${pe2pub}
 MY_INNER_IPADDR=${pe1ip2}/30
-MY_OUTER_IPADDR=${ac2ip2}' > /etc/sysconfig/network-scripts/ifcfg-${pe2if}
+MY_OUTER_IPADDR=${ce2pub}' > /etc/sysconfig/network-scripts/ifcfg-${pe2if}
 
 ifup ${pe1if}
 ifup ${pe2if}
 # ifdown ${pe1if}
 # ifdown ${pe2if}
 
-###FRR配置###
+echo '>>>FRR配置'
 vtysh
 configure
-ip route ${pe1lo}/32 ${ac1if}
-ip route ${pe2lo}/32 ${ac2if}
 ip route 114.113.245.99/32  ${pe1if}
 ip route 114.113.245.100/32 ${pe2if}
 !
@@ -401,8 +417,8 @@ write integrated
 write memory
 write terminal
 exit
-#################
-# NAT上网
+
+echo '>>>NAT上网'
 yum install iptables-services -y
 systemctl enable iptables
 systemctl start iptables
@@ -415,7 +431,7 @@ iptables -t nat -A POSTROUTING -s 172.16.0.0/12 -o eth0 -j MASQUERADE
 iptables -t nat -A POSTROUTING -s 192.168.0.0/16 -o eth0 -j MASQUERADE
 service iptables save
 `;
-  let filename = `${lineid}-Fast-SD-WAN-FastIP-CentOS-GRE-Config-${time.ez}-By-${user}`;
+  let filename = `${lineid}-假组网海外VPS-CentOS${version}-GRE-Config-${time.ez}-By-${user}`;
   let data = {};
   console.log(fastip301centosGre);
   downloadConfig(filename, fastip301centosGre);

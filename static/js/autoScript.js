@@ -293,17 +293,29 @@ function getTempJS(value){
                 console.log("fastip203 未下载");
             };
             break;
+               $("#service_dev").append(fastip301html);
         case "fastip301":
             try{
                 if($.isFunction(fastip301sub)){
-                    $("#service_dev").append(fastip301html);
-                    fastip201getList();
+                   fastip301getList();
                     console.log("fastip301 已下载");
                 };
             }catch(e){
                 js_path = "/static/js/"+ value + ".js";
                 $.getScript(js_path, function(){});
                 console.log("fastip301 未下载");
+            };
+            break;
+        case "fastip302":
+            try{
+                if($.isFunction(fastip302sub)){
+                   fastip302getList();
+                    console.log("fastip302 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("fastip302 未下载");
             };
             break;
         case "sdwan001":
