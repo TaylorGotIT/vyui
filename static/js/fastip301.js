@@ -314,6 +314,10 @@ let fastip301centosGre  =
 #系统：vyui-v1
 #CentOS${version}
 +++++++++++++++++++++++++++++++++++++++++++
+echo '>>>清理旧配置！！！（非必须，除非使用过）'
+rm -rf /etc/sysconfig/network-scripts/ifcfg-tun*
+rm -rf /etc/openvpn/vtun*
+
 echo '>>>更改主机名称'
 hostnamectl set-hostname ${lineid}-${cname}-${area}
 
