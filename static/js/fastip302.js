@@ -163,7 +163,7 @@ function fastip302getList() {
         }
     };
     console.log(info_json);
-    $("#lineid_input").val(info_json.id[0]);
+    $("#lineid_input").val(info_json.id[0].substr(0,7));
     $("#pe1_input").val(info_json.pe[0]);
     $("#pe1_if_input").val(info_json.if[0]);
     $("#pe1_ip_input").val(info_json.ip[0]);
@@ -199,8 +199,7 @@ function fastip302sub(url){
   let area = $("#area_input").val().toUpperCase();
   let lineid = $("#lineid_input").val();
   let version = $("#version_select").val();
-  let cid = lineid.substr(0,6);
-  let sid = lineid.substr(0,7);
+
 //获取主线参数
   let pe1 = $("#pe1_input").val();
   let pe1if = 'tun'+$("#pe1_if_input").val().match(/[1-9]\d+/)[0];
@@ -440,7 +439,7 @@ iptables -t nat -A POSTROUTING -s 172.16.0.0/12 -o eth0 -j MASQUERADE
 iptables -t nat -A POSTROUTING -s 192.168.0.0/16 -o eth0 -j MASQUERADE
 service iptables save
 `;
-  let filename = `${sid}-假组网海外VPS-CentOS${version}-GREOverOpenVPN-Config-By-${user}-${time.ez}`;
+  let filename = `${lineid}-假组网海外VPS-CentOS${version}-GREOverOpenVPN-Config-By-${user}-${time.ez}`;
   let data = {};
   console.log(fastip302fastipGreOverOpenvpn);
   downloadConfig(filename, fastip302fastipGreOverOpenvpn);
