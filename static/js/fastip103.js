@@ -402,7 +402,7 @@ set service dns forwarding name-server ${oversea2dns}`;
 greTemp += `echo '>>>GRE 配置[Main]<<<'
 set interfaces tunnel ${pe1if} description PE1_${pe1}
 set interfaces tunnel ${pe1if} address ${pe1ip2}/30
-set interfaces tunnel ${pe1if} source-address ${ac1ip2}
+set interfaces tunnel ${pe1if} local ${ac1ip2}
 set interfaces tunnel ${pe1if} remote ${pe1lo}
 set interfaces tunnel ${pe1if} encapsulation gre
 set interfaces tunnel ${pe1if} multicast disable
@@ -410,7 +410,7 @@ set interfaces tunnel ${pe1if} parameters ip ttl 255
 echo '>>>GRE 配置[Backup]<<<'
 set interfaces tunnel ${pe2if} description PE2_${pe2}
 set interfaces tunnel ${pe2if} address ${pe2ip2}/30
-set interfaces tunnel ${pe2if} source-address ${ac2ip2}
+set interfaces tunnel ${pe2if} local ${ac2ip2}
 set interfaces tunnel ${pe2if} remote ${pe2lo}
 set interfaces tunnel ${pe2if} encapsulation gre
 set interfaces tunnel ${pe2if} multicast disable

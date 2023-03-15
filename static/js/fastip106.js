@@ -508,7 +508,7 @@ set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.sec
 greTemp += `echo '>>>GRE 配置[Main]<<<'
 set interfaces tunnel ${pe1if} description PE1_${pe1}
 set interfaces tunnel ${pe1if} address ${pe1ip2}/30
-set interfaces tunnel ${pe1if} source-address ${ac1ip2}
+set interfaces tunnel ${pe1if} local ${ac1ip2}
 set interfaces tunnel ${pe1if} remote ${pe1lo}
 set interfaces tunnel ${pe1if} encapsulation gre
 set interfaces tunnel ${pe1if} multicast disable
@@ -516,7 +516,7 @@ set interfaces tunnel ${pe1if} parameters ip ttl 255
 echo '>>>GRE 配置[Backup]<<<'
 set interfaces tunnel ${pe2if} description PE2_${pe2}
 set interfaces tunnel ${pe2if} address ${pe2ip2}/30
-set interfaces tunnel ${pe2if} source-address ${ac2ip2}
+set interfaces tunnel ${pe2if} local ${ac2ip2}
 set interfaces tunnel ${pe2if} remote ${pe2lo}
 set interfaces tunnel ${pe2if} encapsulation gre
 set interfaces tunnel ${pe2if} multicast disable
@@ -524,8 +524,8 @@ set interfaces tunnel ${pe2if} parameters ip ttl 255
 echo '>>>GRE 配置[${natpe1}]<<<'
 set interfaces tunnel ${natpe1if} description ${natpe1}
 set interfaces tunnel ${natpe1if} address ${natpe1ip2}/30
-set interfaces tunnel ${natpe1if} local-ip ${natce1lo}
-set interfaces tunnel ${natpe1if} remote-ip ${natpe1lo}
+set interfaces tunnel ${natpe1if} local ${natce1lo}
+set interfaces tunnel ${natpe1if} remote ${natpe1lo}
 set interfaces tunnel ${natpe1if} encapsulation gre
 set interfaces tunnel ${natpe1if} multicast disable
 set interfaces tunnel ${natpe1if} parameters ip ttl 255`;
@@ -935,6 +935,23 @@ set system name-server 192.168.8.1
 delete service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server ${oversea1dns}
 delete service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server ${oversea2dns}
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server 192.168.8.1
+
+###SmartDMS 解决TK直播解析问题###
+sudo  wget ftp://psalesftp:Tfe28@w%@59.36.7.222/Taylorg/smartdns.1.2023.03.04-1125.x86_64-debian-all.deb
+sudo dpkg -i smartdns.1.2023.03.04-1125.x86_64-debian-all.deb
+echo -e 'bind 192.168.75.13:53 -no-cache
+force-AAAA-SOA yes
+server 8.8.8.8
+server 8.8.4.4' >> /etc/smartdns/smartdns.conf
+#CE路由器关闭DNS配置，开启SmartDNS
+del service dns
+sudo systemclt enable smartdns
+sudo systemclt start smartdns
+CE路由器更改DHCP下发DNS为 192.168.8.1 和 192.168.9.1
+del service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.8.0/24 name-server
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.8.0/24 name-server 192.168.8.1
+del service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 name-server
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 name-server 192.168.9.1
 `;
   let filename = `${lineid}-Fast-SD-WAN-GREOverGRE-Config-${time.ez}-By-${user}`;
   let data = {};
