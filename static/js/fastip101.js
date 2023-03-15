@@ -4,8 +4,8 @@ const fastip101html = `<table border="1">
 <td>LineID</td>
 <td><input id="lineid_input"></td>
 <td><select id="version_select">
-<option value="40" selected="selected">FnetOS[ 4.0 ]</option>
-<option value="32">FnetOS[ 3.2 ]</option>
+<option value="32" selected="selected">FnetOS[ 3.2 ]</option>
+<option value="40">FnetOS[ 4.0 ]</option>
 <option value="31">FnetOS[ 3.1 ]</option></select></td>
 </tr>
 <tr>
@@ -362,7 +362,7 @@ set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
 }
 let openvpnTemp = '';
 let greTemp = '';
-let smartdns = '';
+let smartdnsTemp = '';
 switch(version){
     case "40":
 greTemp += `echo '>>>GRE 配置[Main]<<<'
@@ -411,7 +411,7 @@ set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
 #set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300’
 set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
 
-smartdns += `set epoch file-sync task 1 local '/opt/cn.txt'
+smartdnsTemp += `set epoch file-sync task 1 local '/opt/cn.txt'
 set epoch file-sync task 1 remote 'http://59.37.126.146:1909/f32x/domainlist/cn_domainlist.last'
 set epoch file-sync task 2 local '/opt/oversea.txt'
 set epoch file-sync task 2 remote 'http://59.37.126.146:1909/f32x/domainlist/oversea_domainlist.last'
@@ -478,7 +478,7 @@ set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
 #set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300’
 set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
 
-smartdns +=`set service dns dnsmasq cache-size '9999'
+smartdnsTemp +=`set service dns dnsmasq cache-size '9999'
 set service dns dnsmasq fnetlink-dns enable
 set service dns dnsmasq fnetlink-dns local-isp-dns ${local1dns}
 set service dns dnsmasq fnetlink-dns local-isp-dns ${local2dns}
@@ -530,7 +530,7 @@ set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
 #set interfaces openvpn ${ac2if} openvpn-option 'tun-mtu 1420'
 set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
 
-smartdns +=`set service dns forwarding cache-size '9999'
+smartdnsTemp +=`set service dns forwarding cache-size '9999'
 set service dns forwarding fnetlink-dns 'enable'
 set service dns forwarding fnetlink-dns local-isp-dns ${local1dns}
 set service dns forwarding fnetlink-dns local-isp-dns ${local2dns}
@@ -542,6 +542,7 @@ set service dns forwarding name-server ${oversea1dns}
 set service dns forwarding name-server ${oversea2dns}`;
     break;
   };
+
 let fastip101fastipGreOverOpenvpn  =
 `#Fnet MPLS with GRE Over OpenVPN Template.
 #操作人员：${user}
@@ -815,7 +816,7 @@ set nat source rule 4002 destination address ${oversea2dns}/32
 set nat source rule 4002 outbound-interface ${pe2if}
 set nat source rule 4002 translation address ${oversea1ip1}
 echo '>>>SmartDNS配置<<<'
-${smartdns}
+${smartdnsTemp}
 ###以上配置commit后再贴###
 delete system name-server
 set system name-server 192.168.8.1
