@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<head xmlns:Accept-Language="http://www.w3.org/1999/xhtml">
+    <meta Accept-Language: fr-CH, fr;q=0.9, en;q=0.8, de;q=0.7, *;q=0.5 />
+    <title>{{ title }}</title>
+    <link rel="shortcut icon" type="image/x-icon" href="static/img/favicon.ico"/>
+    {% module xsrf_form_html() %}
+
+    </head>
+<body>
+    <a href="/">[ Home ]</a><br>
+    <select id="service_select" onchange="getTempJS(this.value)">
+            <option value="">请下拉选中一个DNS配置服务模板[ 默认为空 ]</option>
+            <option value="dns001">SmartDNS</option>
+            <option value="dns002">Dnsmasq</option>
+            <option value="dns003">PowerDNS</option>
+    </select>
+
+    <div id="info_dev">
+        <form id="service_dev"></form>
+    </div>
+</body>
+<style>
+
+</style>
+<script type="text/javascript" src="/static/js/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="/static/js/qrcode.min.js"></script>
+<script>
+//动态获取选中的模板JS文件
+function getTempJS(value){
+    console.log(value);
+    $("#service_dev").children().remove();
+    switch(value){
+        case "dns001":
+            try{
+                if($.isFunction(dns001sub)){
+                    //已下载脚本时需要调用脚本执行
+                    $("#service_dev").append(dns001html);
+                    console.log("dns001 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("dns001 未下载");
+            };
+            break;
+        case "dns002":
+            try{
+                if($.isFunction(dns002sub)){
+                    $("#service_dev").append(dns002html);
+                    dns002getList();
+                    console.log("dns002 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("dns002 未下载");
+            };
+            break;
+        case "dns003":
+            try{
+                if($.isFunction(dns003sub)){
+                    $("#service_dev").append(dns003html);
+                    dns003getList();
+                    console.log("dns003 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("dns003 未下载");
+            };
+            break;
+    };
+
+};
+const T_FORM = 'application/x-www-form-urlencoded'
+const T_JSON = 'application/json';
+
+function getCookie(name) {
+    var r = document.cookie.match("\\b" + name + "=([^;]*)\\b");
+    return r ? r[1] : undefined;
+}
+
+function setCookie(cname, cvalue, exdays){
+    let d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    let expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+window.onload=function(){
+    const xsrf = getCookie('_xsrf');
+    //_xsrf Header Setup for Ajax
+    function xsrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!xsrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-XSRFToken", xsrf);
+            }
+        }
+    });
+}
+
+
+function getIPAll(str,num){
+    let addr = str.split('/');
+    let cidr = addr[1];
+    let s = addr[0].split('.');
+    let ips = [];
+    for(let i=0;i<num;i++){
+        let s3 = Number(s[3]) + i;
+        let m2 = s3/254
+        let p = '';
+        if(m2<=1){
+            if(s3==0){
+                ip = `${s[0]}.${s[1]}.${s[2]}.1/32`;
+            }else{
+                ip = `${s[0]}.${s[1]}.${s[2]}.${s3.toString()}/32`;
+            }
+        }else{
+            s3 -= parseInt(m2)*254;
+            let s2 = s[2] + parseInt(m2);
+                ip =  `${s[0]}.${s[1]}.${s2.toString()}.${s3.toString()}/32`;
+        }
+        ips[i]=ip;
+    }
+    return ips;
+}
+
+function downloadConfig(name, str) {
+  let a = document.createElement('a');
+  if(str.search('base64')==-1){
+    a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(str));
+  }else{
+  //当确认为base64图片数据时，直接将其url更改为 base64图片路径；
+    a.href=str;
+  }
+  a.setAttribute('download', name);
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+
+function next(url){
+  console.log('redirect to===>' + url);
+  if(url!=null){
+    window.location.href = url;
+  }
+}
+</script>
+</html>

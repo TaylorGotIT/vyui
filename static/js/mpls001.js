@@ -37,7 +37,6 @@ const mpls001html = `<table border="1">
 <option value="static">WAN Type[ Static ]</option>
 <option value="pppoe">WAN Type[ PPPoE ]</option></select></td></tr>
 <tr id="wan1_input_tr"></tr>
-
 <tr>
 <td>PE</td>
 <td><input id="pe1_input"></td>
@@ -92,6 +91,26 @@ const mpls001html = `<table border="1">
 <td>AC Pub</td>
 <td><input id="ac1_pub_input"></td>
 <td><input id="ac2_pub_input"></td>
+</tr>
+<tr id="dns_bgp_input_tr">
+<td>LocalDNS</td>
+<td><input id="local1_dns_input" placeholder="本地DNS1[eg:223.5.5.5]" value="223.5.5.5"></td>
+<td><input id="local2_dns_input" placeholder="本地DNS2[eg:223.6.6.6]" value="223.6.6.6"></td>
+</tr>
+<tr>
+<td>OverseaDNS</td>
+<td><input id="oversea1_dns_input" placeholder="海外DNS1[eg:8.8.8.8]" value="8.8.8.8"></td>
+<td><input id="oversea2_dns_input" placeholder="海外DNS2[eg:8.8.4.4]" value="8.8.4.4"></td>
+</tr>
+<tr>
+<td>BGPServerA</td>
+<td><input id="bgp_server1_input" placeholder="BGP Server1" value="10.10.99.200"></td>
+<td><input id="bgp_server2_input" placeholder="BGP Server2" value="10.10.99.202"></td>
+</tr>
+<tr>
+<td>BGPServerB</td>
+<td><input id="bgp_server3_input" placeholder="BGP Server3" value="10.10.99.201"></td>
+<td><input id="bgp_server4_input" placeholder="BGP Server4" value="10.10.99.203"></td>
 </tr>
 </table>
 <button type="button" onclick="mpls001sub('/config')">提交配置信息(Submit Config Info)</button>
@@ -222,7 +241,7 @@ function mpls001sub(url){
   let wan1 = $("#wan1_select").val();
   let wan1Type = $("#wan1_type_select").val();
   let wan1Provider = $("#wan1_provider_select").val();
-
+  let version = $("#version_select").val();
   let cname = $("#cname_input").val();
   let area = $("#area_input").val();
   let subnet1 = $("#subnet1_input").val();
@@ -267,9 +286,47 @@ function mpls001sub(url){
   let ce2lo = $("#ce2_lo_input").val();
   let pe2As = $("#pe2_as_input").val();
   let ce2As = $("#ce2_as_input").val();
-
+  let local1dns = $("#local1_dns_input").val();
+  let local2dns = $("#local2_dns_input").val();
+  let oversea1dns = $("#oversea1_dns_input").val();
+  let oversea2dns = $("#oversea2_dns_input").val();
+  let bgp1server1 = $("#bgp_server1_input").val();
+  let bgp1server2 = $("#bgp_server2_input").val();
+  let bgp1server3 = $("#bgp_server3_input").val();
+  let bgp1server4 = $("#bgp_server4_input").val();
 //差异化配置生成
+let imageTemp = '';
+let initTemp = '';
 let wan1Temp = '';
+let openvpnTemp = '';
+let greTemp = '';
+let smartdnsTemp = '';
+switch(version){
+    case "40":
+//系统升级/降级模板
+imageTemp +=`echo '# 系统升级最新4.0版本'
+conf
+delete system host-name
+delete epoch controller
+sudo systemctl stop epoch-openvpnd
+rm /config/.initagentd.status
+delete interfaces ethernet
+delete interface openvpn
+delete interface tunnel
+delete interface loopback lo
+delete nat
+delete protocols
+delete policy
+set interfaces ethernet eth0 address dhcp
+commit
+exit
+curl http://202.104.174.189:18080/epochos/ | grep vyos-epoch | awk -F '"' '{print "http://192.168.75.15/epochos/"$2}' | sed -n '$p' > img_list
+while read -r url; do wget "$url" done < img_list
+cat img_list
+do add system image xxx`;
+//初始化模板
+initTemp +=``;
+//WAN接口模板
 if(wan1=="eth0" || wan1=="eth1"){
 switch(wan1Type){
     case "dhcp":
@@ -288,11 +345,13 @@ set protocols static route 1.1.1.1/32 next-hop ${wan1gw}`;
         let pppoe1user = $("#pppoe1_user_input").val();
         let pppoe1pass = $("#pppoe1_pass_input").val();
         wan1Temp += `set interfaces ethernet ${wan1} description WAN1_${wan1Provider}_${pppoe1user}/${pppoe1pass}
-set interfaces ethernet ${wan1} pppoe 1 default-route 'none'
-set interfaces ethernet ${wan1} pppoe 1 mtu '1492'
-set interfaces ethernet ${wan1} pppoe 1 name-server 'none'
-set interfaces ethernet ${wan1} pppoe 1 password ${pppoe1user}
-set interfaces ethernet ${wan1} pppoe 1 user-id ${pppoe1pass}
+del interface ethernet ${wan1} address
+set interfaces pppoe pppoe1 authentication user ${pppoe1user}
+set interfaces pppoe pppoe1 authentication password ${pppoe1pass}
+set interfaces pppoe pppoe1 default-route 'auto'
+set interfaces pppoe pppoe1 description description WAN1_${wan1Provider}_${pppoe1user}/${pppoe1pass}
+set interfaces pppoe pppoe1 mtu '1492'
+set interfaces pppoe pppoe1 source-interface ${wan1}
 set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
     break;
   };
@@ -318,23 +377,18 @@ set protocols static route 1.1.1.1/32 next-hop ${wan1gw}`;
         let pppoe1user = $("#pppoe1_user_input").val();
         let pppoe1pass = $("#pppoe1_pass_input").val();
         wan1Temp += `set interfaces bridge ${wan1} description WAN1_${wan1Provider}_${pppoe1user}/${pppoe1pass}
-set interfaces bridge ${wan1} pppoe 1 default-route 'none'
-set interfaces bridge ${wan1} pppoe 1 mtu '1492'
-set interfaces bridge ${wan1} pppoe 1 name-server 'none'
-set interfaces bridge ${wan1} pppoe 1 password ${pppoe1user}
-set interfaces bridge ${wan1} pppoe 1 user-id ${pppoe1pass}
-set interfaces bridge ${wan1} member interface eth0
-set interfaces bridge ${wan1} member interface eth1
+del interfaces bridge ${wan1} address
+set interfaces pppoe pppoe1 authentication user ${pppoe1user}
+set interfaces pppoe pppoe1 authentication password ${pppoe1pass}
+set interfaces pppoe pppoe1 default-route 'auto'
+set interfaces pppoe pppoe1 description description WAN1_${wan1Provider}_${pppoe1user}/${pppoe1pass}
+set interfaces pppoe pppoe1 mtu '1492'
+set interfaces pppoe pppoe1 source-interface ${wan1}
 set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
     break;
   };
 }
-
-let openvpnTemp = '';
-let greTemp = '';
-let smartdnsTemp = '';
-switch(version){
-    case "40":
+//OpenVPN接口模板
 openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
 set interfaces openvpn ${ac1if} description AC1_${ac1}
 set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
@@ -402,6 +456,126 @@ set service dns forwarding name-server ${oversea1dns}
 set service dns forwarding name-server ${oversea2dns}`;
     break;
     case "32":
+imageTemp += `echo '# 系统降级到3.2.17'
+conf
+delete system host-name
+delete interfaces bridge
+delete interfaces ethernet
+delete interface openvpn
+delete interface tunnel
+delete interface loopback lo
+delete nat
+delete protocols
+set inter eth eth0 add dhcp
+commit
+exit
+sudo wget http://192.168.75.15/FnetOS/vyos-1.2.9-S1-amd64.iso
+add system image vyos-1.2.9-S1-amd64.iso
+添加系统镜像后重启
+reboot
+开机后串口9600进入
+conf
+set inter eth eth0 add dhcp
+commit
+exit
+sudo wget -O /tmp/finit http://59.37.126.146:1909/patching/f3.2.x_init.py
+sudo chmod +x /tmp/finit
+sudo /tmp/finit
+update patch_updater
+update patch
+update sdwan
+sudo useradd -d /var/lib/misc -s /bin/false dnsmasq
+sudo echo "" > .bash_history
+sudo rm -rf /var/log/wtmp*
+sudo rm -rf /config/archive/config.boot*
+sudo rm -rf /config/config.boot*
+>~/.bash_history
+reboot
+初始化3.2.17后进入
+config
+set system console device ttyS0 speed 115200
+set service smartping
+del system login user vyos
+delete zone-policy
+commit
+save
+exit
+# paping
+sudo  wget ftp://psalesftp:Tfe28@w%@59.36.7.222/Taylorg/fnetos_tools_paping_2020.11.26.deb
+sudo dpkg -i fnetos_tools_paping_2020.11.26.deb
+# smartping FnetOS 3.2.X && Speedtest.py
+wget http://59.37.126.146:1909/f32x/debs/fnetos_smartping_2020.10.23.deb
+sudo dpkg -i fnetos_smartping_2020.10.23.deb
+# smartdns
+# 下载 安装 配置
+sudo  wget ftp://psalesftp:Tfe28@w%@59.36.7.222/Taylorg/smartdns.1.2023.03.04-1125.x86_64-debian-all.deb
+sudo dpkg -i smartdns.1.2023.03.04-1125.x86_64-debian-all.deb
+# 清理安装包
+dir
+rm -rf *
+curl -O https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py
+sudo chmod +x ./speedtest.py`;
+//WAN接口模板
+if(wan1=="eth0" || wan1=="eth1"){
+switch(wan1Type){
+    case "dhcp":
+        wan1Temp += `set interfaces ethernet ${wan1} description WAN1-${wan1Provider}-DHCP
+set interfaces ethernet ${wan1} address dhcp
+set protocols static route 1.1.1.1/32 dhcp-interface ${wan1}`;
+    break;
+    case "static":
+        let wan1ip = $("#wan1_ip_input").val();
+        let wan1gw = $("#wan1_gw_input").val();
+        wan1Temp += `set interfaces ethernet ${wan1} description WAN1-${wan1Provider}-GW-${wan1gw}
+set interfaces ethernet ${wan1} address ${wan1ip}
+set protocols static route 1.1.1.1/32 next-hop ${wan1gw}`;
+    break;
+    case "pppoe":
+        let pppoe1user = $("#pppoe1_user_input").val();
+        let pppoe1pass = $("#pppoe1_pass_input").val();
+        wan1Temp += `set interfaces ethernet ${wan1} description WAN1_${wan1Provider}_${pppoe1user}/${pppoe1pass}
+del interfaces ethernet ${wan1} address
+set interfaces ethernet ${wan1} pppoe 1 default-route 'none'
+set interfaces ethernet ${wan1} pppoe 1 mtu '1492'
+set interfaces ethernet ${wan1} pppoe 1 name-server 'none'
+set interfaces ethernet ${wan1} pppoe 1 password ${pppoe1user}
+set interfaces ethernet ${wan1} pppoe 1 user-id ${pppoe1pass}
+set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
+    break;
+  };
+}else if(wan1=="br0" || wan1=="br1"){
+switch(wan1Type){
+    case "dhcp":
+        wan1Temp += `set interfaces bridge ${wan1} description WAN1-${wan1Provider}-DHCP
+set interfaces bridge ${wan1} address dhcp
+set interfaces bridge ${wan1} member interface eth0
+set interfaces bridge ${wan1} member interface eth1
+set protocols static route 1.1.1.1/32 dhcp-interface ${wan1}`;
+    break;
+    case "static":
+        let wan1ip = $("#wan1_ip_input").val();
+        let wan1gw = $("#wan1_gw_input").val();
+        wan1Temp += `set interfaces bridge ${wan1} description WAN1-${wan1Provider}-GW-${wan1gw}
+set interfaces bridge ${wan1} address ${wan1ip}
+set interfaces bridge ${wan1} member interface eth0
+set interfaces bridge ${wan1} member interface eth1
+set protocols static route 1.1.1.1/32 next-hop ${wan1gw}`;
+    break;
+    case "pppoe":
+        let pppoe1user = $("#pppoe1_user_input").val();
+        let pppoe1pass = $("#pppoe1_pass_input").val();
+        wan1Temp += `set interfaces bridge ${wan1} description WAN1_${wan1Provider}_${pppoe1user}/${pppoe1pass}
+del interfaces bridge ${wan1} address
+set interfaces bridge ${wan1} pppoe 1 default-route 'none'
+set interfaces bridge ${wan1} pppoe 1 mtu '1492'
+set interfaces bridge ${wan1} pppoe 1 name-server 'none'
+set interfaces bridge ${wan1} pppoe 1 password ${pppoe1user}
+set interfaces bridge ${wan1} pppoe 1 user-id ${pppoe1pass}
+set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
+    break;
+  };
+}
+//OpenVPN接口模板
 openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
 set interfaces openvpn ${ac1if} description AC1_${ac1}
 set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
@@ -458,6 +632,67 @@ set service dns dnsmasq name-server ${oversea1dns}
 set service dns dnsmasq name-server ${oversea2dns}`;
     break;
     case "31":
+//WAN接口模板
+if(wan1=="eth0" || wan1=="eth1"){
+switch(wan1Type){
+    case "dhcp":
+        wan1Temp += `set interfaces ethernet ${wan1} description WAN1-${wan1Provider}-DHCP
+set interfaces ethernet ${wan1} address dhcp
+set protocols static route 1.1.1.1/32 dhcp-interface ${wan1}`;
+    break;
+    case "static":
+        let wan1ip = $("#wan1_ip_input").val();
+        let wan1gw = $("#wan1_gw_input").val();
+        wan1Temp += `set interfaces ethernet ${wan1} description WAN1-${wan1Provider}-GW-${wan1gw}
+set interfaces ethernet ${wan1} address ${wan1ip}
+set protocols static route 1.1.1.1/32 next-hop ${wan1gw}`;
+    break;
+    case "pppoe":
+        let pppoe1user = $("#pppoe1_user_input").val();
+        let pppoe1pass = $("#pppoe1_pass_input").val();
+        wan1Temp += `set interfaces ethernet ${wan1} description WAN1_${wan1Provider}_${pppoe1user}/${pppoe1pass}
+del interfaces ethernet ${wan1} address
+set interfaces ethernet ${wan1} pppoe 1 default-route 'none'
+set interfaces ethernet ${wan1} pppoe 1 mtu '1492'
+set interfaces ethernet ${wan1} pppoe 1 name-server 'none'
+set interfaces ethernet ${wan1} pppoe 1 password ${pppoe1user}
+set interfaces ethernet ${wan1} pppoe 1 user-id ${pppoe1pass}
+set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
+    break;
+  };
+}else if(wan1=="br0" || wan1=="br1"){
+switch(wan1Type){
+    case "dhcp":
+        wan1Temp += `set interfaces bridge ${wan1} description WAN1-${wan1Provider}-DHCP
+set interfaces bridge ${wan1} address dhcp
+set interfaces bridge ${wan1} member interface eth0
+set interfaces bridge ${wan1} member interface eth1
+set protocols static route 1.1.1.1/32 dhcp-interface ${wan1}`;
+    break;
+    case "static":
+        let wan1ip = $("#wan1_ip_input").val();
+        let wan1gw = $("#wan1_gw_input").val();
+        wan1Temp += `set interfaces bridge ${wan1} description WAN1-${wan1Provider}-GW-${wan1gw}
+set interfaces bridge ${wan1} address ${wan1ip}
+set interfaces bridge ${wan1} member interface eth0
+set interfaces bridge ${wan1} member interface eth1
+set protocols static route 1.1.1.1/32 next-hop ${wan1gw}`;
+    break;
+    case "pppoe":
+        let pppoe1user = $("#pppoe1_user_input").val();
+        let pppoe1pass = $("#pppoe1_pass_input").val();
+        wan1Temp += `set interfaces bridge ${wan1} description WAN1_${wan1Provider}_${pppoe1user}/${pppoe1pass}
+del interfaces bridge ${wan1} address
+set interfaces bridge ${wan1} pppoe 1 default-route 'none'
+set interfaces bridge ${wan1} pppoe 1 mtu '1492'
+set interfaces bridge ${wan1} pppoe 1 name-server 'none'
+set interfaces bridge ${wan1} pppoe 1 password ${pppoe1user}
+set interfaces bridge ${wan1} pppoe 1 user-id ${pppoe1pass}
+set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
+    break;
+  };
+}
+//OpenVPN接口模板
 openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
 set interfaces openvpn ${ac1if} description AC1_${ac1}
 set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
@@ -520,64 +755,8 @@ let mpls001MPLSGreOverOpenvpn  =
 #系统：vyui-v1
 #vyos version >= 1.28.
 +++++++++++++++++++++++++++++++++++++++++++
-echo '初始化设备'
-delete system host-name
-delete epoch controller
-sudo systemctl stop epoch-openvpnd
-rm /config/.initagentd.status
-delete interfaces ethernet eth0 address
-delete interfaces ethernet eth1 address
-delete interfaces ethernet eth2 address
-delete interfaces ethernet eth3 address
-delete interfaces ethernet eth4 address
-delete interfaces ethernet eth5 address
-delete interface openvpn
-delete interface tunnel
-delete interface loopback lo
-delete firewall options interface
-delete nat
-delete protocols
-delete policy
-delete track
-delete smokeping
-delete traffic-policy
-delete service dns
-delete service dhcp-server
-delete system name-server
-delete system flow-accounting
-set interfaces ethernet eth0 address dhcp
-commit
-exit
-###接网线下载镜像!!!
-echo '>>>升级到最新镜像<<<'
-curl http://202.104.174.189:18080/epochos/ | \
-grep vyos-epoch | \
-awk -F '"' '{print "http://192.168.75.15/epochos/"$2}' | \
-sed -n '$p' > img_list
-while read -r url; do wget "$url" done < img_list
-####等待下载完成后升级系统!!!
-while read -r img; do add system image "$img"; done < img_list
-echo '>>>Table default 海外，DHCP指定海外DNS<<<'
-set interfaces bridge br2 description LAN-Bridge-ETH1-5
-set interfaces bridge br2 address 192.168.8.1/24
-set interfaces bridge br2 member interface eth1
-set interfaces bridge br2 member interface eth2
-set interfaces bridge br2 member interface eth3
-set interfaces bridge br2 member interface eth4
-set interfaces bridge br2 member interface eth5
-set system name-server 114.114.114.114
-set service ssh disable-host-validation
-set service ssh port 2707
-set system login user bothwin authentication encrypted-password '$6$v.wWSn9tGGGWzElK$qrB79AFWdg4lCtrbVNjea6Gs.oMGeQ8now53XO/h8V8DZ5yiqzv33h0rSMw8wWKTZXRFf6O8uRRCcPaIHsaiq0'
-set system time-zone Asia/Hong_Kong
-set service smartping
-commit
-save
-exit
-sudo curl -O https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py
-sudo chmod +x  speedtest.py
-conf
-echo '基础配置[防火墙规则，系统名称，物理接口]'
+${imageTemp}
+echo '# 基础配置[防火墙规则，系统名称，物理接口]'
 set firewall group network-group GROUP-FNET-Whitelist network 202.104.174.178/32
 set firewall group network-group GROUP-FNET-Whitelist network 114.112.232.0/23
 set firewall group network-group GROUP-FNET-Whitelist network 114.112.236.0/22
@@ -596,26 +775,26 @@ set firewall name WAN2LOCAL rule 2000 protocol 'tcp_udp'
 set interfaces ethernet eth0 firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe1if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe2if} firewall local name 'WAN2LOCAL'
-echo '基础配置[系统名称，物理接口]'
+echo '# 基础配置[系统名称，物理接口]'
 set system host-name ${lineid}-${cname}-${area}
 set service snmp community both-win authorization 'ro'
 set service smartping
 ${wan1Temp}
 ${openvpnTemp}
 ${greTemp}
-echo '>>>MTU TCP-MSS配置[interface]<<<'
+echo '# MTU TCP-MSS配置[interface]'
 set firewall options interface ${ac1if} adjust-mss '1300'
 set firewall options interface ${ac2if} adjust-mss '1300'
 set firewall options interface tun${pe1ifNum} adjust-mss '1300'
 set firewall options interface tun${pe2ifNum} adjust-mss '1300'
-echo '>>>路由配置[Track 默认路由，对接公网路由，内网路由]<<<'
+echo '# 路由配置[Track 默认路由，对接公网路由，内网路由]'
 set track name to-main failure-count 2
 set track name to-main success-count 2
 set track name to-main test 10 resp-time 5
 set track name to-main test 10 target ${pe1ip1}
 set track name to-main test 10 ttl-limit 1
 set track name to-main test 10 type ping
-echo '>>>静态路由配置[Static]<<<'
+echo '# 静态路由配置[Static]'
 set protocols static route ${ac1pub}/32 next-hop 1.1.1.1
 set protocols static route ${ac2pub}/32 next-hop 1.1.1.1
 set protocols static route ${pe1lo}/32 next-hop ${ac1ip1}
@@ -626,7 +805,7 @@ set protocols static route 192.168.55.125/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.125/32 next-hop ${pe2ip1} distance 5
 set protocols static route 192.168.55.250/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.250/32 next-hop ${pe2ip1} distance 5
-echo '>>>动态路由配置[BGP]<<<'
+echo '# 组网配置[BGP]'
 set policy prefix-list Local-Route rule 10 action 'permit'
 set policy prefix-list Local-Route rule 10 prefix ${subnet1}
 set policy prefix-list Local-Route rule 20 action 'permit'
@@ -634,7 +813,7 @@ set policy prefix-list Local-Route rule 20 prefix ${subnet2}
 set policy route-map BGP rule 10 action 'permit'
 set policy route-map BGP rule 10 match ip address prefix-list 'Local-Route'
 set policy route-map BGP rule 999 action 'deny'
-
+#
 set policy route-map bgp-from--Main rule 100 action 'permit'
 set policy route-map bgp-from--Main rule 100 description 'Main'
 set policy route-map bgp-from--Main rule 100 match
@@ -661,7 +840,7 @@ set protocols bgp 65000 neighbor ${pe2ip1} address-family ipv4-unicast soft-reco
 set protocols bgp 65000 neighbor ${pe2ip1} local-as ${ce2As}
 set protocols bgp 65000 neighbor ${pe2ip1} remote-as ${pe2As}
 set protocols bgp 65000 neighbor ${pe2ip1} update-source ${pe2ip2}
-echo '>>>NetFlow<<<'
+echo '# NetFlow配置'
 set system flow-accounting interface tun1015
 set system flow-accounting interface tun1153
 set system flow-accounting netflow engine-id '1'
@@ -676,7 +855,82 @@ set system flow-accounting netflow timeout tcp-rst '120'
 set system flow-accounting netflow timeout udp '300'
 set system flow-accounting netflow version '9'
 set system flow-accounting syslog-facility 'daemon'
-echo '>>>SmartDNS配置<<<'
+####################
+#如果客户需要BGP分流 #
+####################
+echo '# 海外点 发布默认路由配置[BGP]'
+set policy prefix-list Local-Route rule 100 action 'permit'
+set policy prefix-list Local-Route rule 100 prefix 0.0.0.0/0
+
+echo '# FastIP 配置[BGP]'
+set protocols static route ${bgp1server1}/32 next-hop ${pe1ip1}
+set protocols static route ${bgp1server2}/32 next-hop ${pe1ip1}
+set protocols static route ${bgp1server3}/32 next-hop ${pe2ip1}
+set protocols static route ${bgp1server4}/32 next-hop ${pe2ip1}
+set policy community-list 80 rule 10 action 'permit'
+set policy community-list 80 rule 10 description 'to_hk'
+set policy community-list 80 rule 10 regex '65000:9939'
+set policy community-list 81 rule 10 action 'permit'
+set policy community-list 81 rule 10 description 'to_ct'
+set policy community-list 81 rule 10 regex '65000:4134'
+set policy community-list 82 rule 10 action 'permit'
+set policy community-list 82 rule 10 description 'to_cnc'
+set policy community-list 82 rule 10 regex '65000:4837'
+set policy community-list 83 rule 10 action 'permit'
+set policy community-list 83 rule 10 description 'to_cn_other'
+set policy community-list 83 rule 10 regex '65000:9808'
+set policy route-map bgp-from--RSVR rule 100 action 'permit'
+set policy route-map bgp-from--RSVR rule 100 description 'to_hk'
+set policy route-map bgp-from--RSVR rule 100 match community community-list '80'
+set policy route-map bgp-from--RSVR rule 100 set ip-next-hop ${pe1ip1}
+set policy route-map bgp-from--RSVR rule 200 action 'permit'
+set policy route-map bgp-from--RSVR rule 200 description 'to_ct'
+set policy route-map bgp-from--RSVR rule 200 match community community-list '81'
+set policy route-map bgp-from--RSVR rule 200 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR rule 300 action 'permit'
+set policy route-map bgp-from--RSVR rule 300 description 'to_cnc'
+set policy route-map bgp-from--RSVR rule 300 match community community-list '82'
+set policy route-map bgp-from--RSVR rule 300 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR rule 400 action 'permit'
+set policy route-map bgp-from--RSVR rule 400 description 'to_cn_other'
+set policy route-map bgp-from--RSVR rule 400 match community community-list '83'
+set policy route-map bgp-from--RSVR rule 400 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR2 rule 100 action 'permit'
+set policy route-map bgp-from--RSVR2 rule 100 description 'to_hk'
+set policy route-map bgp-from--RSVR2 rule 100 match community community-list '80'
+set policy route-map bgp-from--RSVR2 rule 100 set ip-next-hop ${pe2ip1}
+set policy route-map bgp-from--RSVR2 rule 100 set local-preference '50'
+set policy route-map bgp-from--RSVR2 rule 200 action 'permit'
+set policy route-map bgp-from--RSVR2 rule 200 description 'to_ct'
+set policy route-map bgp-from--RSVR2 rule 200 match community community-list '81'
+set policy route-map bgp-from--RSVR2 rule 200 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR2 rule 200 set local-preference '50'
+set policy route-map bgp-from--RSVR2 rule 300 action 'permit'
+set policy route-map bgp-from--RSVR2 rule 300 description 'to_cnc'
+set policy route-map bgp-from--RSVR2 rule 300 match community community-list '82'
+set policy route-map bgp-from--RSVR2 rule 300 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR2 rule 300 set local-preference '50'
+set policy route-map bgp-from--RSVR2 rule 400 action 'permit'
+set policy route-map bgp-from--RSVR2 rule 400 description 'to_cn_other'
+set policy route-map bgp-from--RSVR2 rule 400 match community community-list '83'
+set policy route-map bgp-from--RSVR2 rule 400 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR2 rule 400 set local-preference '50'
+set protocols bgp 65000 neighbor ${bgp1server1} peer-group 'RSVR'
+set protocols bgp 65000 neighbor ${bgp1server3} peer-group 'RSVR'
+set protocols bgp 65000 neighbor ${bgp1server2} peer-group 'RSVR2'
+set protocols bgp 65000 neighbor ${bgp1server4} peer-group 'RSVR2'
+set protocols bgp 65000 parameters router-id ${pe1ip2}
+set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast route-map import 'bgp-from--RSVR'
+set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast soft-reconfiguration inbound
+set protocols bgp 65000 peer-group RSVR remote-as '65000'
+set protocols bgp 65000 peer-group RSVR update-source ${pe1ip2}
+set protocols bgp 65000 peer-group RSVR2 address-family ipv4-unicast route-map import 'bgp-from--RSVR2'
+set protocols bgp 65000 peer-group RSVR2 address-family ipv4-unicast soft-reconfiguration inbound
+set protocols bgp 65000 peer-group RSVR2 remote-as '65000'
+set protocols bgp 65000 peer-group RSVR2 update-source ${pe2ip2}
+set protocols bgp 65000 timers holdtime '15'
+set protocols bgp 65000 timers keepalive '60'
+echo '# DNS服务配置[SmartDNS]'
 ${smartdnsTemp}
 `;
   let filename = `${lineid}-MPLS-GREOverOpenVPN-Config-${time.ez}-By-${user}`;

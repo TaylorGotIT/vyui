@@ -142,7 +142,8 @@ function fastip105getList() {
         "pe":[],
         "if":[],
         "ip":[],
-        "lo":[],
+        "celo":[],
+        "pelo":[],
         "pub":[],
         "as":[],
         "natpe":[],
@@ -168,13 +169,13 @@ function fastip105getList() {
                     }else if(l1.search('pe')!=-1){
                         info_json.pe.push(l1);
                     }else{
-                        info_json.lo.push(l1);
+                        info_json.pelo.push(l1);
                     };
 
                     break;
                 case 'ce':
                     if(l1.search('.')!=-1){
-                        info_json.lo.push(l1);
+                        info_json.celo.push(l1);
                     }
                     break;
                 case 'tun':
@@ -191,11 +192,11 @@ function fastip105getList() {
                     if(a!=10&&a!=172&&a!=192){
                         info_json.pub.push(l1);
                     }else{
-                        info_json.lo.push(l1);
+                        info_json.pelo.push(l1);
                     };
                     break;
                 case 'ce对接':
-                    info_json.lo.push(l1);
+                    info_json.celo.push(l1);
                     break;
                 case 'peas号':
                     info_json.as.push(l1);
@@ -242,10 +243,10 @@ function fastip105getList() {
     $("#pe2_if_input").val(info_json.if[2]);
     $("#pe1_ip_input").val(info_json.ip[0]);
     $("#pe2_ip_input").val(info_json.ip[2]);
-    $("#pe1_lo_input").val(info_json.lo[0]);
-    $("#pe2_lo_input").val(info_json.lo[2]);
-    $("#ce1_lo_input").val(info_json.lo[1]);
-    $("#ce2_lo_input").val(info_json.lo[3]);
+    $("#pe1_lo_input").val(info_json.pelo[0]);
+    $("#pe2_lo_input").val(info_json.pelo[1]);
+    $("#ce1_lo_input").val(info_json.celo[0]);
+    $("#ce2_lo_input").val(info_json.celo[1]);
     $("#pe1_as_input").val(info_json.as[1]);
     $("#pe2_as_input").val(info_json.as[1]);
     $("#ac1_input").val(info_json.ac[0]);
@@ -262,10 +263,10 @@ function fastip105getList() {
     $("#natpe2_if_input").val(info_json.if[5]);
     $("#natpe1_ip_input").val(info_json.ip[4]);
     $("#natpe2_ip_input").val(info_json.ip[5]);
-    $("#natpe1_lo_input").val(info_json.lo[4]);
-    $("#natce1_lo_input").val(info_json.lo[5]);
-    $("#natpe2_lo_input").val(info_json.lo[6]);
-    $("#natce2_lo_input").val(info_json.lo[7]);
+    $("#natpe1_lo_input").val(info_json.pelo[2]);
+    $("#natce1_lo_input").val(info_json.pelo[3]);
+    $("#natpe2_lo_input").val(info_json.celo[2]);
+    $("#natce2_lo_input").val(info_json.celo[3]);
     $("#natpe1_oversea_input").val(info_json.oversea[0]);
     $("#natpe2_oversea_input").val(info_json.oversea[1]);
   };
@@ -284,12 +285,12 @@ function fastip105setWan(value){
         break;
         case "static":
             $(wan_input_tr).empty();
-            $(wan_input_tr).append(`<td><input id="wan1_ip_input" placeholder="IP[x.x.x.x/x]"></td>
+            $(wan_input_tr).append(`<td>Static</td><td><input id="wan1_ip_input" placeholder="IP[x.x.x.x/x]"></td>
             <td><input id="wan1_gw_input" placeholder="GW[x.x.x.x]"></td>`);
         break;
         case "pppoe":
             $(wan_input_tr).empty();
-            $(wan_input_tr).append(`<td><input id="pppoe1_user_input" placeholder="PPPoE[x.163.gd]"></td>
+            $(wan_input_tr).append(`<td>PPPoE</td><td><input id="pppoe1_user_input" placeholder="PPPoE[x.163.gd]"></td>
             <td><input id="pppoe1_pass_input" placeholder="PPPoE[******]"></td>`);
         break;
     };
@@ -395,12 +396,7 @@ switch (oversea2ips.length){
         oversea2ip3 = oversea2ips[2].split('-')[0];
     break;
 }
-console.log(oversea1ip1);
-console.log(oversea1ip2);
-console.log(oversea1ip3);
-console.log(oversea2ip1);
-console.log(oversea2ip2);
-console.log(oversea2ip2);
+
 let oversea1dns = $("#oversea1_dns_input").val();
 let oversea2dns = $("#oversea2_dns_input").val();
 let oversea3dns = $("#oversea3_dns_input").val();
@@ -411,31 +407,7 @@ let bgp1server3 = $("#bgp_server3_input").val();
 let bgp1server4 = $("#bgp_server4_input").val();
 //差异化配置生成
 let wanTemp = '';
-switch(wan1Type){
-    case "dhcp":
-        wanTemp += `set interfaces ethernet ${wan1} description WAN1-${wan1Provider}-DHCP
-set interfaces ethernet ${wan1} address dhcp
-set protocols static route 1.1.1.1/32 dhcp-interface ${wan1}`;
-    break;
-    case "static":
-        let wan1ip = $("#wan1_ip_input").val();
-        let wan1gw = $("#wan1_gw_input").val();
-        wanTemp += `set interfaces ethernet ${wan1} description WAN1-${wan1Provider}-GW-${wan1gw}
-set interfaces ethernet ${wan1} address ${wan1ip}
-set protocols static route 1.1.1.1/32 next-hop ${wan1gw}`;
-    break;
-    case "pppoe":
-        let pppoe1user = $("#pppoe1_user_input").val();
-        let pppoe1pass = $("#pppoe1_pass_input").val();
-        wanTemp += `set interfaces ethernet ${wan1} description WAN1_${wan1Provider}_${pppoe1user}/${pppoe1pass}
-set interfaces ethernet ${wan1} pppoe 1 default-route 'none'
-set interfaces ethernet ${wan1} pppoe 1 mtu '1492'
-set interfaces ethernet ${wan1} pppoe 1 name-server 'none'
-set interfaces ethernet ${wan1} pppoe 1 password ${pppoe1user}
-set interfaces ethernet ${wan1} pppoe 1 user-id ${pppoe1pass}
-set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
-    break;
-  };
+let imageTemp = '';
 let openvpnTemp = '';
 let greTemp = '';
 let smartdnsTemp = '';
@@ -674,61 +646,7 @@ let fastip105fastipGreOverOpenvpn  =
 #系统：vyui-v2
 #FnetOS Version ${version}
 +++++++++++++++++++++++++++++++++++++++++++
-echo '>>>升级到最新镜像<<<'
-conf
-delete interfaces bridge
-delete interfaces ethernet
-set interfaces ethernet eth0 address dhcp
-set system name-server 114.114.114.114
-commit
-exit
-curl http://202.104.174.189:18080/epochos/ | \
-grep vyos-epoch | \
-awk -F '"' '{print $2}' | \
-sed -n '$p' > img_list
-while read -r img; do wget "http://192.168.75.15/epochos/$img"; done < img_list
-while read -r img; do add system image "$img"; done < img_list
-echo '>>>初始化设备<<<'
-delete system host-name
-delete epoch controller
-sudo systemctl stop epoch-openvpnd
-rm /config/.initagentd.status
-delete interfaces bridge
-delete interfaces ethernet
-delete interface openvpn
-delete interface tunnel
-delete interface loopback lo
-delete firewall options interface
-delete nat
-delete protocols
-delete policy
-delete track
-delete smokeping
-delete traffic-policy
-delete service dns
-delete service dhcp-server
-delete system name-server
-delete system flow-accounting
-echo '>>>Table default 海外，DHCP指定海外DNS<<<'
-set interfaces bridge br2 description LAN-Bridge-ETH1-5
-set interfaces bridge br2 address 192.168.8.1/24
-set interfaces bridge br2 member interface eth1
-set interfaces bridge br2 member interface eth2
-set interfaces bridge br2 member interface eth3
-set interfaces bridge br2 member interface eth4
-set interfaces bridge br2 member interface eth5
-set system name-server 114.114.114.114
-set service ssh disable-host-validation
-set service ssh port 2707
-set system login user bothwin authentication encrypted-password '$6$v.wWSn9tGGGWzElK$qrB79AFWdg4lCtrbVNjea6Gs.oMGeQ8now53XO/h8V8DZ5yiqzv33h0rSMw8wWKTZXRFf6O8uRRCcPaIHsaiq0'
-set system time-zone Asia/Hong_Kong
-set service smartping
-commit
-save
-exit
-sudo curl -O https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py
-sudo chmod +x  speedtest.py
-conf
+${imageTemp}
 echo '基础配置[防火墙规则，系统名称，物理接口]'
 set firewall group network-group GROUP-FNET-Whitelist network 202.104.174.178/32
 set firewall group network-group GROUP-FNET-Whitelist network 114.112.232.0/23
@@ -923,57 +841,77 @@ echo '>>>海外DNS4 NAT ${oversea4dns}/32<<<'
 set nat source rule 4002 destination address ${oversea4dns}/32
 set nat source rule 4002 outbound-interface ${natpe2if}
 set nat source rule 4002 translation address ${oversea2ip1}
-echo '>>>系统DNS设置与客户端一致方便测试<<<'
-echo '>>>测试${natpe1}出口时更改为当地DNS<<<'
+echo '# 分流DNS配置<<<'
+${smartdnsTemp}
 delete system name-server
-set system name-server ${oversea1dns}
-set system name-server ${oversea2dns}
-echo '>>>测试${natpe2}出口时更改为当地DNS<<<'
-delete system name-server
-set system name-server ${oversea1dns}
-set system name-server ${oversea2dns}
+set system name-server 192.168.8.1
+###SmartDMS 解决TK直播解析问题###
+echo '# CE ETH5接口192.168.9.1/24'
+del interfaces ethernet eth5 bridge-group bridge 'br2'
+#[v4.0]del interfaces bridge br2 member interface eth5
+set interfaces ethernet eth5 address '192.168.9.1/24'
+set interfaces ethernet eth5 desc 'WIFI-LAN'
+echo '# 上游server需要选择当地DNS，示例为美国区域DNS'
+sudo  wget ftp://psalesftp:Tfe28@w%@59.36.7.222/Taylorg/smartdns.1.2023.03.04-1125.x86_64-debian-all.deb
+sudo dpkg -i smartdns.1.2023.03.04-1125.x86_64-debian-all.deb
+sudo chmod 777 /etc/smartdns/smartdns.conf
+sudo sed -i "s/^[^#]*:53$/#&/g" /etc/smartdns/smartdns.conf
+sudo echo -e 'bind 192.168.9.1:5353 -no-cache
+force-AAAA-SOA yes
+speed-check-mode ping,tcp:80,tcp:443
+server 1.0.0.1
+server 8.8.4.4
+server 4.2.2.1
+server 208.67.222.222' >> /etc/smartdns/smartdns.conf
+sudo chmod 644 /etc/smartdns/smartdns.conf
+echo '# 开启SmartDNS'
+sudo systemclt enable smartdns
+sudo systemclt start smartdns
+echo '# 策略路由 全局海外'
+set protocols static table 100 route 0.0.0.0/0 next-hop ${natpe1ip1}
+set policy route lanMap rule 10 set table '100'
+set policy route lanMap rule 10 source address '192.168.9.0/24'
+set interfaces ethernet eth5 policy route lanMap
+echo '# dns 5353 劫持'
+set nat destination rule 53 destination address '192.168.9.1'
+set nat destination rule 53 destination port '53'
+set nat destination rule 53 inbound-interface 'eth5'
+set nat destination rule 53 protocol 'tcp_udp'
+set nat destination rule 53 source address '192.168.9.0/24'
+set nat destination rule 53 translation port '5353'
+echo '# 测试SmartDNS'
+sudo nslookup www.tiktok.com 192.168.9.1 -port=5353
+###########
+#  测试   #
+###########
 IP/环境监测
-    区域
-    https://ipinfo.io/${oversea1ip1}
-    https://ipinfo.io/${oversea2ip1}
-    类型
-    ISP > Business > hosting
-    AS号
-    https://bgp.he.net
-    whoer.net 100%
-    https://whoer.net
-    污染度     < 50%
-    https://scamalytics.com
-测试：
-    大包测试
-        openvpn
-            sudo ping ${ac1ip1} -i 0.1 -c 100 -s 1500
-            sudo ping ${ac2ip1} -i 0.1 -c 100 -s 1500
-        tunnel
-            sudo ping ${pe1ip1} -i 0.1 -c 100 -s 1500
-            sudo ping ${pe2ip1} -i 0.1 -c 100 -s 1500
-            sudo ping ${natpe1ip1} -i 0.1 -c 100 -s 1500
-            sudo ping ${natpe2ip1} -i 0.1 -c 100 -s 1500
-        域名
-            ping www.yahoo.com -l 1500
-    网站测速
-        speedtest
-            https://www.speedtest.net
-        Fast
-            https://fast.com
-        ATT
-            https://www.att.com/support/speedtest
-        泰国
-            https://speedtest.adslthailand.com
-        谷歌云盘上传下载测速
-            https://drive.google.com/drive/my-drive
+区域
+https://ipinfo.io/${oversea1ip1}
+类型
+ISP > Business > hosting
+AS号
+https://bgp.he.net
+whoer.net 100%
+https://whoer.net
+污染度     < 50%
+https://scamalytics.com
+Ping测试：
+sudo ping ${ac1ip1} -i 0.1 -c 100 -q -s 1500
+sudo ping ${ac2ip1} -i 0.1 -c 100 -q
+sudo ping ${pe1ip1} -i 0.1 -c 100 -q -s 1500
+sudo ping ${pe2ip1} -i 0.1 -c 100 -q -s 1500
+sudo ping ${natpe1ip1} -i 0.1 -c 100 -q -s 1500
+sudo ping www.yahoo.com -i 0.1 -c 100 -q -s 1500
+网站测速:
+https://www.speedtest.net
+https://fast.com
+https://www.att.com/support/speedtest
 SmartPing监控：
-    阿里DNS：114.114.114.114
-    谷歌DNS：8.8.8.8
-    主线Pub: ${ac1pub}
-    备线Pub: ${ac2pub}
-    ${natpe1}: ${natpe1ip1}
-    ${natpe2}: ${natpe2ip1}
+阿里DNS：223.5.5.5
+谷歌DNS：8.8.8.8
+主线Pub: ${ac1pub}
+备线Pub: ${ac2pub}
+${natpe1}: ${natpe1ip1}
 ##############
 如果客户需要BGP分流
 echo '>>>动态路由配置[BGP]<<<'
@@ -1044,14 +982,6 @@ set protocols bgp 65000 peer-group RSVR2 remote-as '65000'
 set protocols bgp 65000 peer-group RSVR2 update-source ${pe2ip2}
 set protocols bgp 65000 timers holdtime '15'
 set protocols bgp 65000 timers keepalive '60'
-echo '>>>SmartDNS配置<<<'
-${smartdnsTemp}
-###以上配置commit后再贴###
-delete system name-server
-set system name-server 192.168.8.1
-delete service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server ${oversea1dns}
-delete service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server ${oversea2dns}
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server 192.168.8.1
 `;
   let filename = `${lineid}-Fast-SD-WAN-FastIP-GREOverOpenVPN-Config-${time.ez}-By-${user}`;
   let data = {};

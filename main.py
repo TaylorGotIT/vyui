@@ -235,6 +235,16 @@ class VYIPCheck(VYreq):
         self.render("temp/excelHandler.html", title="ExcelHandler")
 
 
+class VYSmartDNS(VYreq):
+    @authed
+    def get(self):
+        self.render("temp/smartDNS.html", title="SmartDNS")
+
+    @authed
+    def post(self):
+        self.render("temp/excelHandler.html", title="ExcelHandler")
+
+
 settings = {
     "cookie_secret": "__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__",
     "login_url": "/login",
@@ -250,6 +260,7 @@ if __name__ == "__main__":
         (r"/wg", VYwg),
         (r"/excel", VYExcel),
         (r"/ipCheck", VYIPCheck),
+        (r"/smartDNS", VYSmartDNS),
         (r'/static/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), './static')}),
         (r'/temp/(.*)', tornado.web.StaticFileHandler, {'path': os.path.join(os.path.dirname(__file__), './temp')})
     ], **settings)

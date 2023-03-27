@@ -379,6 +379,56 @@ function getTempJS(value){
                 console.log("mpls002 未下载");
             };
             break;
+        case "dhcp032":
+            try{
+                if($.isFunction(mpls002sub)){
+                    $("#service_dev").append(mpls002html);
+                    console.log("mpls002 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("mpls002 未下载");
+            };
+            break;
+        case "dhcp040":
+            try{
+                if($.isFunction(mpls002sub)){
+                    $("#service_dev").append(mpls002html);
+                    console.log("mpls002 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("mpls002 未下载");
+            };
+            break;
+        //FnetOS3.2
+        case "wifi032":
+            try{
+                if($.isFunction(mpls002sub)){
+                    $("#service_dev").append(mpls002html);
+                    console.log("mpls002 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("mpls002 未下载");
+            };
+            break;
+        //FnetOS4.0
+        case "wifi040":
+            try{
+                if($.isFunction(mpls002sub)){
+                    $("#service_dev").append(mpls002html);
+                    console.log("mpls002 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("mpls002 未下载");
+            };
+            break;
     };
 
 };
