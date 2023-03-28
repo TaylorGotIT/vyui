@@ -771,6 +771,17 @@ set nat source rule 4002 outbound-interface ${ac2if}
 set nat source rule 4002 translation address ${oversea1ip1}
 echo '>>>SmartDNS智能DNS配置<<<'
 ${smartdnsTemp}
+echo '# 登录消息[banner]'
+set system login banner post-login "################ \n\
+SN: E1X16225005xxxxxxxx \n\
+版本: FnetOS 3.2.17 @ vyos-1.2.9-S1 \n\
+服务: FastIP GZ 10M \n\
+公网: ETH0 DHCP \n\
+内网: BR2 192.168.8.254/24 \n\
+拓扑：WIFI路由器---CE路由器---光猫 \n\
+安装人员: ${user} \n\
+最后修改: ${user} ${time.cn} \n\
+################"
 ###以上配置commit后再贴###
 delete system name-server
 set system name-server 192.168.8.1

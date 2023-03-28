@@ -494,7 +494,6 @@ reboot
 初始化3.2.17后进入
 config
 set system console device ttyS0 speed 115200
-set service smartping
 del system login user vyos
 delete zone-policy
 commit
@@ -932,6 +931,17 @@ set protocols bgp 65000 timers holdtime '15'
 set protocols bgp 65000 timers keepalive '60'
 echo '# DNS服务配置[SmartDNS]'
 ${smartdnsTemp}
+echo '# 登录消息[banner]'
+set system login banner post-login "################ \n\
+SN: E1X16225005xxxxxxxx \n\
+版本: FnetOS 3.2.17 @ vyos-1.2.9-S1 \n\
+服务: FastIP GZ 10M \n\
+公网: ETH0 DHCP \n\
+内网: BR2 192.168.8.254/24 \n\
+拓扑：WIFI路由器---CE路由器---光猫 \n\
+安装人员: ${user} \n\
+最后修改: ${user} ${time.cn} \n\
+################"
 `;
   let filename = `${lineid}-MPLS-GREOverOpenVPN-Config-${time.ez}-By-${user}`;
   let data = {};

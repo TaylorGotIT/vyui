@@ -413,6 +413,27 @@ let greTemp = '';
 let smartdnsTemp = '';
 switch(version){
     case "40":
+//系统升级/降级模板
+imageTemp +=`echo '# 系统升级最新4.0版本'
+conf
+delete system host-name
+delete epoch controller
+sudo systemctl stop epoch-openvpnd
+rm /config/.initagentd.status
+delete interfaces ethernet
+delete interface openvpn
+delete interface tunnel
+delete interface loopback lo
+delete nat
+delete protocols
+delete policy
+set interfaces ethernet eth0 address dhcp
+commit
+exit
+curl http://202.104.174.189:18080/epochos/ | grep vyos-epoch | awk -F '"' '{print "http://192.168.75.15/epochos/"$2}' | sed -n '$p' > img_list
+while read -r url; do wget "$url" done < img_list
+cat img_list
+do add system image xxx`;
 openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
 set interfaces openvpn ${ac1if} description AC1_${ac1}
 set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
@@ -496,6 +517,64 @@ set service dns forwarding name-server ${oversea1dns}
 set service dns forwarding name-server ${oversea2dns}`;
     break;
     case "32":
+imageTemp += `echo '# 系统降级到3.2.17'
+conf
+delete system host-name
+delete interfaces bridge
+delete interfaces ethernet
+delete interface openvpn
+delete interface tunnel
+delete interface loopback lo
+delete nat
+delete protocols
+set inter eth eth0 add dhcp
+commit
+exit
+sudo wget http://192.168.75.15/FnetOS/vyos-1.2.9-S1-amd64.iso
+add system image vyos-1.2.9-S1-amd64.iso
+添加系统镜像后重启
+reboot
+开机后串口9600进入
+conf
+set inter eth eth0 add dhcp
+commit
+exit
+sudo wget -O /tmp/finit http://59.37.126.146:1909/patching/f3.2.x_init.py
+sudo chmod +x /tmp/finit
+sudo /tmp/finit
+update patch_updater
+update patch
+update sdwan
+sudo useradd -d /var/lib/misc -s /bin/false dnsmasq
+sudo echo "" > .bash_history
+sudo rm -rf /var/log/wtmp*
+sudo rm -rf /config/archive/config.boot*
+sudo rm -rf /config/config.boot*
+>~/.bash_history
+reboot
+初始化3.2.17后进入
+config
+set system console device ttyS0 speed 115200
+del system login user vyos
+delete zone-policy
+commit
+save
+exit
+# paping
+sudo  wget ftp://psalesftp:Tfe28@w%@59.36.7.222/Taylorg/fnetos_tools_paping_2020.11.26.deb
+sudo dpkg -i fnetos_tools_paping_2020.11.26.deb
+# smartping FnetOS 3.2.X && Speedtest.py
+wget http://59.37.126.146:1909/f32x/debs/fnetos_smartping_2020.10.23.deb
+sudo dpkg -i fnetos_smartping_2020.10.23.deb
+# smartdns
+# 下载 安装 配置
+sudo  wget ftp://psalesftp:Tfe28@w%@59.36.7.222/Taylorg/smartdns.1.2023.03.04-1125.x86_64-debian-all.deb
+sudo dpkg -i smartdns.1.2023.03.04-1125.x86_64-debian-all.deb
+# 清理安装包
+dir
+rm -rf *
+curl -O https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py
+sudo chmod +x ./speedtest.py`;
 openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
 set interfaces openvpn ${ac1if} description AC1_${ac1}
 set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
@@ -864,7 +943,7 @@ SN: E1X16225005xxxxxxxx \n\
 内网: BR2 192.168.8.254/24 \n\
 拓扑：WIFI路由器---CE路由器---光猫 \n\
 安装人员: ${user} \n\
-最后修改: ${user} ${time.ez} \n\
+最后修改: ${user} ${time.cn} \n\
 ################"
 
 ###########

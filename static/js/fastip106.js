@@ -579,7 +579,6 @@ reboot
 初始化3.2.17后进入
 config
 set system console device ttyS0 speed 115200
-set service smartping
 del system login user vyos
 delete zone-policy
 commit
@@ -1112,7 +1111,7 @@ SN: E1X16225005xxxxxxxx \n\
 内网: BR2 192.168.8.254/24 \n\
 拓扑：WIFI路由器---CE路由器---光猫 \n\
 安装人员: ${user} \n\
-最后修改: ${user} ${time.ez} \n\
+最后修改: ${user} ${time.cn} \n\
 ################"
 
 ###########
