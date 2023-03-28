@@ -802,6 +802,11 @@ set policy local-route rule 201 source '192.168.9.201'
 echo '>>>本地NAT<<<'
 set nat source rule 100 outbound-interface 'eth0'
 set nat source rule 100 translation address 'masquerade'
+echo '# 海外NAT<<<'
+set nat source rule 1999 outbound-interface ${natpe1if}
+set nat source rule 1999 translation address ${oversea1ip1}
+set nat source rule 2999 outbound-interface ${natpe2if}
+set nat source rule 2999 translation address ${oversea2ip1}
 echo '>>>MAC 绑定 NAT<<<'
 set nat source rule 101 source address 192.168.9.101/32
 set nat source rule 101 outbound-interface ${natpe1if}
@@ -810,37 +815,6 @@ set nat source rule 101 translation address ${oversea1ip1}
 set nat source rule 201 source address 192.168.9.201/32
 set nat source rule 201 outbound-interface ${natpe2if}
 set nat source rule 201 translation address ${oversea2ip1}
-#
-echo '>>>Br2 NAT 192.168.8.0/24<<<'
-set nat source rule 1998 source address 192.168.8.0/24
-set nat source rule 1998 outbound-interface ${natpe1if}
-set nat source rule 1998 translation address ${oversea1ip1}
-set nat source rule 2998 source address 192.168.8.0/24
-set nat source rule 2998 outbound-interface ${natpe2if}
-set nat source rule 2998 translation address ${oversea2ip1}
-echo '>>>Wlan1 NAT 192.168.9.0/24<<<'
-set nat source rule 1999 source address 192.168.9.0/24
-set nat source rule 1999 outbound-interface ${natpe1if}
-set nat source rule 1999 translation address ${oversea1ip1}
-set nat source rule 2999 source address 192.168.9.0/24
-set nat source rule 2999 outbound-interface ${natpe2if}
-set nat source rule 2999 translation address ${oversea2ip1}
-echo '>>>海外DNS1 NAT ${oversea1dns}/32<<<'
-set nat source rule 3001 destination address ${oversea1dns}/32
-set nat source rule 3001 outbound-interface ${natpe1if}
-set nat source rule 3001 translation address ${oversea1ip1}
-echo '>>>海外DNS2 NAT ${oversea2dns}/32<<<'
-set nat source rule 3002 destination address ${oversea2dns}/32
-set nat source rule 3002 outbound-interface ${natpe1if}
-set nat source rule 3002 translation address ${oversea1ip1}
-echo '>>>海外DNS3 NAT ${oversea3dns}/32<<<'
-set nat source rule 4001 destination address ${oversea3dns}/32
-set nat source rule 4001 outbound-interface ${natpe2if}
-set nat source rule 4001 translation address ${oversea2ip1}
-echo '>>>海外DNS4 NAT ${oversea4dns}/32<<<'
-set nat source rule 4002 destination address ${oversea4dns}/32
-set nat source rule 4002 outbound-interface ${natpe2if}
-set nat source rule 4002 translation address ${oversea2ip1}
 echo '# 分流DNS配置<<<'
 ${smartdnsTemp}
 delete system name-server
@@ -881,6 +855,18 @@ set nat destination rule 53 source address '192.168.9.0/24'
 set nat destination rule 53 translation port '5353'
 echo '# 测试SmartDNS'
 sudo nslookup www.tiktok.com 192.168.9.1 -port=5353
+echo '# 登录消息[banner]'
+set system login banner post-login "################ \n\
+SN: E1X16225005xxxxxxxx \n\
+版本: FnetOS 3.2.17 @ vyos-1.2.9-S1 \n\
+服务: FastIP GZ 10M \n\
+公网: ETH0 DHCP \n\
+内网: BR2 192.168.8.254/24 \n\
+拓扑：WIFI路由器---CE路由器---光猫 \n\
+安装人员: ${user} \n\
+最后修改: ${user} ${time.ez} \n\
+################"
+
 ###########
 #  测试   #
 ###########

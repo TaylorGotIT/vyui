@@ -985,11 +985,10 @@ set policy local-route rule 101 source '192.168.9.101'
 echo '>>>本地NAT<<<'
 set nat source rule 100 outbound-interface 'eth0'
 set nat source rule 100 translation address 'masquerade'
-echo '>>>海外NAT<<<'
-set nat source rule 2000 source address 192.168.8.0/24
-set nat source rule 2000 outbound-interface ${natpe1if}
-set nat source rule 2000 translation address ${oversea1ip1}
-echo '>>>MAC 绑定 NAT<<<'
+echo '# 海外NAT'
+set nat source rule 1999 outbound-interface ${natpe1if}
+set nat source rule 1999 translation address ${oversea1ip1}
+echo '# MAC 绑定 多IP时绑定<<<'
 # set nat source rule 101 source address 192.168.9.101/32
 # set nat source rule 101 outbound-interface ${natpe1if}
 # set nat source rule 101 translation address ${oversea1ip1}
@@ -1104,6 +1103,18 @@ set nat destination rule 53 source address '192.168.9.0/24'
 set nat destination rule 53 translation port '5353'
 echo '# 测试SmartDNS'
 sudo nslookup www.tiktok.com 192.168.9.1 -port=5353
+echo '# 登录消息[banner]'
+set system login banner post-login "################ \n\
+SN: E1X16225005xxxxxxxx \n\
+版本: FnetOS 3.2.17 @ vyos-1.2.9-S1 \n\
+服务: FastIP GZ 10M \n\
+公网: ETH0 DHCP \n\
+内网: BR2 192.168.8.254/24 \n\
+拓扑：WIFI路由器---CE路由器---光猫 \n\
+安装人员: ${user} \n\
+最后修改: ${user} ${time.ez} \n\
+################"
+
 ###########
 #  测试   #
 ###########
