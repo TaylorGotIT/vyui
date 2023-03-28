@@ -5,8 +5,9 @@ const dns001html = `<table border="1">
 </tr>
 <tr>
 
-<button type="button" onclick="dns001sub('/wg')">自动生成WireGuard配置</button>
-
+<button type="button" onclick="dns001AddDomain('/wg')">添加新域名</button>
+<button type="button" onclick="dns001TransToSmartDNSForm('/wg')"></button>
+<button type="button" onclick="dns001TransToDnsmasqForm('/wg')"></button>
 <div id="dns001qrcode"></div>
 `;
 
@@ -24,16 +25,16 @@ function dns001GetTextFile(file){
       let text = event.target.result;
       console.log(file);
       const lines = text.split('\n');
-      console.log(lines);
-      for (let i = 0; i < lines.length; i++) {
+      for (i in lines) {
         const line = lines[i].trim();
         console.log(line);
-        // Do something with the line
+
       }
     };
 };
 
-function dns001sub(url){
+function dns001AddDomain(url){
+  let time = getTime(new Date());
   let server = 1;
   let client = $("#client_end_input").val() - $("#client_start_input").val() + 1;
   console.log(client);

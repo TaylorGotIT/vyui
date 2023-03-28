@@ -525,8 +525,17 @@ delete interfaces ethernet
 delete interface openvpn
 delete interface tunnel
 delete interface loopback lo
+delete firewall options interface
 delete nat
 delete protocols
+delete policy
+delete traffic-policy
+delete track
+delete smokeping
+delete service dns
+delete service dhcp-server
+delete system name-server
+delete system flow-accounting
 set inter eth eth0 add dhcp
 commit
 exit
@@ -553,13 +562,6 @@ sudo rm -rf /config/config.boot*
 >~/.bash_history
 reboot
 初始化3.2.17后进入
-config
-set system console device ttyS0 speed 115200
-del system login user vyos
-delete zone-policy
-commit
-save
-exit
 # paping
 sudo  wget ftp://psalesftp:Tfe28@w%@59.36.7.222/Taylorg/fnetos_tools_paping_2020.11.26.deb
 sudo dpkg -i fnetos_tools_paping_2020.11.26.deb
@@ -574,7 +576,15 @@ sudo dpkg -i smartdns.1.2023.03.04-1125.x86_64-debian-all.deb
 dir
 rm -rf *
 curl -O https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py
-sudo chmod +x ./speedtest.py`;
+sudo chmod +x ./speedtest.py
+config
+set system console device ttyS0 speed 115200
+del system login user vyos
+set service smartping
+delete zone-policy
+commit
+save
+exit`;
 openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
 set interfaces openvpn ${ac1if} description AC1_${ac1}
 set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
@@ -918,8 +928,10 @@ server 4.2.2.1
 server 208.67.222.222' >> /etc/smartdns/smartdns.conf
 sudo chmod 644 /etc/smartdns/smartdns.conf
 echo '# 开启SmartDNS'
-sudo systemclt enable smartdns
-sudo systemclt start smartdns
+sudo systemctl enable smartdns
+sudo systemctl start smartdns
+sudo systemctl status smartdns
+sudo netstat -tunlp | grep smartdns
 echo '# 策略路由 全局海外'
 set protocols static table 100 route 0.0.0.0/0 next-hop ${natpe1ip1}
 set policy route lanMap rule 10 set table '100'

@@ -464,8 +464,17 @@ delete interfaces ethernet
 delete interface openvpn
 delete interface tunnel
 delete interface loopback lo
+delete firewall options interface
 delete nat
 delete protocols
+delete policy
+delete traffic-policy
+delete track
+delete smokeping
+delete service dns
+delete service dhcp-server
+delete system name-server
+delete system flow-accounting
 set inter eth eth0 add dhcp
 commit
 exit
@@ -492,13 +501,6 @@ sudo rm -rf /config/config.boot*
 >~/.bash_history
 reboot
 初始化3.2.17后进入
-config
-set system console device ttyS0 speed 115200
-del system login user vyos
-delete zone-policy
-commit
-save
-exit
 # paping
 sudo  wget ftp://psalesftp:Tfe28@w%@59.36.7.222/Taylorg/fnetos_tools_paping_2020.11.26.deb
 sudo dpkg -i fnetos_tools_paping_2020.11.26.deb
@@ -513,7 +515,15 @@ sudo dpkg -i smartdns.1.2023.03.04-1125.x86_64-debian-all.deb
 dir
 rm -rf *
 curl -O https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py
-sudo chmod +x ./speedtest.py`;
+sudo chmod +x ./speedtest.py
+config
+set system console device ttyS0 speed 115200
+del system login user vyos
+set service smartping
+delete zone-policy
+commit
+save
+exit`;
 //WAN接口模板
 if(wan1=="eth0" || wan1=="eth1"){
 switch(wan1Type){
