@@ -6,8 +6,20 @@ const dns001html = `<table border="1">
 <tr>
 
 <button type="button" onclick="dns001AddDomain('/wg')">添加新域名</button>
-<button type="button" onclick="dns001TransToSmartDNSForm('/wg')"></button>
-<button type="button" onclick="dns001TransToDnsmasqForm('/wg')"></button>
+<button type="button" onclick="dns001TransToSmartDNSForm('/wg')">转换为SmartDNS配置格式</button>
+<button type="button" onclick="dns001TransToDnsmasqForm('/wg')">转换为Dnsmasq配置格式</button>
+
+<table id="myTable">
+  <thead>
+    <tr>
+      <th>列1</th>
+      <th>列2</th>
+      <th>列3</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
 <div id="dns001qrcode"></div>
 `;
 
@@ -33,33 +45,20 @@ function dns001GetTextFile(file){
     };
 };
 
-function dns001AddDomain(url){
-  let time = getTime(new Date());
-  let server = 1;
-  let client = $("#client_end_input").val() - $("#client_start_input").val() + 1;
-  console.log(client);
-  let prekey = $("#client_prekey_select").val();
-  if(prekey == 0){
-    prekey+=client
-  };
-  console.log(prekey);
-  let type = 'post';
-  let datatype = 'json';
-  let data = JSON.stringify({
-    "server": server,
-    "client": client,
-    "prekey": prekey,
-  });
-  $.ajax({
-    url:url,
-    data:data,
-    dataType:datatype,
-    type:type,
-    success:function(d){
-      console.log(d);
-      genWgConfig(d);
-    },
-  });
+function dns001AddDomain(data){
+  for (var i = 0; i < data.length; i++) {
+  // 创建新行
+    var row = document.createElement("tr");
+
+  // 遍历当前行的元素并创建新单元格
+    for (var j = 0; j < data[i].length; j++) {
+      var cell = document.createElement("td");
+      var cellText = document.createTextNode(data[i][j]);
+      cell.appendChild(cellText);
+      row.appendChild(cell);
+    }
+    tbody.appendChild(row);
+  }
 }
 
 function genWgConfig(d){

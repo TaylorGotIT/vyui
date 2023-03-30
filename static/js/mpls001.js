@@ -517,13 +517,21 @@ rm -rf *
 curl -O https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py
 sudo chmod +x ./speedtest.py
 config
-set system console device ttyS0 speed 115200
+del zone-policy
 del system login user vyos
+del interface eth1 address
+del interface eth2 address
+set interfaces bridge br2 description LAN
+set interfaces bridge br2 address 192.168.8.1/24
+set interfaces ethernet eth1 bridge-group bridge br2
+set interfaces ethernet eth2 bridge-group bridge br2
+set interfaces ethernet eth3 bridge-group bridge br2
+set interfaces ethernet eth4 bridge-group bridge br2
+set interfaces ethernet eth5 bridge-group bridge br2
+set system console device ttyS0 speed 115200
 set service smartping
-delete zone-policy
 commit
-save
-exit`;
+save`;
 //WAN接口模板
 if(wan1=="eth0" || wan1=="eth1"){
 switch(wan1Type){
@@ -757,7 +765,7 @@ set service dns forwarding name-server ${oversea2dns}`;
     break;
   };
 
-let mpls001MPLSGreOverOpenvpn  =
+let mpls001MPLSGreOverOpenvpn  = String.raw
 `#Fnet MPLS with GRE Over OpenVPN Template.
 #操作人员：${user}
 #时间：${time.cn}
@@ -947,7 +955,7 @@ SN: E1X16225005xxxxxxxx \n\
 版本: FnetOS 3.2.17 @ vyos-1.2.9-S1 \n\
 服务: FastIP GZ 10M \n\
 公网: ETH0 DHCP \n\
-内网: BR2 192.168.8.254/24 \n\
+内网: BR2 192.168.8.1/24 \n\
 拓扑：WIFI路由器---CE路由器---光猫 \n\
 安装人员: ${user} \n\
 最后修改: ${user} ${time.cn} \n\

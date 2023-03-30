@@ -578,13 +578,21 @@ rm -rf *
 curl -O https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py
 sudo chmod +x ./speedtest.py
 config
-set system console device ttyS0 speed 115200
+del zone-policy
 del system login user vyos
+del interface eth1 address
+del interface eth2 address
+set interfaces bridge br2 description LAN
+set interfaces bridge br2 address 192.168.8.1/24
+set interfaces ethernet eth1 bridge-group bridge br2
+set interfaces ethernet eth2 bridge-group bridge br2
+set interfaces ethernet eth3 bridge-group bridge br2
+set interfaces ethernet eth4 bridge-group bridge br2
+set interfaces ethernet eth5 bridge-group bridge br2
+set system console device ttyS0 speed 115200
 set service smartping
-delete zone-policy
 commit
-save
-exit`;
+save`;
 openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
 set interfaces openvpn ${ac1if} description AC1_${ac1}
 set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
@@ -728,7 +736,7 @@ set service dns forwarding name-server ${oversea2dns}`;
     break;
   };
 
-let fastip105fastipGreOverOpenvpn  =
+let fastip105fastipGreOverOpenvpn  = String.raw
 `#Fnet MPLS with GRE Over OpenVPN Tiktok Template.
 #操作人员：${user}
 #时间：${time.cn}
@@ -910,10 +918,13 @@ delete system name-server
 set system name-server 192.168.8.1
 ###SmartDMS 解决TK直播解析问题###
 echo '# CE ETH5接口192.168.9.1/24'
+config
 del interfaces ethernet eth5 bridge-group bridge 'br2'
 #[v4.0]del interfaces bridge br2 member interface eth5
 set interfaces ethernet eth5 address '192.168.9.1/24'
 set interfaces ethernet eth5 desc 'WIFI-LAN'
+commit
+exit
 echo '# 上游server需要选择当地DNS，示例为美国区域DNS'
 sudo  wget ftp://psalesftp:Tfe28@w%@59.36.7.222/Taylorg/smartdns.1.2023.03.04-1125.x86_64-debian-all.deb
 sudo dpkg -i smartdns.1.2023.03.04-1125.x86_64-debian-all.deb
