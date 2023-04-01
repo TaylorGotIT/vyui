@@ -264,8 +264,8 @@ function fastip105getList() {
     $("#natpe1_ip_input").val(info_json.ip[4]);
     $("#natpe2_ip_input").val(info_json.ip[5]);
     $("#natpe1_lo_input").val(info_json.pelo[2]);
-    $("#natce1_lo_input").val(info_json.pelo[3]);
-    $("#natpe2_lo_input").val(info_json.celo[2]);
+    $("#natpe2_lo_input").val(info_json.pelo[3]);
+    $("#natce1_lo_input").val(info_json.celo[2]);
     $("#natce2_lo_input").val(info_json.celo[3]);
     $("#natpe1_oversea_input").val(info_json.oversea[0]);
     $("#natpe2_oversea_input").val(info_json.oversea[1]);

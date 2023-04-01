@@ -28,9 +28,20 @@ function outputText(text) {
   console.log(text.name);
 };
 
-const dns_arr = [];
+
 //读取上传text
-function dns001GetTextFile(file){
+async function dns001GetTextFile(file) {
+      const inputElement = document.getElementById('fileInput');
+      const text = await file.text();
+      const lines = text.split('\n').map(line => line.trim());
+      const types = lines.filter(line => line.startsWith('#'));
+      const domains = lines.filter(line => line && !line.startsWith('#'));
+      inputElement.dataset.domains = domains;
+      return domains;
+}
+
+
+/***function dns001GetTextFile(file){
   const reader = new FileReader();
   reader.readAsText(file);
     reader.onload = (event) => {
@@ -42,10 +53,12 @@ function dns001GetTextFile(file){
         console.log(line);
 
       }
+      dns_arr = lines;
     };
-};
+}; ***/
 
-function dns001AddDomain(data){
+function dns001AddDomain(){
+  let data = dns_arr;
   for (var i = 0; i < data.length; i++) {
   // 创建新行
     var row = document.createElement("tr");
