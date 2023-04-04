@@ -430,7 +430,7 @@ set interfaces openvpn ${ac1if} openvpn-option '--nobind'
 set interfaces openvpn ${ac1if} openvpn-option '--ping 10'
 set interfaces openvpn ${ac1if} openvpn-option '--ping-restart 60'
 set interfaces openvpn ${ac1if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300’
+#set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300'
 set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
 echo 'OpenVPN 接入配置[ac2]'
 set interfaces openvpn ${ac2if} description AC2_${ac2}
@@ -444,7 +444,7 @@ set interfaces openvpn ${ac2if} openvpn-option '--nobind'
 set interfaces openvpn ${ac2if} openvpn-option '--ping 10'
 set interfaces openvpn ${ac2if} openvpn-option '--ping-restart 60'
 set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300’
+#set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300'
 set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
 
 smartdnsTemp += `set epoch file-sync task 1 local '/opt/cn.txt'
@@ -480,7 +480,7 @@ set interfaces openvpn ${ac1if} openvpn-option '--nobind'
 set interfaces openvpn ${ac1if} openvpn-option '--ping 10'
 set interfaces openvpn ${ac1if} openvpn-option '--ping-restart 60'
 set interfaces openvpn ${ac1if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300’
+#set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300'
 set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
 echo 'OpenVPN 接入配置[ac2]'
 set interfaces openvpn ${ac2if} description AC2_${ac2}
@@ -494,7 +494,7 @@ set interfaces openvpn ${ac2if} openvpn-option '--nobind'
 set interfaces openvpn ${ac2if} openvpn-option '--ping 10'
 set interfaces openvpn ${ac2if} openvpn-option '--ping-restart 60'
 set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300’
+#set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300'
 set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
 
 smartdnsTemp +=`set service dns dnsmasq cache-size '9999'
