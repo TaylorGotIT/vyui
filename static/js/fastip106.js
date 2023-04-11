@@ -370,6 +370,7 @@ let bgp1server2 = $("#bgp_server2_input").val();
 let bgp1server3 = $("#bgp_server3_input").val();
 let bgp1server4 = $("#bgp_server4_input").val();
 //差异化配置生成
+let initTemp +=``;
 let wanTemp = '';
 let imageTemp = '';
 let openvpnTemp = '';
@@ -399,8 +400,7 @@ curl http://202.104.174.189:18080/epochos/ | grep vyos-epoch | awk -F '"' '{prin
 while read -r url; do wget "$url" done < img_list
 cat img_list
 do add system image xxx`;
-//初始化模板
-initTemp +=``;
+
 //WAN接口模板
 if(wan1=="eth0" || wan1=="eth1"){
 switch(wan1Type){
