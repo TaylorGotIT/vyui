@@ -370,7 +370,7 @@ let bgp1server2 = $("#bgp_server2_input").val();
 let bgp1server3 = $("#bgp_server3_input").val();
 let bgp1server4 = $("#bgp_server4_input").val();
 //差异化配置生成
-let initTemp +=``;
+let initTemp ='';
 let wanTemp = '';
 let imageTemp = '';
 let openvpnTemp = '';
