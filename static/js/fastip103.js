@@ -327,7 +327,7 @@ set interfaces ethernet ${wan1} pppoe 1 user-id ${pppoe1pass}
 set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
     break;
   };
-
+let greTemp = '';
 let openvpnTemp = '';
 let smartdnsTemp = '';
 switch(version){

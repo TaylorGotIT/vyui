@@ -604,8 +604,8 @@ sudo chmod +x ./speedtest.py
 config
 del zone-policy
 del system login user vyos
-del interface eth1 address
-del interface eth2 address
+del interface ethernet eth1 address
+del interface ethernet eth2 address
 set interfaces bridge br2 description LAN
 set interfaces bridge br2 address 192.168.8.1/24
 set interfaces ethernet eth1 bridge-group bridge br2
@@ -1083,13 +1083,16 @@ echo '# 分流DNS配置<<<'
 ${smartdnsTemp}
 delete system name-server
 set system name-server 192.168.8.1
-###SmartDMS 解决TK直播解析问题###
+###SmartDNS 解决TK直播解析问题###
 echo '# CE ETH5接口192.168.9.1/24'
 config
 del interfaces ethernet eth5 bridge-group bridge 'br2'
 #[v4.0]del interfaces bridge br2 member interface eth5
 set interfaces ethernet eth5 address '192.168.9.1/24'
 set interfaces ethernet eth5 desc 'WIFI-LAN'
+delete system name-server
+set system name-server ${oversea1dns}
+set system name-server ${oversea2dns}
 commit
 exit
 echo '# 上游server需要选择当地DNS，示例为美国区域DNS'
@@ -1100,11 +1103,8 @@ sudo sed -i "s/^[^#]*:53$/#&/g" /etc/smartdns/smartdns.conf
 sudo echo -e 'bind 192.168.9.1:5353 -no-cache
 force-AAAA-SOA yes
 speed-check-mode ping,tcp:80,tcp:443
-server 1.0.0.1
-server 8.8.4.4
-server 4.2.2.1
-server 208.67.222.222' >> /etc/smartdns/smartdns.conf
-sudo chmod 644 /etc/smartdns/smartdns.conf
+server-https https://dns.google/dns-query
+server-https https://cloudflare-dns.com/dns-query' >> /etc/smartdns/smartdns.conf
 echo '# 开启SmartDNS'
 sudo systemctl enable smartdns
 sudo systemctl start smartdns
@@ -1130,7 +1130,7 @@ SN: E1X16225005xxxxxxxx \n\
 版本: FnetOS 3.2.17 @ vyos-1.2.9-S1 \n\
 服务: FastIP GZ 10M \n\
 公网: ETH0 DHCP \n\
-内网: BR2 192.168.8.254/24 \n\
+内网: BR2 192.168.8.1/24 SmartDNS ON?OFF? \n\
 拓扑：WIFI路由器---CE路由器---光猫 \n\
 安装人员: ${user} \n\
 最后修改: ${user} ${time.cn} \n\
