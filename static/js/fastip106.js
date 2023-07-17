@@ -973,7 +973,7 @@ set interfaces wireless wlan1 mode 'n'
 echo 'LAN DHCP Server Range: 2-100'
 #[4.0]set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 description 'dhcp_br2'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 default-router '192.168.8.1'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 lease '86400'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 lease '7200'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 dns-server 192.168.8.1
 #[4.0]set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server 192.168.8.1
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 start '192.168.8.2'
@@ -981,7 +981,7 @@ set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range
 echo 'WIFI DHCP Server Range: 2-100'
 #[4.0]set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 description 'dhcp_wlan1'
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 default-router '192.168.9.1'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 lease '86400'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 lease '7200'
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 dns-server 192.168.9.1
 #[4.0]set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 name-server 192.168.9.1
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 range 0 start '192.168.9.2'
@@ -1100,7 +1100,7 @@ sudo  wget ftp://psalesftp:Tfe28@w%@59.36.7.222/Taylorg/smartdns.1.2023.03.04-11
 sudo dpkg -i smartdns.1.2023.03.04-1125.x86_64-debian-all.deb
 sudo chmod 777 /etc/smartdns/smartdns.conf
 sudo sed -i "s/^[^#]*:53$/#&/g" /etc/smartdns/smartdns.conf
-sudo echo -e 'bind 192.168.9.1:5353 -no-cache
+sudo echo -e 'bind 127.0.0.1:5353 -no-cache
 force-AAAA-SOA yes
 speed-check-mode ping,tcp:80,tcp:443
 server-https https://dns.google/dns-query
@@ -1116,14 +1116,14 @@ set policy route lanMap rule 10 set table '100'
 set policy route lanMap rule 10 source address '192.168.9.0/24'
 set interfaces ethernet eth5 policy route lanMap
 echo '# dns 5353 劫持'
-set nat destination rule 53 destination address '192.168.9.1'
+set nat destination rule 53 destination address '127.0.0.1'
 set nat destination rule 53 destination port '53'
 set nat destination rule 53 inbound-interface 'eth5'
 set nat destination rule 53 protocol 'tcp_udp'
 set nat destination rule 53 source address '192.168.9.0/24'
 set nat destination rule 53 translation port '5353'
 echo '# 测试SmartDNS'
-sudo nslookup www.tiktok.com 192.168.9.1 -port=5353
+sudo nslookup www.tiktok.com 127.0.0.1 -port=5353
 echo '# 登录消息[banner]'
 set system login banner post-login "################ \n\
 SN: E1X16225005xxxxxxxx \n\
