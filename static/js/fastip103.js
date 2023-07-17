@@ -4,8 +4,8 @@ const fastip103html = `<table border="1">
 <td>LineID</td>
 <td><input id="lineid_input" placeholder="线路ID"></td>
 <td><select id="version_select">
-<option value="32" selected="selected">FnetOS[ 3.2 ]</option>
-<option value="40">FnetOS[ 4.0 ]</option>
+<option value="40" selected="selected">FnetOS[ 4.0 ]</option>
+<option value="32">FnetOS[ 3.2 ]</option>
 <option value="31">FnetOS[ 3.1 ]</option></select></td>
 </tr>
 <tr>

@@ -11,9 +11,9 @@ const mpls001html = `<table border="1">
 <td><input id="area_input" placeholder="Area[GZ,SZ,SH,etc...]"></td></tr>
 
 <tr><td><select id="version_select">
-<option value="40" selected="selected">[ v4.0 ]</option>
-<option value="32">[ v3.2 ]</option>
-<option value="31">[ v3.1 ]</option></select></td>
+<option value="40" selected="selected">FnetOS[ 4.0 ]</option>
+<option value="32">FnetOS[ 3.2 ]</option>
+<option value="31">FnetOS[ 3.1 ]</option></select></td>
 <td><input id="subnet_input" placeholder="Subnet[eg:10.1.1.0/24]"></td></tr>
 
 <tr><td><select id="wan1_select">

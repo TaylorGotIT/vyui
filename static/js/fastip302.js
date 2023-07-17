@@ -368,9 +368,9 @@ BOOTPROTO=static
 ONBOOT=yes
 DEVICETYPE=tunnel
 TYPE=GRE
-PEER_INNER_IPADDR=${pe1ip1}/30
+PEER_INNER_IPADDR=${pe2ip1}/30
 PEER_OUTER_IPADDR=${pe2lo}
-MY_INNER_IPADDR=${pe1ip2}/30
+MY_INNER_IPADDR=${pe2ip2}/30
 MY_OUTER_IPADDR=${ac2ip2}' > /etc/sysconfig/network-scripts/ifcfg-${pe2if}
 
 echo '>>>启动GRE'
@@ -434,6 +434,10 @@ echo '>>>NAT上网'
 yum install iptables-services -y
 systemctl enable iptables
 systemctl start iptables
+iptables -F
+iptables -L
+iptables -t nat -F
+iptables -t nat -L
 iptables -t nat -A POSTROUTING -s 10.0.0.0/8 -o eth0 -j MASQUERADE
 iptables -t nat -A POSTROUTING -s 172.16.0.0/12 -o eth0 -j MASQUERADE
 iptables -t nat -A POSTROUTING -s 192.168.0.0/16 -o eth0 -j MASQUERADE

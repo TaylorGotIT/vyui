@@ -1,8 +1,8 @@
 /* FastIP 假组网 Tiktok 多运营商 */
 const fastip103html = `<table border="1">
 <tr><td><select id="version_select">
-<option value="32" selected="selected">FnetOS[ 3.2 ]</option>
-<option value="40">FnetOS[ 4.0 ]</option>
+<option value="40" selected="selected">FnetOS[ 4.0 ]</option>
+<option value="32">FnetOS[ 3.2 ]</option>
 <option value="31">FnetOS[ 3.1 ]</option></select></td>
 <td><input id="lineid_input" placeholder="Area[GZ,SZ,SH,etc...]"></td></tr>
 <tr><td><input id="cname_input" placeholder="CompanyName[eg:Huawei]"></td>

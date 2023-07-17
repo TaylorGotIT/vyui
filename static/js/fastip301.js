@@ -363,9 +363,9 @@ BOOTPROTO=static
 ONBOOT=yes
 DEVICETYPE=tunnel
 TYPE=GRE
-PEER_INNER_IPADDR=${pe1ip1}/30
+PEER_INNER_IPADDR=${pe2ip1}/30
 PEER_OUTER_IPADDR=${pe2pub}
-MY_INNER_IPADDR=${pe1ip2}/30
+MY_INNER_IPADDR=${pe2ip2}/30
 MY_OUTER_IPADDR=${ce2pub}' > /etc/sysconfig/network-scripts/ifcfg-${pe2if}
 
 ifup ${pe1if}
