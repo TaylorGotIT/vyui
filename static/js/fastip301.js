@@ -117,6 +117,12 @@ function fastip301getList() {
                 case 'ce对接':
                     info_json.pub.push(l1);
                     break;
+                case 'pedocking':
+                    info_json.pelo.push(l1);
+                    break;
+                case 'cedocking':
+                    info_json.celo.push(l1);
+                    break;
                 case 'peas号':
                     info_json.as.push(l1);
                     break;

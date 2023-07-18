@@ -129,7 +129,7 @@ const fastip106html = `<table border="1">
 
 function fastip106getList() {
 //空格全角分号去除
-    let str = $("#config_textarea").val().replaceAll(' ','').replaceAll('：',':').replaceAll(';','');
+    let str = $("#config_textarea").val().replaceAll(' ','').replaceAll('：',':').replaceAll(';','').replaceAll('::',':');
     if(str.length>32){
     let lines = str.split(/\r?\n/);
     let info_json = {
@@ -152,7 +152,7 @@ function fastip106getList() {
             let l = line.split(':');
             let l0 = l[0].toLowerCase();
             let l1 = l[1];
-            console.log(l0);
+            console.log(l0+":"+l1);
             switch(l0){
                 case 'lineid':
                     info_json.id.push(l1);
@@ -192,6 +192,12 @@ function fastip106getList() {
                     };
                     break;
                 case 'ce对接':
+                    info_json.celo.push(l1);
+                    break;
+                case 'pedocking':
+                    info_json.pelo.push(l1);
+                    break;
+                case 'cedocking':
                     info_json.celo.push(l1);
                     break;
                 case 'peas号':

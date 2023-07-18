@@ -122,6 +122,12 @@ function fastip201getList() {
                 case 'ce对接':
                     info_json.celo.push(l1);
                     break;
+                case 'pedocking':
+                    info_json.pelo.push(l1);
+                    break;
+                case 'cedocking':
+                    info_json.celo.push(l1);
+                    break;
                 case '拨号ip':
                     info_json.pub.push(l1);
                     break;
