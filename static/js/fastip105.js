@@ -417,6 +417,8 @@ let imageTemp = '';
 let openvpnTemp = '';
 let greTemp = '';
 let smartdnsTemp = '';
+let dhcpTemp = '';
+
 switch(version){
     case "40":
 //系统升级/降级模板

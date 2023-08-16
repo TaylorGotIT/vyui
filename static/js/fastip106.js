@@ -544,7 +544,21 @@ set service dns forwarding listen-address 0.0.0.0
 set service dns forwarding name-server ${oversea1dns}
 set service dns forwarding name-server ${oversea2dns}`;
 
-dhcpTemp += ``;
+dhcpTemp += `echo 'LAN DHCP Server Range: 2-200'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 description 'dhcp_br2'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 default-router '192.168.8.1'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 lease '7200'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server 192.168.8.1
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 start '192.168.8.2'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 stop '192.168.8.200'
+echo 'WIFI DHCP Server Range: 2-200'
+set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 description 'dhcp_wlan0'
+set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 default-router '192.168.9.1'
+set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 lease '7200'
+set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 name-server 192.168.9.1
+set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 range 0 start '192.168.9.2'
+set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 range 0 stop '192.168.9.200'
+`;
     break;
     case "32":
 imageTemp += `echo '# 系统降级到3.2.17'
@@ -749,6 +763,20 @@ set service dns dnsmasq name-server ${oversea1dns}
 set service dns dnsmasq name-server ${oversea2dns}
 del system name-server
 set system name-server 192.168.8.1`;
+
+dhcpTemp += `echo 'LAN DHCP Server Range: 2-200'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 default-router '192.168.8.1'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 lease '7200'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 dns-server 192.168.8.1
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 start '192.168.8.2'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 stop '192.168.8.200'
+echo 'WIFI DHCP Server Range: 2-200'
+set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 default-router '192.168.9.1'
+set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 lease '7200'
+set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 dns-server 192.168.9.1
+set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 range 0 start '192.168.9.2'
+set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 range 0 stop '192.168.9.200'
+`;
     break;
     case "31":
 //WAN接口模板
@@ -873,6 +901,20 @@ set service dns forwarding listen-on ${wan1}
 set service dns dnsmasq listen-on br2
 set service dns forwarding name-server ${oversea1dns}
 set service dns forwarding name-server ${oversea2dns}`;
+
+dhcpTemp += `echo 'LAN DHCP Server Range: 2-200'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 default-router '192.168.8.1'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 lease '7200'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 dns-server 192.168.8.1
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 start '192.168.8.2'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 stop '192.168.8.200'
+echo 'WIFI DHCP Server Range: 2-200'
+set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 default-router '192.168.9.1'
+set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 lease '7200'
+set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 dns-server 192.168.9.1
+set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 range 0 start '192.168.9.2'
+set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 range 0 stop '192.168.9.200'
+`;
     break;
   };
 
@@ -955,20 +997,22 @@ set protocols static route ${natpe1lo}/32 next-hop ${pe2ip1} distance 5
 echo '>>>海外DNS路由<<<'
 set protocols static route ${oversea1dns}/32 next-hop ${natpe1ip1}
 set protocols static route ${oversea2dns}/32 next-hop ${natpe1ip1}
-
 set protocols static route 114.113.245.99/32 next-hop ${pe1ip1}
 set protocols static route 114.113.245.100/32 next-hop ${pe2ip1}
 set protocols static route 192.168.55.125/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.125/32 next-hop ${pe2ip1} distance 5
 set protocols static route 192.168.55.250/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.250/32 next-hop ${pe2ip1} distance 5
+echo '>>>全局海外时写默认路由<<<'
+set protocols static route 0.0.0.0/0 next-hop ${natpe1ip1}
+
 echo '5G WIFI SSID: sdwan PASSWD: 123456@sdwan'
 set interfaces wireless wlan1 address '192.168.9.1/24'
 set interfaces wireless wlan1 channel '0'
 set interfaces wireless wlan1 country-code 'cn'
 set interfaces wireless wlan1 dhcp-options client-id 'sdwan'
 set interfaces wireless wlan1 hw-id 'cc:d3:9d:99:ff:61'
-set interfaces wireless wlan1 mode 'ac'
+set interfaces wireless wlan1 mode 'n'
 set interfaces wireless wlan1 physical-device 'phy0'
 set interfaces wireless wlan1 security wpa mode 'wpa2'
 set interfaces wireless wlan1 security wpa passphrase '123456@sdwan'
@@ -976,30 +1020,16 @@ set interfaces wireless wlan1 ssid 'sdwan'
 set interfaces wireless wlan1 type 'access-point'
 echo '2.4G WIFI 600M传输距离远'
 set interfaces wireless wlan1 mode 'n'
-echo 'LAN DHCP Server Range: 2-100'
-#[4.0]set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 description 'dhcp_br2'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 default-router '192.168.8.1'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 lease '7200'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 dns-server 192.168.8.1
-#[4.0]set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server 192.168.8.1
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 start '192.168.8.2'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 stop '192.168.8.100'
-echo 'WIFI DHCP Server Range: 2-100'
-#[4.0]set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 description 'dhcp_wlan1'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 default-router '192.168.9.1'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 lease '7200'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 dns-server 192.168.9.1
-#[4.0]set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 name-server 192.168.9.1
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 range 0 start '192.168.9.2'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 range 0 stop '192.168.9.100'
+
+${dhcpTemp}
 echo '192.168.9.101  54:05:db:b4:4a:41 dhcp_wlan1  iPhone'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 101 ip-address '192.168.9.101'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 101 mac-address '54:05:db:b4:4a:41'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 101 static-mapping-parameters 'option domain-name-servers ${oversea1dns}, ${oversea2dns};'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 201 ip-address '192.168.9.201'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 201 mac-address '54:05:db:b4:4a:41'
+set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 201 static-mapping-parameters 'option domain-name-servers ${oversea1dns}, ${oversea2dns};'
 echo '192.168.8.101  55:05:db:b4:4a:40 dhcp_br2  iPhone'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 1101 ip-address '192.168.8.101'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 1101 mac-address '55:05:db:b4:4a:43'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 1101 static-mapping-parameters 'option domain-name-servers ${oversea1dns}, ${oversea2dns};'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 201 ip-address '192.168.8.101'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 201 mac-address '55:05:db:b4:4a:43'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 201 static-mapping-parameters 'option domain-name-servers ${oversea1dns}, ${oversea2dns};'
 echo 'Table 100 to ${natpe1}'
 set protocols static table 100 route 0.0.0.0/0 next-hop ${natpe1ip1}
 set policy local-route rule 101 set table '100'

@@ -1,5 +1,5 @@
-/* FastIP 假组网 单运营商 */
-const fastip001html = `<table border="1">
+/* FastIP 单运营商 公网GRE */
+const fastip005html = `<table border="1">
 <tr>
 <td>LineID</td>
 <td><input id="lineid_input" placeholder="线路ID"></td>
@@ -23,7 +23,7 @@ const fastip001html = `<table border="1">
 <option value="CT" selected="selected">电信</option>
 <option value="CU">联通</option>
 <option value="CM">移动</option></select></td>
-<td><select id="wan1_type_select" onchange=fastip001setWan1(this.value)>
+<td><select id="wan1_type_select" onchange=fastip005setWan1(this.value)>
 <option value="dhcp" selected="selected">WAN Type[ DHCP ]</option>
 <option value="static">WAN Type[ Static ]</option>
 <option value="pppoe">WAN Type[ PPPoE ]</option></select></td>
@@ -55,8 +55,8 @@ const fastip001html = `<table border="1">
 </tr>
 <tr>
 <td>AC IF</td>
-<td><input id="ac1_if_input" placeholder="AC1IF[eg:vtun1000]"></td>
-<td><input id="ac2_if_input" placeholder="AC2IF[eg:vtun2000]"></td>
+<td><input id="ac1_if_input" placeholder="AC1IF[eg:tun1000]"></td>
+<td><input id="ac2_if_input" placeholder="AC2IF[eg:tun2000]"></td>
 </tr>
 <tr>
 <td>AC IP</td>
@@ -67,6 +67,11 @@ const fastip001html = `<table border="1">
 <td>AC Pub</td>
 <td><input id="ac1_pub_input" placeholder="AC1Pub[eg:x.x.x.x]"></td>
 <td><input id="ac2_pub_input" placeholder="AC2Pub[eg:x.x.x.x]"></td>
+</tr>
+<tr>
+<td>CE Pub</td>
+<td><input id="ce1_pub_input" placeholder="CE1Pub[eg:x.x.x.x]"></td>
+<td><input id="ce2_pub_input" placeholder="CE2Pub[eg:x.x.x.x]"></td>
 </tr>
 <tr>
 <td>CE Lo</td>
@@ -80,10 +85,10 @@ const fastip001html = `<table border="1">
 </tr>
 <tr>
 </table>
-<button type="button" onclick="fastip001sub('/config')">提交配置信息(Submit Config Info)</button>
+<button type="button" onclick="fastip005sub('/config')">提交配置信息(Submit Config Info)</button>
 `;
 
-function fastip001getList() {
+function fastip005getList() {
 //空格全角分号去除
     let str = $("#config_textarea").val().replaceAll(' ','').replaceAll('：',':').replaceAll(';','');
     if(str.length>32){
@@ -123,6 +128,12 @@ function fastip001getList() {
                     info_json.if.push(l1);
                     break;
                 case 'docking':
+                    info_json.pub.push(l1);
+                    break;
+                case 'pedocking':
+                    info_json.pub.push(l1);
+                    break;
+                case 'cedocking':
                     info_json.pub.push(l1);
                     break;
                 case 'celoip':
@@ -175,6 +186,7 @@ function fastip001getList() {
     $("#ac1_if_input").val(info_json.if[0]);
     $("#ac1_ip_input").val(info_json.ip[0]);
     $("#ac1_pub_input").val(info_json.pub[0]);
+    $("#ce1_pub_input").val(info_json.pub[1]);
     $("#ce1_lo_input").val(info_json.lo[0]);
     $("#ac1_oversea_input").val(info_json.oversea[0]);
     $("#bgp_server1_input").val(info_json.bgp[0]);
@@ -183,7 +195,8 @@ function fastip001getList() {
     $("#ac2_input").val(info_json.pe[1]);
     $("#ac2_if_input").val(info_json.if[1]);
     $("#ac2_ip_input").val(info_json.ip[1]);
-    $("#ac2_pub_input").val(info_json.pub[1]);
+    $("#ac2_pub_input").val(info_json.pub[2]);
+    $("#ce2_pub_input").val(info_json.pub[3]);
     $("#ce2_lo_input").val(info_json.lo[1]);
     $("#ac2_oversea_input").val(info_json.oversea[0]);
     $("#bgp_server2_input").val(info_json.bgp[1]);
@@ -191,11 +204,11 @@ function fastip001getList() {
   };
 };
 
-$("#service_dev").append(fastip001html);
+$("#service_dev").append(fastip005html);
 //加载测试资源的解析数据
-fastip001getList();
+fastip005getList();
 
-function fastip001setWan1(value){
+function fastip005setWan1(value){
     let html='';
     wan_input_tr = '#wan1_input_tr';
     switch(value){
@@ -215,7 +228,7 @@ function fastip001setWan1(value){
     };
 }
 
-function fastip001sub(url){
+function fastip005sub(url){
   let time = getTime(new Date());
   let user = $("#user_input").val();
   let wan1 = $("#wan1_select").val();
@@ -245,6 +258,7 @@ function fastip001sub(url){
   let ac1ip1 = ac1ips[0];
   let ac1ip2 = ac1ips[1];
   let ac1pub = $("#ac1_pub_input").val();
+  let ce1pub = $("#ce1_pub_input").val();
 
   let ce2lo = $("#ce2_lo_input").val();
   let ac2 = $("#ac2_input").val();
@@ -254,6 +268,7 @@ function fastip001sub(url){
   let ac2ip1 = ac2ips[0];
   let ac2ip2 = ac2ips[1];
   let ac2pub = $("#ac2_pub_input").val();
+  let ce2pub = $("#ce2_pub_input").val();
 //差异化配置生成
 let wan1Temp = '';
 if(wan1=="eth0" || wan1=="eth1"){
@@ -261,14 +276,14 @@ switch(wan1Type){
     case "dhcp":
         wan1Temp += `set interfaces ethernet ${wan1} description WAN1-${wan1Provider}-DHCP
 set interfaces ethernet ${wan1} address dhcp
-set protocols static route 1.1.1.1/32 dhcp-interface ${wan1}`;
+set protocols static route 127.1.1.1/32 dhcp-interface ${wan1}`;
     break;
     case "static":
         let wan1ip = $("#wan1_ip_input").val();
         let wan1gw = $("#wan1_gw_input").val();
         wan1Temp += `set interfaces ethernet ${wan1} description WAN1-${wan1Provider}-GW-${wan1gw}
 set interfaces ethernet ${wan1} address ${wan1ip}
-set protocols static route 1.1.1.1/32 next-hop ${wan1gw}`;
+set protocols static route 127.1.1.1/32 next-hop ${wan1gw}`;
     break;
     case "pppoe":
         let pppoe1user = $("#pppoe1_user_input").val();
@@ -279,7 +294,7 @@ set interfaces ethernet ${wan1} pppoe 1 mtu '1492'
 set interfaces ethernet ${wan1} pppoe 1 name-server 'none'
 set interfaces ethernet ${wan1} pppoe 1 password ${pppoe1user}
 set interfaces ethernet ${wan1} pppoe 1 user-id ${pppoe1pass}
-set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
+set protocols static interface-route 127.1.1.1/32 next-hop-interface pppoe1`;
     break;
   };
 }else if(wan1=="br0" || wan1=="br1"){
@@ -289,7 +304,7 @@ switch(wan1Type){
 set interfaces bridge ${wan1} address dhcp
 set interfaces bridge ${wan1} member interface eth0
 set interfaces bridge ${wan1} member interface eth1
-set protocols static route 1.1.1.1/32 dhcp-interface ${wan1}`;
+set protocols static route 127.1.1.1/32 dhcp-interface ${wan1}`;
     break;
     case "static":
         let wan1ip = $("#wan1_ip_input").val();
@@ -298,7 +313,7 @@ set protocols static route 1.1.1.1/32 dhcp-interface ${wan1}`;
 set interfaces bridge ${wan1} address ${wan1ip}
 set interfaces bridge ${wan1} member interface eth0
 set interfaces bridge ${wan1} member interface eth1
-set protocols static route 1.1.1.1/32 next-hop ${wan1gw}`;
+set protocols static route 127.1.1.1/32 next-hop ${wan1gw}`;
     break;
     case "pppoe":
         let pppoe1user = $("#pppoe1_user_input").val();
@@ -311,46 +326,33 @@ set interfaces bridge ${wan1} pppoe 1 password ${pppoe1user}
 set interfaces bridge ${wan1} pppoe 1 user-id ${pppoe1pass}
 set interfaces bridge ${wan1} member interface eth0
 set interfaces bridge ${wan1} member interface eth1
-set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
+set protocols static interface-route 127.1.1.1/32 next-hop-interface pppoe1`;
     break;
   };
 }
 
-let openvpnTemp = '';
+let greTemp = `echo '>>>GRE 配置[Main]<<<'
+set interfaces tunnel ${ac1if} description AC1_${ac1}
+set interfaces tunnel ${ac1if} address ${ac1ip2}/30
+set interfaces tunnel ${ac1if} source-address ${ce1pub}
+set interfaces tunnel ${ac1if} remote ${ac1pub}
+set interfaces tunnel ${ac1if} encapsulation gre
+set interfaces tunnel ${ac1if} multicast disable
+set interfaces tunnel ${ac1if} parameters ip ttl 255
+echo '>>>GRE 配置[Backup]<<<'
+set interfaces tunnel ${ac2if} description AC2_${ac2}
+set interfaces tunnel ${ac2if} address ${ac2ip2}/30
+set interfaces tunnel ${ac2if} source-address ${ce2pub}
+set interfaces tunnel ${ac2if} remote ${ac2pub}
+set interfaces tunnel ${ac2if} encapsulation gre
+set interfaces tunnel ${ac2if} multicast disable
+set interfaces tunnel ${ac2if} parameters ip ttl 255`;
+
 let smartdnsTemp = '';
 let dhcpTemp = '';
 
 switch(version){
     case "40":
-openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
-set interfaces openvpn ${ac1if} description AC1_${ac1}
-set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
-set interfaces openvpn ${ac1if} remote-address ${ac1ip1}
-set interfaces openvpn ${ac1if} remote-host ${ac1pub}
-set interfaces openvpn ${ac1if} remote-port ${ac1port}
-set interfaces openvpn ${ac1if} mode site-to-site
-set interfaces openvpn ${ac1if} protocol udp
-set interfaces openvpn ${ac1if} openvpn-option '--nobind'
-set interfaces openvpn ${ac1if} openvpn-option '--ping 10'
-set interfaces openvpn ${ac1if} openvpn-option '--ping-restart 60'
-set interfaces openvpn ${ac1if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300'
-set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
-echo 'OpenVPN 接入配置[ac2]'
-set interfaces openvpn ${ac2if} description AC2_${ac2}
-set interfaces openvpn ${ac2if} local-address ${ac2ip2} subnet-mask 255.255.255.252
-set interfaces openvpn ${ac2if} remote-address ${ac2ip1}
-set interfaces openvpn ${ac2if} remote-host ${ac2pub}
-set interfaces openvpn ${ac2if} remote-port ${ac2port}
-set interfaces openvpn ${ac2if} mode site-to-site
-set interfaces openvpn ${ac2if} protocol udp
-set interfaces openvpn ${ac2if} openvpn-option '--nobind'
-set interfaces openvpn ${ac2if} openvpn-option '--ping 10'
-set interfaces openvpn ${ac2if} openvpn-option '--ping-restart 60'
-set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300'
-set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
-
 smartdnsTemp += `set epoch file-sync task 1 local '/opt/cn.txt'
 set epoch file-sync task 1 remote 'http://59.37.126.146:1909/f32x/domainlist/cn_domainlist.last'
 set epoch file-sync task 2 local '/opt/oversea.txt'
@@ -388,35 +390,6 @@ set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 ran
 `;
     break;
     case "32":
-openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
-set interfaces openvpn ${ac1if} description AC1_${ac1}
-set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
-set interfaces openvpn ${ac1if} remote-address ${ac1ip1}
-set interfaces openvpn ${ac1if} remote-host ${ac1pub}
-set interfaces openvpn ${ac1if} remote-port ${ac1port}
-set interfaces openvpn ${ac1if} mode site-to-site
-set interfaces openvpn ${ac1if} protocol udp
-set interfaces openvpn ${ac1if} openvpn-option '--nobind'
-set interfaces openvpn ${ac1if} openvpn-option '--ping 10'
-set interfaces openvpn ${ac1if} openvpn-option '--ping-restart 60'
-set interfaces openvpn ${ac1if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300'
-set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
-echo 'OpenVPN 接入配置[ac2]'
-set interfaces openvpn ${ac2if} description AC2_${ac2}
-set interfaces openvpn ${ac2if} local-address ${ac2ip2} subnet-mask 255.255.255.252
-set interfaces openvpn ${ac2if} remote-address ${ac2ip1}
-set interfaces openvpn ${ac2if} remote-host ${ac2pub}
-set interfaces openvpn ${ac2if} remote-port ${ac2port}
-set interfaces openvpn ${ac2if} mode site-to-site
-set interfaces openvpn ${ac2if} protocol udp
-set interfaces openvpn ${ac2if} openvpn-option '--nobind'
-set interfaces openvpn ${ac2if} openvpn-option '--ping 10'
-set interfaces openvpn ${ac2if} openvpn-option '--ping-restart 60'
-set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300'
-set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
-
 smartdnsTemp +=`set service dns dnsmasq cache-size '9999'
 set service dns dnsmasq fnetlink-dns enable
 set service dns dnsmasq fnetlink-dns local-isp-dns ${local1dns}
@@ -441,31 +414,6 @@ set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 ran
 `;
     break;
     case "31":
-openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
-set interfaces openvpn ${ac1if} description AC1_${ac1}
-set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
-set interfaces openvpn ${ac1if} remote-address ${ac1ip1}
-set interfaces openvpn ${ac1if} remote-host ${ac1pub}
-set interfaces openvpn ${ac1if} remote-port ${ac1port}
-set interfaces openvpn ${ac1if} mode site-to-site-client
-set interfaces openvpn ${ac1if} protocol udp
-set interfaces openvpn ${ac1if} openvpn-option 'persist-tun'
-set interfaces openvpn ${ac1if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac1if} openvpn-option 'tun-mtu 1420'
-set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
-echo 'OpenVPN 接入配置[ac2]'
-set interfaces openvpn ${ac2if} description AC2_${ac2}
-set interfaces openvpn ${ac2if} local-address ${ac2ip2} subnet-mask 255.255.255.252
-set interfaces openvpn ${ac2if} remote-address ${ac2ip1}
-set interfaces openvpn ${ac2if} remote-host ${ac2pub}
-set interfaces openvpn ${ac2if} remote-port ${ac2port}
-set interfaces openvpn ${ac1if} mode site-to-site-client
-set interfaces openvpn ${ac2if} protocol udp
-set interfaces openvpn ${ac2if} openvpn-option 'persist-tun'
-set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac2if} openvpn-option 'tun-mtu 1420'
-set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
-
 smartdnsTemp +=`set service dns forwarding cache-size '9999'
 set service dns forwarding fnetlink-dns 'enable'
 set service dns forwarding fnetlink-dns local-isp-dns ${local1dns}
@@ -493,7 +441,7 @@ set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 ran
     break;
   };
 
-let fastip001fastipOpenvpn  =
+let fastip005fastipOpenvpn  =
 `#Fnetlink FastIP Template.
 #操作人员：${user}
 #时间：${time.cn}
@@ -587,12 +535,12 @@ set interfaces loopback lo address ${ce2lo}/32
 set interfaces loopback lo address ${oversea1ip1}/32
 set interfaces loopback lo description ${ce1lo},${oversea1ips}
 ${wan1Temp}
-${openvpnTemp}
+${greTemp}
 echo '>>>MTU TCP-MSS配置[interface]<<<'
 set firewall options interface ${ac1if} adjust-mss '1300'
 set firewall options interface ${ac2if} adjust-mss '1300'
 echo '>>>路由配置[Track 默认路由，对接公网路由，内网路由]<<<'
-set protocols static route 223.5.5.5/32 next-hop 1.1.1.1
+set protocols static route 223.5.5.5/32 next-hop 127.1.1.1
 set track name to-223 failure-count 2
 set track name to-223 success-count 2
 set track name to-223 test 10 resp-time 5
@@ -606,9 +554,9 @@ set track name to-main test 10 target ${ac1ip1}
 set track name to-main test 10 ttl-limit 1
 set track name to-main test 10 type ping
 echo '>>>静态路由配置[Static]<<<'
-set protocols static route 0.0.0.0/0 next-hop 1.1.1.1 distance 220
-set protocols static route ${ac1pub}/32 next-hop 1.1.1.1
-set protocols static route ${ac2pub}/32 next-hop 1.1.1.1
+set protocols static route 0.0.0.0/0 next-hop 127.1.1.1 distance 220
+set protocols static route ${ac1pub}/32 next-hop 127.1.1.1
+set protocols static route ${ac2pub}/32 next-hop 127.1.1.1
 set protocols static route 114.113.245.99/32 next-hop ${ac1ip1}
 set protocols static route 114.113.245.100/32 next-hop ${ac2ip1}
 set protocols static route 192.168.55.125/32 next-hop ${ac1ip1} track to-main
@@ -641,15 +589,15 @@ set policy route-map bgp-from--RSVR rule 100 set ip-next-hop ${ac1ip1}
 set policy route-map bgp-from--RSVR rule 200 action 'permit'
 set policy route-map bgp-from--RSVR rule 200 description 'to_ct'
 set policy route-map bgp-from--RSVR rule 200 match community community-list '81'
-set policy route-map bgp-from--RSVR rule 200 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR rule 200 set ip-next-hop 127.1.1.1
 set policy route-map bgp-from--RSVR rule 300 action 'permit'
 set policy route-map bgp-from--RSVR rule 300 description 'to_cnc'
 set policy route-map bgp-from--RSVR rule 300 match community community-list '82'
-set policy route-map bgp-from--RSVR rule 300 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR rule 300 set ip-next-hop 127.1.1.1
 set policy route-map bgp-from--RSVR rule 400 action 'permit'
 set policy route-map bgp-from--RSVR rule 400 description 'to_cn_other'
 set policy route-map bgp-from--RSVR rule 400 match community community-list '83'
-set policy route-map bgp-from--RSVR rule 400 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR rule 400 set ip-next-hop 127.1.1.1
 set policy route-map bgp-from--RSVR2 rule 100 action 'permit'
 set policy route-map bgp-from--RSVR2 rule 100 description 'to_hk'
 set policy route-map bgp-from--RSVR2 rule 100 match community community-list '80'
@@ -658,17 +606,17 @@ set policy route-map bgp-from--RSVR2 rule 100 set local-preference '50'
 set policy route-map bgp-from--RSVR2 rule 200 action 'permit'
 set policy route-map bgp-from--RSVR2 rule 200 description 'to_ct'
 set policy route-map bgp-from--RSVR2 rule 200 match community community-list '81'
-set policy route-map bgp-from--RSVR2 rule 200 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR2 rule 200 set ip-next-hop 127.1.1.1
 set policy route-map bgp-from--RSVR2 rule 200 set local-preference '50'
 set policy route-map bgp-from--RSVR2 rule 300 action 'permit'
 set policy route-map bgp-from--RSVR2 rule 300 description 'to_cnc'
 set policy route-map bgp-from--RSVR2 rule 300 match community community-list '82'
-set policy route-map bgp-from--RSVR2 rule 300 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR2 rule 300 set ip-next-hop 127.1.1.1
 set policy route-map bgp-from--RSVR2 rule 300 set local-preference '50'
 set policy route-map bgp-from--RSVR2 rule 400 action 'permit'
 set policy route-map bgp-from--RSVR2 rule 400 description 'to_cn_other'
 set policy route-map bgp-from--RSVR2 rule 400 match community community-list '83'
-set policy route-map bgp-from--RSVR2 rule 400 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR2 rule 400 set ip-next-hop 127.1.1.1
 set policy route-map bgp-from--RSVR2 rule 400 set local-preference '50'
 set protocols bgp 65000 neighbor ${bgp1server1} peer-group 'RSVR'
 set protocols bgp 65000 neighbor ${bgp1server2} peer-group 'RSVR'
@@ -736,9 +684,9 @@ SN: E1X16225005xxxxxxxx \n\
 delete system name-server
 set system name-server 192.168.8.1
 ###回程路由、WIFI、DHCP###
-set protocols static route 10.0.0.0/8 next-hop 1.1.1.1
-set protocols static route 172.16.0.0/12 next-hop 1.1.1.1
-set protocols static route 192.168.0.0/16 next-hop 1.1.1.1
+set protocols static route 10.0.0.0/8 next-hop 127.1.1.1
+set protocols static route 172.16.0.0/12 next-hop 127.1.1.1
+set protocols static route 192.168.0.0/16 next-hop 127.1.1.1
 echo '5G WIFI SSID: sdwan PASSWD: 123456@sdwan'
 set interfaces wireless wlan1 address '192.168.9.1/24'
 set interfaces wireless wlan1 channel '0'
@@ -776,7 +724,7 @@ SmartPing监控：
 `;
   let filename = `${lineid}-FastIP-HK-FnetOS-ConfigBy${user}-${time.ez}`;
   let data = {};
-  downloadConfig(filename, fastip001fastipOpenvpn);
+  downloadConfig(filename, fastip005fastipOpenvpn);
   let type = 'post'
   let datatype = 'json';
   ajaxHandler(url,data,datatype,type);
