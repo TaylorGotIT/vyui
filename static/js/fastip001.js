@@ -352,9 +352,9 @@ set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
 set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
 
 smartdnsTemp += `set epoch file-sync task 1 local '/opt/cn.txt'
-set epoch file-sync task 1 remote 'http://59.37.126.146:1909/f32x/domainlist/cn_domainlist.last'
+set epoch file-sync task 1 remote 'http://183.56.161.82:1909/f32x/domainlist/cn_domainlist.last'
 set epoch file-sync task 2 local '/opt/oversea.txt'
-set epoch file-sync task 2 remote 'http://59.37.126.146:1909/f32x/domainlist/oversea_domainlist.last'
+set epoch file-sync task 2 remote 'http://183.56.161.82:1909/f32x/domainlist/oversea_domainlist.last'
 set service dns forwarding allow-from '0.0.0.0/0'
 set service dns forwarding cache-size '10000'
 set service dns forwarding dnssec 'off'
