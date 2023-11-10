@@ -101,6 +101,7 @@ function sdwan005getList() {
                 "pelo":[],
                 "celo":[],
                 "pub":[],
+                "route":[],
                 "psk":[],
                 "other":[],
             };
@@ -141,6 +142,9 @@ function sdwan005getList() {
                     info_json.psk.push(l1);
                     break;
                 default:
+                    if(l0.search('路由')!=-1){
+                        info_json.route.push(l1);
+                    }
                     info_json.other.push(l1);
             }
         }
@@ -148,11 +152,16 @@ function sdwan005getList() {
     console.log(info_json);
     let site1id = info_json.id[0].replace(/[0-9]+/g,"");
     let site1num = getColNum(site1id);
-    let loopIParr = getLoopIP(site1num);
-    $("#loop1_ip_input").val(loopIParr[0]);
-    $("#loop2_ip_input").val(loopIParr[1]);
+    if(info_json.route.length == 0){
+        let loopIParr = getLoopIP(site1num);
+        $("#loop1_ip_input").val(loopIParr[0]);
+        $("#loop2_ip_input").val(loopIParr[1]);
+    }
+    else{
+        $("#loop1_ip_input").val(info_json.route[0]);
+        $("#loop2_ip_input").val(info_json.route[1]);
+    }
     $("#site1_id_input").val("站点-"+site1id);
-
     $("#line1_input").val(info_json.id[0]);
     $("#pe1_input").val(info_json.pe[0]);
     $("#pe1_if_input").val(info_json.if[0]);
