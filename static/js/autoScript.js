@@ -368,6 +368,18 @@ function getTempJS(value){
                 console.log("sdwab003 未下载");
             };
             break;
+        case "sdwan005":
+            try{
+                if($.isFunction(sdwan005sub)){
+                    $("#service_dev").append(sdwan005html);
+                    console.log("sdwan005 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("sdwab005 未下载");
+            };
+            break;
         case "mpls001":
             try{
                 if($.isFunction(mpls001sub)){

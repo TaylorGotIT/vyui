@@ -1,4 +1,5 @@
-const sdwan001html = `<table border="1">
+/* 华为SD-WAN 单机 DHCP接入 */
+const sdwan005html = `<table border="1">
 <tr>
 <td><input id="site1_id_input"></td>
 <td>中控开局IP</td>
@@ -16,8 +17,8 @@ const sdwan001html = `<table border="1">
 <td><input id="controller1_ip_input" value="119.145.21.126"></td>
 </tr>
 <tr>
-<td><input id="wan1_ip_input" placeholder="[wan-ip]192.168.1.254/24"></td>
-<td><input id="wan1_gw_input" placeholder="[wan-gw]192.168.1.1"></td>
+<td><input id="wan1_ip_input" placeholder="[wan-ip] DHCP" disabled></td>
+<td><input id="wan1_gw_input" placeholder="[wan-gw] DHCP" disabled></td>
 </tr>
 <tr>
 <td><select id="loop2_if_select">
@@ -76,10 +77,10 @@ const sdwan001html = `<table border="1">
 <td><input id="pe2_psk_input"></td>
 </tr>
 </table>
-<button type="button" onclick="sdwan001sub('/config')">提交配置信息(Submit Config Info)</button>
+<button type="button" onclick="sdwan005sub('/config')">提交配置信息(Submit Config Info)</button>
 `;
 
-function sdwan001getList() {
+function sdwan005getList() {
     let str = $("#config_textarea").val().replaceAll(' ','').replaceAll('：',':').replaceAll(';','');;
     let lines = str.split(/\r?\n/);
     let id_html ="";
@@ -171,10 +172,10 @@ function sdwan001getList() {
 
 }
 //填充模板表格
-$("#service_dev").append(sdwan001html);
+$("#service_dev").append(sdwan005html);
 //加载测试资源的解析数据
-sdwan001getList();
-function sdwan001setWan1type(value){
+sdwan005getList();
+function sdwan005setWan1type(value){
     $("#wan_setup_td").empty();
     let html = '';
     switch(value){
@@ -196,7 +197,7 @@ function sdwan001setWan1type(value){
 };
 
 
-function sdwan001sub(url){
+function sdwan005sub(url){
   let user = $("#user_input").val();
   let time=getTime(new Date());
   let controller1ip = $("#controller1_ip_input").val();
@@ -239,7 +240,7 @@ function sdwan001sub(url){
   let pe2psk = $("#pe2_psk_input").val();
   let ce2lo = $("#ce2_lo_input").val();
 
-  let sdwan001mplsGreOverIPsec  =
+  let sdwan005mplsGreOverIPsec  =
 `#Fnet Huawei SD-WAN MPLS with GRE Over Ipsec Template.
 #Operator: ${user}
 #${time.cn}
@@ -335,7 +336,7 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "undo portswitch")
     result, n11, n21 = ops.cli.execute(handle, "description wan-mpls-ipsec")
     result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance underlay_ipsecA")
-    result, n11, n21 = ops.cli.execute(handle, "ip address ${wan1ip}")
+    result, n11, n21 = ops.cli.execute(handle, "ip address dhcp-alloc")
     result, n11, n21 = ops.cli.execute(handle, "nat outbound 3999 ")
     result, n11, n21 = ops.cli.execute(handle, "ipsec policy S2S-IPSEC")
     # lo1 lo2
@@ -358,7 +359,7 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "description 'bak-to-${pe2}-${pe2if}-by-${wan1}'")
     result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance underlay_ipsecB")
     result, n11, n21 = ops.cli.execute(handle, "tcp adjust-mss 1300")
-    result, n11, n21 = ops.cli.execute(handle, "ip address ${pe2ip2} 30")
+    result, n11, n21 = ops.cli.execute(handle, "ip address ${pe2ip2}")
     result, n11, n21 = ops.cli.execute(handle, "tunnel-protocol gre")
     result, n11, n21 = ops.cli.execute(handle, "source LoopBack2")
     result, n11, n21 = ops.cli.execute(handle, "destination vpn-instance underlay_ipsecA ${pe2lo}")
@@ -387,17 +388,17 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "start now")
     result, n11, n21 = ops.cli.execute(handle, "quit")
     # static route
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 0.0.0.0 0 ${wan1gw}")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA ${pe1lo} 32 ${wan1gw} description pe1lo")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA ${pe2lo} 32 ${wan1gw} description pe2lo")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA ${pe1pub} 32 ${wan1gw} description pe1pub")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA ${pe2pub} 32 ${wan1gw} description pe2pub")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 0.0.0.0 0 GigabitEthernet 0/0/8 dhcp")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA ${pe1lo} 32 GigabitEthernet 0/0/8 dhcp description pe1lo")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA ${pe2lo} 32 GigabitEthernet 0/0/8 dhcp description pe2lo")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA ${pe1pub} 32 GigabitEthernet 0/0/8 dhcp description pe1pub")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA ${pe2pub} 32 GigabitEthernet 0/0/8 dhcp description pe2pub")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 100.64.0.0 16 ${pe1ip1} description mpls1")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 100.65.0.0 16 ${pe1ip1} description mpls2")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 114.113.245.99 32 ${pe1ip1} description monitor1")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 192.168.55.250 32 ${pe1ip1} description jumpServer")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA ${loop2ip} 30 vpn-instance underlay_ipsecB description underlay_ipsecA-to-underlay_ipsecB")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 0.0.0.0 0 vpn-instance underlay_ipsecA ${wan1gw}")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 0.0.0.0 0 vpn-instance underlay_ipsecA")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 100.64.0.0 16 ${pe2ip1} description mpls1")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 100.65.0.0 16 ${pe2ip1} description mpls2")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 114.113.245.100 32 ${pe2ip1} description monitor2")
@@ -406,7 +407,7 @@ def ops_execute(ops):
     ops.cli.close(handle)
     return 0
 `;
-let sdwan001helpText = `##########中控配置###########
+let sdwan005helpText = `##########中控配置###########
 快速开局先填写一条线路，开局后再填写。
 name:       mpls_main
 tn:         mpls_main
@@ -447,7 +448,7 @@ quit
 interface ${wan1}
  undo portswitch
  ip binding vpn-instance underlay_ipsecA
- ip address ${wan1ip}
+ ip address dhcp
 quit
 ip route-static vpn-instance underlay_ipsecA 0.0.0.0 0 192.168.1.1 preference 222
 登录公司公网FTP，上传文件到自己的文件夹，路由器通过公网获取开局脚本。
@@ -571,8 +572,8 @@ ops
 `;
   let scriptName = `${lineid}.py`;
   let helpTextName = `${lineid}-HelpText-${time.ez}`;
-  console.log(sdwan001mplsGreOverIPsec);
-  console.log(sdwan001helpText);
-  downloadConfig(scriptName, sdwan001mplsGreOverIPsec);
-  downloadConfig(helpTextName, sdwan001helpText);
+  console.log(sdwan005mplsGreOverIPsec);
+  console.log(sdwan005helpText);
+  downloadConfig(scriptName, sdwan005mplsGreOverIPsec);
+  downloadConfig(helpTextName, sdwan005helpText);
 };
