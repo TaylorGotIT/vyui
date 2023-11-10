@@ -403,6 +403,13 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 100.65.0.0 16 ${pe2ip1} description mpls2")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 114.113.245.100 32 ${pe2ip1} description monitor2")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 192.168.55.250 32 ${pe2ip1} description jumpServer")
+    # ops
+    result, n11, n21 = ops.cli.execute(handle, "ops")
+    result, n11, n21 = ops.cli.execute(handle, "script-assistant python ipsecmain.py")
+    result, n11, n21 = ops.cli.execute(handle, "script-assistant python ipsecbackup.py")
+    result, n11, n21 = ops.cli.execute(handle, "environment ipsecmain ${pe1pub}")
+    result, n11, n21 = ops.cli.execute(handle, "environment ipsecbackup ${pe2pub}")
+    result, n11, n21 = ops.cli.execute(handle, "quit")
     ops.syslog("ops:add_tunnel is success", "critical", "syslog")
     ops.cli.close(handle)
     return 0
@@ -484,10 +491,7 @@ ops install file ipsecbackup.py
 system-view
 ops
  script-assistant python ${lineid}.py
- environment ipsecmain ${pe1pub}
- environment ipsecbackup ${pe2pub}
- script-assistant python ipsecmain.py
- script-assistant python ipsecbackup.py
+ quit
 #确认还原出厂设置   Y
 #当前设置保存为出厂设置    Y
 set factory-configuration from current-configuration
