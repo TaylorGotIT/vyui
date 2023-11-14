@@ -368,7 +368,7 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "description 'bak-to-${pe2}-${pe2if}-by-${wan1}'")
     result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance underlay_ipsecB")
     result, n11, n21 = ops.cli.execute(handle, "tcp adjust-mss 1300")
-    result, n11, n21 = ops.cli.execute(handle, "ip address ${pe2ip2}")
+    result, n11, n21 = ops.cli.execute(handle, "ip address ${pe2ip2} 30")
     result, n11, n21 = ops.cli.execute(handle, "tunnel-protocol gre")
     result, n11, n21 = ops.cli.execute(handle, "source LoopBack2")
     result, n11, n21 = ops.cli.execute(handle, "destination vpn-instance underlay_ipsecA ${pe2lo}")
