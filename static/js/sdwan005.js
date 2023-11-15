@@ -375,7 +375,7 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "quit")
     # nqa
     result, n11, n21 = ops.cli.execute(handle, "nqa event 1 log")
-    result, n11, n21 = ops.cli.execute(handle, "nqa test-instance admin ipsecmain")
+    result, n11, n21 = ops.cli.execute(handle, "nqa test-instance admin ipsec_main")
     result, n11, n21 = ops.cli.execute(handle, "test-type icmp")
     result, n11, n21 = ops.cli.execute(handle, "destination-address ipv4 ${pe1lo}")
     result, n11, n21 = ops.cli.execute(handle, "source-address ipv4 ${ce1lo}")
@@ -386,7 +386,7 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "start now")
     result, n11, n21 = ops.cli.execute(handle, "quit")
     result, n11, n21 = ops.cli.execute(handle, "nqa event 1 log")
-    result, n11, n21 = ops.cli.execute(handle, "nqa test-instance admin ipsecbackup")
+    result, n11, n21 = ops.cli.execute(handle, "nqa test-instance admin ipsec_backup")
     result, n11, n21 = ops.cli.execute(handle, "test-type icmp")
     result, n11, n21 = ops.cli.execute(handle, "destination-address ipv4 ${pe2lo}")
     result, n11, n21 = ops.cli.execute(handle, "source-address ipv4 ${ce2lo}")
@@ -414,10 +414,10 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 192.168.55.250 32 ${pe2ip1} description jumpServer")
     # ops
     result, n11, n21 = ops.cli.execute(handle, "ops")
-    result, n11, n21 = ops.cli.execute(handle, "script-assistant python ipsecmain.py")
-    result, n11, n21 = ops.cli.execute(handle, "script-assistant python ipsecbackup.py")
-    result, n11, n21 = ops.cli.execute(handle, "environment ipsecmain ${pe1pub}")
-    result, n11, n21 = ops.cli.execute(handle, "environment ipsecbackup ${pe2pub}")
+    result, n11, n21 = ops.cli.execute(handle, "script-assistant python ipsec_main.py")
+    result, n11, n21 = ops.cli.execute(handle, "script-assistant python ipsec_backup.py")
+    result, n11, n21 = ops.cli.execute(handle, "environment ipsec_main ${pe1pub}")
+    result, n11, n21 = ops.cli.execute(handle, "environment ipsec_backup ${pe2pub}")
     result, n11, n21 = ops.cli.execute(handle, "quit")
     ops.syslog("ops:add_tunnel is success", "critical", "syslog")
     ops.cli.close(handle)
@@ -432,25 +432,26 @@ vrf:        underlay_1
 interface:  ${loop2if}.100
 ip address: ${loop1ip2}/30
 gateway:    ${loop1ip1}
+url开局：YES
 
 name:       mpls_backup
 tn:         mpls_backup
-rd:         mpls
+rd:         mpls1
 vrf:        underlay_2
 interface:  ${loop2if}.200
 ip address: ${loop2ip2}/30
 gateway:    ${loop2ip1}
+url开局：NO
 
 ##########初始化开局脚本#####
+！！！R22 开机进入命令行会要求创建新用户，直接创建bothwin即可。
+
 #####上传 ${lineid}.py 开局脚本及ipsec自动重置脚本#####
 【1】公网FTP
+system-view
 ssh server permit interface all
 stelnet server enable
 aaa
- undo local-aaa-user password policy administrator
- undo local-aaa-user password policy bothwin
- local-user admin service-type terminal ssh http
- local-user bothwin password irreversible-cipher Tfe28@w%
  local-user bothwin service-type terminal ssh ftp
  local-user bothwin ftp-directory flash:
  local-user bothwin privilege level 15
@@ -459,14 +460,15 @@ aaa
 #
 ip vpn-instance underlay_ipsecA
  ipv4-family
-quit
-quit
+ quit
+ quit
+#
 interface ${wan1}
  undo portswitch
  ip binding vpn-instance underlay_ipsecA
  ip address dhcp
 quit
-ip route-static vpn-instance underlay_ipsecA 0.0.0.0 0 192.168.1.1 preference 222
+ip route-static vpn-instance underlay_ipsecA 0.0.0.0 0 ${wan1} preference 222
 登录公司公网FTP，上传文件到自己的文件夹，路由器通过公网获取开局脚本。
 ftp 59.36.7.222 vpn-instance underlay_ipsecA
 dir
@@ -475,15 +477,12 @@ get ${lineid}.py
 # local-user admin password irreversible-cipher admin@huawei.com
 
 【2】本地FTP
+system-view
 ftp server permit interface GigabitEthernet 0/0/0
 ftp server enable
 ssh server permit interface all
 stelnet server enable
 aaa
- undo local-aaa-user password policy administrator
- undo local-aaa-user password policy bothwin
- local-user admin service-type terminal ssh http
- local-user bothwin password irreversible-cipher Tfe28@w%
  local-user bothwin service-type terminal ssh ftp
  local-user bothwin ftp-directory flash:
  local-user bothwin privilege level 15
@@ -491,15 +490,16 @@ aaa
  quit
 # 电脑网口 192.168.1.100/24 连接华为SD-WAN路由器 G0/0/0
 # windows文件浏览页面输入访问路径：ftp://192.168.1.1/
-# 认证登录后 上传${lineid}.py ipsecmain.py ipsecbackup.py
+# 认证登录后 上传${lineid}.py ipsec_main.py ipsec_backup.py
 
 ##### 安装python脚本：
 ops install file ${lineid}.py
-ops install file ipsecmain.py
-ops install file ipsecbackup.py
+ops install file ipsec_main.py
+ops install file ipsec_backup.py
 system-view
 ops
  script-assistant python ${lineid}.py
+ quit
  quit
 #确认还原出厂设置   Y
 #当前设置保存为出厂设置    Y
@@ -526,15 +526,17 @@ ip vpn-instance underlay_1
  quit
 interface ${loop2if}
  undo portswitch
+ quit
 #
 interface ${loop2if}.100
  dot1q termination vid 100
  ip binding vpn-instance underlay_1
  ip address ${loop1ip2} 30
+ quit
 #
-ip route-static vpn-instance underlay_1 ${controller1ip} 32 ${loop1if}.100 ${loop1ip1} tag 4400 description agile-controller
+ip route-static vpn-instance underlay_1 ${controller1ip} 32 ${loop2if}.100 ${loop1ip1} tag 4400 description agile-controller
 #Pinc测试
-ping -vpn-instance underlay_1 -a ${loop1ip1} ${controller1ip}
+ping -vpn-instance underlay_1 -a ${loop1ip2} ${controller1ip}
 #确认OK后，命令行开局
  agile controller host ${controller1ip} port 10020 vpn-instance underlay_1
 quit
@@ -561,25 +563,28 @@ def ops_execute(ops):
 system-view
 ops
  undo script-assistant python ${lineid}.py
- undo environment ipsecmain ${pe1pub}
- undo environment ipsecbackup ${pe2pub}
- undo script-assistant python ipsecmain.py
- undo script-assistant python ipsecbackup.py
-Ctrl+Z
+ undo environment ipsec_main ${pe1pub}
+ undo environment ipsec_backup ${pe2pub}
+ undo script-assistant python ipsec_main.py
+ undo script-assistant python ipsec_backup.py
+ quit
+ quit
 ops uninstall file ${lineid}.py
-ops uninstall file ipsecmain.py
-ops uninstall file ipsecbackup.py
+ops uninstall file ipsec_main.py
+ops uninstall file ipsec_backup.py
+#重新传入脚本替换旧脚本
+
 #重新加载
 ops install file ${lineid}.py
-ops install file ipsecmain.py
-ops install file ipsecbackup.py
+ops install file ipsec_main.py
+ops install file ipsec_backup.py
 system-view
 ops
  script-assistant python ${lineid}.py
- environment ipsecmain 新对接IP
- environment ipsecbackup 新对接IP
- script-assistant python ipsecmain.py
- script-assistant python ipsecbackup.py
+ environment ipsec_main 新对接IP
+ environment ipsec_backup 新对接IP
+ script-assistant python ipsec_main.py
+ script-assistant python ipsec_backup.py
 #
 如卸载和加载脚本都没有报错，则表示配置变更成功。
 `;
