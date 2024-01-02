@@ -136,6 +136,9 @@ function fastip005getList() {
                 case 'cedocking':
                     info_json.pub.push(l1);
                     break;
+                case 'ce对接':
+                    info_json.pub.push(l1);
+                    break;
                 case 'celoip':
                     info_json.lo.push(l1);
                     break;
