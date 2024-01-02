@@ -279,14 +279,14 @@ switch(wan1Type){
     case "dhcp":
         wan1Temp += `set interfaces ethernet ${wan1} description WAN1-${wan1Provider}-DHCP
 set interfaces ethernet ${wan1} address dhcp
-set protocols static route 127.1.1.1/32 dhcp-interface ${wan1}`;
+set protocols static route 1.1.1.1/32 dhcp-interface ${wan1}`;
     break;
     case "static":
         let wan1ip = $("#wan1_ip_input").val();
         let wan1gw = $("#wan1_gw_input").val();
         wan1Temp += `set interfaces ethernet ${wan1} description WAN1-${wan1Provider}-GW-${wan1gw}
 set interfaces ethernet ${wan1} address ${wan1ip}
-set protocols static route 127.1.1.1/32 next-hop ${wan1gw}`;
+set protocols static route 1.1.1.1/32 next-hop ${wan1gw}`;
     break;
     case "pppoe":
         let pppoe1user = $("#pppoe1_user_input").val();
@@ -297,7 +297,7 @@ set interfaces ethernet ${wan1} pppoe 1 mtu '1492'
 set interfaces ethernet ${wan1} pppoe 1 name-server 'none'
 set interfaces ethernet ${wan1} pppoe 1 password ${pppoe1user}
 set interfaces ethernet ${wan1} pppoe 1 user-id ${pppoe1pass}
-set protocols static interface-route 127.1.1.1/32 next-hop-interface pppoe1`;
+set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
     break;
   };
 }else if(wan1=="br0" || wan1=="br1"){
@@ -307,7 +307,7 @@ switch(wan1Type){
 set interfaces bridge ${wan1} address dhcp
 set interfaces bridge ${wan1} member interface eth0
 set interfaces bridge ${wan1} member interface eth1
-set protocols static route 127.1.1.1/32 dhcp-interface ${wan1}`;
+set protocols static route 1.1.1.1/32 dhcp-interface ${wan1}`;
     break;
     case "static":
         let wan1ip = $("#wan1_ip_input").val();
@@ -316,7 +316,7 @@ set protocols static route 127.1.1.1/32 dhcp-interface ${wan1}`;
 set interfaces bridge ${wan1} address ${wan1ip}
 set interfaces bridge ${wan1} member interface eth0
 set interfaces bridge ${wan1} member interface eth1
-set protocols static route 127.1.1.1/32 next-hop ${wan1gw}`;
+set protocols static route 1.1.1.1/32 next-hop ${wan1gw}`;
     break;
     case "pppoe":
         let pppoe1user = $("#pppoe1_user_input").val();
@@ -329,7 +329,7 @@ set interfaces bridge ${wan1} pppoe 1 password ${pppoe1user}
 set interfaces bridge ${wan1} pppoe 1 user-id ${pppoe1pass}
 set interfaces bridge ${wan1} member interface eth0
 set interfaces bridge ${wan1} member interface eth1
-set protocols static interface-route 127.1.1.1/32 next-hop-interface pppoe1`;
+set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
     break;
   };
 }
@@ -543,7 +543,7 @@ echo '>>>MTU TCP-MSS配置[interface]<<<'
 set firewall options interface ${ac1if} adjust-mss '1300'
 set firewall options interface ${ac2if} adjust-mss '1300'
 echo '>>>路由配置[Track 默认路由，对接公网路由，内网路由]<<<'
-set protocols static route 223.5.5.5/32 next-hop 127.1.1.1
+set protocols static route 223.5.5.5/32 next-hop 1.1.1.1
 set track name to-223 failure-count 2
 set track name to-223 success-count 2
 set track name to-223 test 10 resp-time 5
@@ -557,9 +557,10 @@ set track name to-main test 10 target ${ac1ip1}
 set track name to-main test 10 ttl-limit 1
 set track name to-main test 10 type ping
 echo '>>>静态路由配置[Static]<<<'
-set protocols static route 0.0.0.0/0 next-hop 127.1.1.1 distance 220
-set protocols static route ${ac1pub}/32 next-hop 127.1.1.1
-set protocols static route ${ac2pub}/32 next-hop 127.1.1.1
+set protocols static route 0.0.0.0/0 next-hop 1.1.1.1 distance 220
+set protocols static route ${ac1pub}/32 next-hop 1.1.1.1
+set protocols static route ${ac2pub}/32 next-hop 1.1.1.1
+set protocols static route 202.104.174.178/32 next-hop 1.1.1.1
 set protocols static route 114.113.245.99/32 next-hop ${ac1ip1}
 set protocols static route 114.113.245.100/32 next-hop ${ac2ip1}
 set protocols static route 192.168.55.125/32 next-hop ${ac1ip1} track to-main
@@ -592,15 +593,15 @@ set policy route-map bgp-from--RSVR rule 100 set ip-next-hop ${ac1ip1}
 set policy route-map bgp-from--RSVR rule 200 action 'permit'
 set policy route-map bgp-from--RSVR rule 200 description 'to_ct'
 set policy route-map bgp-from--RSVR rule 200 match community community-list '81'
-set policy route-map bgp-from--RSVR rule 200 set ip-next-hop 127.1.1.1
+set policy route-map bgp-from--RSVR rule 200 set ip-next-hop 1.1.1.1
 set policy route-map bgp-from--RSVR rule 300 action 'permit'
 set policy route-map bgp-from--RSVR rule 300 description 'to_cnc'
 set policy route-map bgp-from--RSVR rule 300 match community community-list '82'
-set policy route-map bgp-from--RSVR rule 300 set ip-next-hop 127.1.1.1
+set policy route-map bgp-from--RSVR rule 300 set ip-next-hop 1.1.1.1
 set policy route-map bgp-from--RSVR rule 400 action 'permit'
 set policy route-map bgp-from--RSVR rule 400 description 'to_cn_other'
 set policy route-map bgp-from--RSVR rule 400 match community community-list '83'
-set policy route-map bgp-from--RSVR rule 400 set ip-next-hop 127.1.1.1
+set policy route-map bgp-from--RSVR rule 400 set ip-next-hop 1.1.1.1
 set policy route-map bgp-from--RSVR2 rule 100 action 'permit'
 set policy route-map bgp-from--RSVR2 rule 100 description 'to_hk'
 set policy route-map bgp-from--RSVR2 rule 100 match community community-list '80'
@@ -609,17 +610,17 @@ set policy route-map bgp-from--RSVR2 rule 100 set local-preference '50'
 set policy route-map bgp-from--RSVR2 rule 200 action 'permit'
 set policy route-map bgp-from--RSVR2 rule 200 description 'to_ct'
 set policy route-map bgp-from--RSVR2 rule 200 match community community-list '81'
-set policy route-map bgp-from--RSVR2 rule 200 set ip-next-hop 127.1.1.1
+set policy route-map bgp-from--RSVR2 rule 200 set ip-next-hop 1.1.1.1
 set policy route-map bgp-from--RSVR2 rule 200 set local-preference '50'
 set policy route-map bgp-from--RSVR2 rule 300 action 'permit'
 set policy route-map bgp-from--RSVR2 rule 300 description 'to_cnc'
 set policy route-map bgp-from--RSVR2 rule 300 match community community-list '82'
-set policy route-map bgp-from--RSVR2 rule 300 set ip-next-hop 127.1.1.1
+set policy route-map bgp-from--RSVR2 rule 300 set ip-next-hop 1.1.1.1
 set policy route-map bgp-from--RSVR2 rule 300 set local-preference '50'
 set policy route-map bgp-from--RSVR2 rule 400 action 'permit'
 set policy route-map bgp-from--RSVR2 rule 400 description 'to_cn_other'
 set policy route-map bgp-from--RSVR2 rule 400 match community community-list '83'
-set policy route-map bgp-from--RSVR2 rule 400 set ip-next-hop 127.1.1.1
+set policy route-map bgp-from--RSVR2 rule 400 set ip-next-hop 1.1.1.1
 set policy route-map bgp-from--RSVR2 rule 400 set local-preference '50'
 set protocols bgp 65000 neighbor ${bgp1server1} peer-group 'RSVR'
 set protocols bgp 65000 neighbor ${bgp1server2} peer-group 'RSVR'
@@ -687,9 +688,9 @@ SN: E1X16225005xxxxxxxx \n\
 delete system name-server
 set system name-server 192.168.8.1
 ###回程路由、WIFI、DHCP###
-set protocols static route 10.0.0.0/8 next-hop 127.1.1.1
-set protocols static route 172.16.0.0/12 next-hop 127.1.1.1
-set protocols static route 192.168.0.0/16 next-hop 127.1.1.1
+set protocols static route 10.0.0.0/8 next-hop 1.1.1.1
+set protocols static route 172.16.0.0/12 next-hop 1.1.1.1
+set protocols static route 192.168.0.0/16 next-hop 1.1.1.1
 echo '5G WIFI SSID: sdwan PASSWD: 123456@sdwan'
 set interfaces wireless wlan1 address '192.168.9.1/24'
 set interfaces wireless wlan1 channel '0'
