@@ -705,9 +705,24 @@ set interfaces bridge br2 member interface eth5
 set system name-server 114.114.114.114
 set service ssh disable-host-validation
 set service ssh port 2707
+set service ssh acl permit '10.0.0.0/8'
+set service ssh acl permit '100.64.0.0/10'
+set service ssh acl permit '172.16.0.0/12'
+set service ssh acl permit '192.168.0.0/16'
+set service ssh acl permit '183.61.239.168/32'
+set service ssh acl permit '202.104.174.178/32'
+set service ssh acl permit '59.37.126.140/32'
+set service ssh acl permit '113.105.190.147/32'
+set service ssh acl permit '114.112.238.8/29'
+set service ssh acl permit '114.113.245.101/32'
+set service ssh acl permit '120.76.31.146/32'
+set system syslog global facility all level 'info'
+set system syslog host 192.168.237.78 facility protocols level 'debug'
+set openfalcon server-address 192.168.237.86
+set openfalcon endpoint-name ${lineid}-${cnameEN}-${area}
 set system login user bothwin authentication encrypted-password '$6$v.wWSn9tGGGWzElK$qrB79AFWdg4lCtrbVNjea6Gs.oMGeQ8now53XO/h8V8DZ5yiqzv33h0rSMw8wWKTZXRFf6O8uRRCcPaIHsaiq0'
 set system time-zone Asia/Hong_Kong
-set service smartping
+set service smartping password both-win
 commit
 save
 exit
@@ -736,7 +751,7 @@ set interfaces tunnel ${pe1if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe2if} firewall local name 'WAN2LOCAL'
 set system host-name ${lineid}-${cname}-${area}
 set service snmp community both-win authorization 'ro'
-set service smartping
+set service smartping password both-win
 set interfaces loopback lo address ${oversea1ip1}/32
 set interfaces loopback lo description ${oversea1ips}
 ${wan1Temp}
@@ -771,6 +786,8 @@ set protocols static route 192.168.55.125/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.125/32 next-hop ${pe2ip1} distance 5
 set protocols static route 192.168.55.250/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.250/32 next-hop ${pe2ip1} distance 5
+set protocols static route 192.168.237.86/32 next-hop ${pe1ip1} track to-main
+set protocols static route 192.168.237.86/32 next-hop ${pe2ip1} distance 5
 echo '>>>动态路由配置[BGP]<<<'
 set protocols static route ${bgp1server1}/32 next-hop ${pe1ip1} track 'to-main'
 set protocols static route ${bgp1server1}/32 blackhole distance '5'

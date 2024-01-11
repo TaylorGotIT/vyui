@@ -529,7 +529,7 @@ set interfaces ethernet eth3 bridge-group bridge br2
 set interfaces ethernet eth4 bridge-group bridge br2
 set interfaces ethernet eth5 bridge-group bridge br2
 set system console device ttyS0 speed 115200
-set service smartping
+set service smartping password both-win
 commit
 save`;
 //WAN接口模板
@@ -795,7 +795,24 @@ set interfaces tunnel ${pe2if} firewall local name 'WAN2LOCAL'
 echo '# 基础配置[系统名称，物理接口]'
 set system host-name ${lineid}-${cname}-${area}
 set service snmp community both-win authorization 'ro'
-set service smartping
+set service smartping password both-win
+set service ssh disable-host-validation
+set service ssh port 2707
+set service ssh acl permit '10.0.0.0/8'
+set service ssh acl permit '100.64.0.0/10'
+set service ssh acl permit '172.16.0.0/12'
+set service ssh acl permit '192.168.0.0/16'
+set service ssh acl permit '183.61.239.168/32'
+set service ssh acl permit '202.104.174.178/32'
+set service ssh acl permit '59.37.126.140/32'
+set service ssh acl permit '113.105.190.147/32'
+set service ssh acl permit '114.112.238.8/29'
+set service ssh acl permit '114.113.245.101/32'
+set service ssh acl permit '120.76.31.146/32'
+set system syslog global facility all level 'info'
+set system syslog host 192.168.237.78 facility protocols level 'debug'
+set openfalcon server-address 192.168.237.86
+set openfalcon endpoint-name ${lineid}-${cnameEN}-${area}
 ${wan1Temp}
 ${openvpnTemp}
 ${greTemp}
@@ -822,6 +839,8 @@ set protocols static route 192.168.55.125/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.125/32 next-hop ${pe2ip1} distance 5
 set protocols static route 192.168.55.250/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.250/32 next-hop ${pe2ip1} distance 5
+set protocols static route 192.168.237.86/32 next-hop ${pe1ip1} track to-main
+set protocols static route 192.168.237.86/32 next-hop ${pe2ip1} distance 5
 echo '# 组网配置[BGP]'
 set policy prefix-list Local-Route rule 10 action 'permit'
 set policy prefix-list Local-Route rule 10 prefix ${subnet1}
