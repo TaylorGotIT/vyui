@@ -686,6 +686,8 @@ set protocols static route 192.168.55.125/32 next-hop ${ac1ip1} track to-main
 set protocols static route 192.168.55.125/32 next-hop ${ac2ip1} distance 5
 set protocols static route 192.168.55.250/32 next-hop ${ac1ip1} track to-main
 set protocols static route 192.168.55.250/32 next-hop ${ac2ip1} distance 5
+set protocols static route 192.168.237.78/32 next-hop ${ac1ip1} track to-main
+set protocols static route 192.168.237.78/32 next-hop ${ac2ip1} distance 5
 set protocols static route 192.168.237.86/32 next-hop ${ac1ip1} track to-main
 set protocols static route 192.168.237.86/32 next-hop ${ac2ip1} distance 5
 set protocols static route ${bgp1server1}/32 next-hop ${ac1ip1} track 'to-main'

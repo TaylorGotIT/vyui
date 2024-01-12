@@ -870,6 +870,8 @@ set protocols static route 192.168.55.125/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.125/32 next-hop ${pe2ip1} distance 5
 set protocols static route 192.168.55.250/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.250/32 next-hop ${pe2ip1} distance 5
+set protocols static route 192.168.237.78/32 next-hop ${pe1ip1} track to-main
+set protocols static route 192.168.237.78/32 next-hop ${pe2ip1} distance 5
 set protocols static route 192.168.237.86/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.237.86/32 next-hop ${pe2ip1} distance 5
 echo '5G WIFI SSID: sdwan PASSWD: 123456@sdwan'
