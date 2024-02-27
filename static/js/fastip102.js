@@ -719,7 +719,7 @@ set service ssh acl permit '120.76.31.146/32'
 set system syslog global facility all level 'info'
 set system syslog host 192.168.237.78 facility protocols level 'debug'
 set openfalcon server-address 192.168.237.86
-set openfalcon endpoint-name ${lineid}-${cnameEN}-${area}
+set openfalcon endpoint-name ${lineid}-${cname}-${area}
 set system login user bothwin authentication encrypted-password '$6$v.wWSn9tGGGWzElK$qrB79AFWdg4lCtrbVNjea6Gs.oMGeQ8now53XO/h8V8DZ5yiqzv33h0rSMw8wWKTZXRFf6O8uRRCcPaIHsaiq0'
 set system time-zone Asia/Hong_Kong
 set service smartping password both-win

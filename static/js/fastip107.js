@@ -163,6 +163,8 @@ function fastip107getList() {
                         info_json.ac.push(l1);
                     }else if(l1.search('nat')!=-1){
                         info_json.natpe.push(l1);
+                    }else if(l1.search('net')!=-1){
+                        info_json.natpe.push(l1);
                     }else if(l1.search('pe')!=-1){
                         info_json.pe.push(l1);
                     }else{
@@ -799,7 +801,7 @@ set service ssh acl permit '120.76.31.146/32'
 set system syslog global facility all level 'info'
 set system syslog host 192.168.237.78 facility protocols level 'debug'
 set openfalcon server-address 192.168.237.86
-set openfalcon endpoint-name ${lineid}-${cnameEN}-${area}
+set openfalcon endpoint-name ${lineid}-${cname}-${area}
 set interfaces loopback lo address ${natce1lo}/32
 set interfaces loopback lo address ${natce2lo}/32
 set interfaces loopback lo address ${oversea1ip1}/32
@@ -896,7 +898,7 @@ set policy local-route rule 201 set table '200'
 set policy local-route rule 201 source '192.168.9.201'
 #
 echo '>>>DNS劫持<<<'
-set nat destination rule 50 outbound-interface 'eth0'
+set nat destination rule 50 inbound-interface 'eth0'
 set nat destination rule 50 destination port 53
 set nat destination rule 50 protocol tcp_udp
 set nat destination rule 50 translation address '192.168.8.1'
@@ -922,25 +924,19 @@ ${smartdnsTemp}
 delete system name-server
 set system name-server 192.168.8.1
 ###AdGuardHome DNS解决客户需要自行管理DNS问题###
-# 下载
-wget https://github.com/AdguardTeam/AdGuardHome/releases/download/v0.107.43/AdGuardHome_linux_amd64.tar.gz
-# 解压 安装
-sudo tar -zxvf AdGuardHome_linux_amd64.tar.gz
-sudo ./AdGuardHome/AdGuardHome -s install
-# 状态 /重启
-sudo ./AdGuardHome/AdGuardHome -s status
-sudo ./AdGuardHome/AdGuardHome -s restart
-
-# SSH代理80端口管理DNS http://127.0.0.1
-# 客户直接管理DNS http://192.168.8.1
-# 默认账户： admin 密码： admin123
-
-set nat destination rule 10 destination port '80'
-set nat destination rule 10 inbound-interface 'vtun25426'
-set nat destination rule 10 protocol 'tcp_udp'
-set nat destination rule 10 source address '192.168.55.250'
-set nat destination rule 10 translation address '192.168.8.1'
-
+add container image adguard/adguardhome
+#
+sudo mkdir /opt/adguardhome
+#
+config
+set container name AdGuardHome image 'docker.io/adguard/adguardhome:latest'
+set container name AdGuardHome allow-host-networks
+set container name AdGuardHome volume dir destination '/opt/adguardhome/conf'
+set container name AdGuardHome volume dir source '/opt/adguardhome'
+commit
+save
+exit
+show container log AdGuardHome
 # 方案1：黑名单 仅控制海外域名解析
 # 分流DNS(192.168.8.1)--->国内域名---223.5.5.5&223.6.6.6
 #                    --->海外域名---AdGuardHome(127.0.0.1)---Web管理黑白名单
@@ -1015,47 +1011,6 @@ set service dns forwarding name-server 127.0.0.1
 ||xsden.org^
 ||rsf.org^
 
-###SmartDNS 解决TK直播解析问题###
-echo '# CE ETH5接口192.168.9.1/24'
-config
-del interfaces ethernet eth5 bridge-group bridge 'br2'
-#[v4.0]del interfaces bridge br2 member interface eth5
-set interfaces ethernet eth5 address '192.168.9.1/24'
-set interfaces ethernet eth5 desc 'WIFI-LAN'
-delete system name-server
-set system name-server ${oversea1dns}
-set system name-server ${oversea2dns}
-commit
-exit
-echo '# 上游server需要选择当地DNS，示例为美国区域DNS'
-sudo  wget ftp://psalesftp:Tfe28@w%@59.36.7.222/Taylorg/smartdns.1.2023.03.04-1125.x86_64-debian-all.deb
-sudo dpkg -i smartdns.1.2023.03.04-1125.x86_64-debian-all.deb
-sudo chmod 777 /etc/smartdns/smartdns.conf
-sudo sed -i "s/^[^#]*:53$/#&/g" /etc/smartdns/smartdns.conf
-sudo echo -e 'bind 192.168.9.1:5353 -no-cache
-force-AAAA-SOA yes
-speed-check-mode ping,tcp:80,tcp:443
-server-https https://dns.google/dns-query
-server-https https://cloudflare-dns.com/dns-query' >> /etc/smartdns/smartdns.conf
-echo '# 开启SmartDNS'
-sudo systemctl enable smartdns
-sudo systemctl start smartdns
-sudo systemctl status smartdns
-sudo netstat -tunlp | grep smartdns
-echo '# 策略路由 全局海外'
-set protocols static table 100 route 0.0.0.0/0 next-hop ${natpe1ip1}
-set policy route lanMap rule 10 set table '100'
-set policy route lanMap rule 10 source address '192.168.9.0/24'
-set interfaces ethernet eth5 policy route lanMap
-echo '# dns 5353 劫持'
-set nat destination rule 53 destination address '192.168.9.1'
-set nat destination rule 53 destination port '53'
-set nat destination rule 53 inbound-interface 'eth5'
-set nat destination rule 53 protocol 'tcp_udp'
-set nat destination rule 53 source address '192.168.9.0/24'
-set nat destination rule 53 translation port '5353'
-echo '# 测试SmartDNS'
-sudo nslookup www.tiktok.com 192.168.9.1 -port=5353
 echo '# 登录消息[banner]'
 set system login banner post-login "################ \n\
 SN: E1X16225005xxxxxxxx \n\
@@ -1072,17 +1027,6 @@ Last Change By: ${user} ${time.cn} \n\
 ###########
 #  测试   #
 ###########
-IP/环境监测
-区域
-https://ipinfo.io/${oversea1ip1}
-类型
-ISP > Business > hosting
-AS号
-https://bgp.he.net
-whoer.net 100%
-https://whoer.net
-污染度     < 50%
-https://scamalytics.com
 Ping测试：
 sudo ping ${ac1ip1} -i 0.1 -c 100 -q -s 1500
 sudo ping ${ac2ip1} -i 0.1 -c 100 -q
