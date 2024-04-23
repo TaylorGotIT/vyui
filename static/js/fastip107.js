@@ -439,6 +439,70 @@ curl http://202.104.174.189:18080/epochos/ | grep vyos-epoch | awk -F '"' '{prin
 while read -r url; do wget "$url" done < img_list
 cat img_list
 do add system image xxx`;
+
+//WAN接口模板
+if(wan1=="eth0" || wan1=="eth1"){
+switch(wan1Type){
+    case "dhcp":
+        wanTemp += `set interfaces ethernet ${wan1} description WAN1-${wan1Provider}-DHCP
+set interfaces ethernet ${wan1} address dhcp
+set protocols static route 1.1.1.1/32 dhcp-interface ${wan1}`;
+    break;
+    case "static":
+        let wan1ip = $("#wan1_ip_input").val();
+        let wan1gw = $("#wan1_gw_input").val();
+        wanTemp += `set interfaces ethernet ${wan1} description WAN1-${wan1Provider}-GW-${wan1gw}
+set interfaces ethernet ${wan1} address ${wan1ip}
+set protocols static route 1.1.1.1/32 next-hop ${wan1gw}`;
+    break;
+    case "pppoe":
+        let pppoe1user = $("#pppoe1_user_input").val();
+        let pppoe1pass = $("#pppoe1_pass_input").val();
+        wanTemp += `set interfaces ethernet ${wan1} description WAN1_${wan1Provider}_${pppoe1user}/${pppoe1pass}
+del interface ethernet ${wan1} address
+set interfaces pppoe pppoe1 authentication user ${pppoe1user}
+set interfaces pppoe pppoe1 authentication password ${pppoe1pass}
+set interfaces pppoe pppoe1 default-route 'auto'
+set interfaces pppoe pppoe1 description description WAN1_${wan1Provider}_${pppoe1user}/${pppoe1pass}
+set interfaces pppoe pppoe1 mtu '1492'
+set interfaces pppoe pppoe1 source-interface ${wan1}
+set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
+    break;
+  };
+}else if(wan1=="br0" || wan1=="br1"){
+switch(wan1Type){
+    case "dhcp":
+        wanTemp += `set interfaces bridge ${wan1} description WAN1-${wan1Provider}-DHCP
+set interfaces bridge ${wan1} address dhcp
+set interfaces bridge ${wan1} member interface eth0
+set interfaces bridge ${wan1} member interface eth1
+set protocols static route 1.1.1.1/32 dhcp-interface ${wan1}`;
+    break;
+    case "static":
+        let wan1ip = $("#wan1_ip_input").val();
+        let wan1gw = $("#wan1_gw_input").val();
+        wanTemp += `set interfaces bridge ${wan1} description WAN1-${wan1Provider}-GW-${wan1gw}
+set interfaces bridge ${wan1} address ${wan1ip}
+set interfaces bridge ${wan1} member interface eth0
+set interfaces bridge ${wan1} member interface eth1
+set protocols static route 1.1.1.1/32 next-hop ${wan1gw}`;
+    break;
+    case "pppoe":
+        let pppoe1user = $("#pppoe1_user_input").val();
+        let pppoe1pass = $("#pppoe1_pass_input").val();
+        wanTemp += `set interfaces bridge ${wan1} description WAN1_${wan1Provider}_${pppoe1user}/${pppoe1pass}
+del interfaces bridge ${wan1} address
+set interfaces pppoe pppoe1 authentication user ${pppoe1user}
+set interfaces pppoe pppoe1 authentication password ${pppoe1pass}
+set interfaces pppoe pppoe1 default-route 'auto'
+set interfaces pppoe pppoe1 description description WAN1_${wan1Provider}_${pppoe1user}/${pppoe1pass}
+set interfaces pppoe pppoe1 mtu '1492'
+set interfaces pppoe pppoe1 source-interface ${wan1}
+set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
+    break;
+  };
+}
+
 openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
 set interfaces openvpn ${ac1if} description AC1_${ac1}
 set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
@@ -750,38 +814,34 @@ let fastip107fastipGreOverOpenvpn  = String.raw
 +++++++++++++++++++++++++++++++++++++++++++
 ${imageTemp}
 echo '基础配置[防火墙规则，系统名称，物理接口]'
-set firewall group network-group GROUP-FNET-Whitelist network 202.104.174.178/32
-set firewall group network-group GROUP-FNET-Whitelist network 114.112.232.0/23
-set firewall group network-group GROUP-FNET-Whitelist network 114.112.236.0/22
-set firewall group network-group GROUP-FNET-Whitelist network 114.113.240.0/23
-set firewall group network-group GROUP-FNET-Whitelist network 114.113.244.0/23
-set firewall group network-group GROUP-FNET-Whitelist network 223.252.176.0/24
-set firewall group network-group GROUP-FNET-Whitelist network 10.0.0.0/8
-set firewall group network-group GROUP-FNET-Whitelist network 172.16.0.0/12
-set firewall group network-group GROUP-FNET-Whitelist network 192.168.0.0/16
+set firewall group network-group GROUP-FNET-Whitelist network '43.229.117.226/32'
+set firewall group network-group GROUP-FNET-Whitelist network '43.229.119.251/32'
+set firewall group network-group GROUP-FNET-Whitelist network '112.93.250.2/32'
+set firewall group network-group GROUP-FNET-Whitelist network '121.46.244.5/32'
+set firewall group network-group GROUP-FNET-Whitelist network '120.76.31.146/32'
+set firewall group network-group GROUP-FNET-Whitelist network '202.104.174.178/32'
+set firewall group network-group GROUP-FNET-Whitelist network '114.112.238.8/29'
+set firewall group network-group GROUP-FNET-Whitelist network '10.0.0.0/8'
+set firewall group network-group GROUP-FNET-Whitelist network '100.68.250.0/24'
+set firewall group network-group GROUP-FNET-Whitelist network '172.16.0.0/12'
+set firewall group network-group GROUP-FNET-Whitelist network '192.168.0.0/16'
 set firewall name WAN2LOCAL default-action 'accept'
 set firewall name WAN2LOCAL rule 1000 action 'accept'
 set firewall name WAN2LOCAL rule 1000 source group network-group 'GROUP-FNET-Whitelist'
 set firewall name WAN2LOCAL rule 2000 action 'drop'
 set firewall name WAN2LOCAL rule 2000 destination port '179,2707,53,161,123,8899'
 set firewall name WAN2LOCAL rule 2000 protocol 'tcp_udp'
-set firewall name VPN2LOCAL default-action 'accept'
-set firewall name VPN2LOCAL rule 1000 action 'accept'
-set firewall name VPN2LOCAL rule 1000 source group network-group 'GROUP-FNET-Whitelist'
-set firewall name VPN2LOCAL rule 2000 action 'drop'
-set firewall name VPN2LOCAL rule 2000 destination port '179,2707,53,161,123,8899'
-set firewall name VPN2LOCAL rule 2000 protocol 'tcp_udp'
-set firewall name VPN2LOCAL rule 3000 action 'drop'
-set firewall name VPN2LOCAL rule 3000 destination port '22,80,135,137,138,139,443,445,1080'
-set firewall name VPN2LOCAL rule 3000 protocol 'tcp_udp'
-set firewall name VPN2LOCAL rule 4000 action 'drop'
-set firewall name VPN2LOCAL rule 4000 destination port '1723,3124,3127,3128,3389,5000,8080,31337'
-set firewall name VPN2LOCAL rule 4000 protocol 'tcp_udp'
+set firewall name WAN2LOCAL rule 3000 action 'drop'
+set firewall name WAN2LOCAL rule 3000 destination port '22,80,135,137,138,139,443,445,1080'
+set firewall name WAN2LOCAL rule 3000 protocol 'tcp_udp'
+set firewall name WAN2LOCAL rule 4000 action 'drop'
+set firewall name WAN2LOCAL rule 4000 destination port '1723,3124,3127,3128,3389,5000,8080,31337'
+set firewall name WAN2LOCAL rule 4000 protocol 'tcp_udp'
 set interfaces ethernet ${wan1} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe1if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe2if} firewall local name 'WAN2LOCAL'
-set interfaces tunnel ${natpe1if} firewall local name 'VPN2LOCAL'
-set interfaces tunnel ${natpe2if} firewall local name 'VPN2LOCAL'
+set interfaces tunnel ${natpe1if} firewall local name 'WAN2LOCAL'
+set interfaces tunnel ${natpe2if} firewall local name 'WAN2LOCAL'
 set system host-name ${lineid}-${cname}-${area}
 set service snmp community both-win authorization 'ro'
 set service smartping password both-win
@@ -798,6 +858,19 @@ set service ssh acl permit '113.105.190.147/32'
 set service ssh acl permit '114.112.238.8/29'
 set service ssh acl permit '114.113.245.101/32'
 set service ssh acl permit '120.76.31.146/32'
+set system flow-accounting interface eth2
+set system flow-accounting netflow engine-id '1'
+set system flow-accounting netflow server 10.100.114.12 port '9995'
+set system flow-accounting netflow timeout expiry-interval '60'
+set system flow-accounting netflow timeout flow-generic '10'
+set system flow-accounting netflow timeout icmp '300'
+set system flow-accounting netflow timeout max-active-life '604800'
+set system flow-accounting netflow timeout tcp-fin '300'
+set system flow-accounting netflow timeout tcp-generic '3600'
+set system flow-accounting netflow timeout tcp-rst '120'
+set system flow-accounting netflow timeout udp '120'
+set system flow-accounting netflow version '9'
+set system flow-accounting syslog-facility 'daemon'
 set system syslog global facility all level 'info'
 set system syslog host 192.168.237.78 facility protocols level 'debug'
 set openfalcon server-address 192.168.237.86
@@ -835,6 +908,13 @@ set track name to-main test 10 resp-time 5
 set track name to-main test 10 target ${pe1ip1}
 set track name to-main test 10 ttl-limit 1
 set track name to-main test 10 type ping
+set protocols static route 1.0.0.1/32 next-hop ${natpe1ip1}
+set track name to-pub1 failure-count 2
+set track name to-pub1 success-count 2
+set track name to-pub1 test 10 resp-time 5
+set track name to-pub1 test 10 target 1.0.0.1
+set track name to-pub1 test 10 ttl-limit 1
+set track name to-pub1 test 10 type ping
 echo '>>>静态路由配置[Static]<<<'
 set protocols static route ${ac1pub}/32 next-hop 1.1.1.1
 set protocols static route ${ac2pub}/32 next-hop 1.1.1.1
@@ -845,6 +925,10 @@ set protocols static route ${natpe1lo}/32 next-hop ${pe1ip1} track to-main
 set protocols static route ${natpe1lo}/32 next-hop ${pe2ip1} distance 5
 set protocols static route ${natpe2lo}/32 next-hop ${pe1ip1} track to-main
 set protocols static route ${natpe2lo}/32 next-hop ${pe2ip1} distance 5
+echo '>>>海外双出口路由<<<'
+set protocols static route 2.2.2.2/32 next-hop ${natpe1ip1} track to-pub1
+set protocols static route 2.2.2.2/32 next-hop ${natpe2ip1} distance 5
+set protocols static table 200 route 0.0.0.0/0 next-hop 2.2.2.2
 echo '>>>监控系统路由<<<'
 set protocols static route 114.113.245.99/32 next-hop ${pe1ip1}
 set protocols static route 114.113.245.100/32 next-hop ${pe2ip1}
@@ -858,71 +942,112 @@ set protocols static route 192.168.237.78/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.237.78/32 next-hop ${pe2ip1} distance 5
 set protocols static route 192.168.237.86/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.237.86/32 next-hop ${pe2ip1} distance 5
-echo '5G WIFI SSID: sdwan PASSWD: 123456@sdwan'
-set interfaces wireless wlan1 address '192.168.9.1/24'
-set interfaces wireless wlan1 channel '0'
-set interfaces wireless wlan1 country-code 'cn'
-set interfaces wireless wlan1 dhcp-options client-id 'sdwan'
-set interfaces wireless wlan1 hw-id 'cc:d3:9d:99:ff:61'
-set interfaces wireless wlan1 mode 'ac'
-set interfaces wireless wlan1 physical-device 'phy0'
-set interfaces wireless wlan1 security wpa mode 'wpa2'
-set interfaces wireless wlan1 security wpa passphrase '123456@sdwan'
-set interfaces wireless wlan1 ssid 'sdwan'
-set interfaces wireless wlan1 type 'access-point'
-echo '2.4G WIFI 600M传输距离远'
-set interfaces wireless wlan1 mode 'n'
-echo 'LAN DHCP Server Range: 2-100'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 description 'dhcp_br2'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 default-router '192.168.8.1'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 lease '86400'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server ${oversea1dns}
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server ${oversea2dns}
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 start '192.168.8.2'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 stop '192.168.8.100'
-echo '192.168.9.101  54:05:db:b4:4a:41 dhcp_wlan1  iPhone'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 101 ip-address '192.168.9.101'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 101 mac-address '54:05:db:b4:4a:41'
-set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 static-mapping 101 static-mapping-parameters 'option domain-name-servers ${oversea1dns}, ${oversea2dns};'
-echo '192.168.8.101  55:05:db:b4:4a:40 dhcp_br2  iPhone'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 1101 ip-address '192.168.8.101'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 1101 mac-address '55:05:db:b4:4a:43'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 static-mapping 1101 static-mapping-parameters 'option domain-name-servers ${oversea1dns}, ${oversea2dns};'
-echo 'Table 100 to ${natpe1}'
-set protocols static table 100 route 0.0.0.0/0 next-hop ${natpe1ip1}
-set policy local-route rule 101 set table '100'
-set policy local-route rule 101 source '192.168.9.101'
-echo 'Table 200 to ${natpe2}'
-set protocols static table 200 route 0.0.0.0/0 next-hop ${natpe2ip1}
-set policy local-route rule 201 set table '200'
-set policy local-route rule 201 source '192.168.9.201'
-#
+echo '>>>NetFlow<<<'
+set protocols static route 10.100.114.12/32 next-hop ${pe1ip1} track to-main
+set protocols static route 10.100.114.12/32 next-hop ${pe2ip1} distance 5
+echo 'Table 201 to ${natpe1}'
+set protocols static table 201 route 0.0.0.0/0 next-hop ${natpe1ip1}
+set policy local-route rule 201 set table '201'
+set policy local-route rule 201 source ${oversea1ip1}
+echo 'Table 202 to ${natpe2}'
+set protocols static table 202 route 0.0.0.0/0 next-hop ${natpe2ip1}
+set policy local-route rule 202 set table '200'
+set policy local-route rule 202 source ${oversea1ip2}
+echo '>>>动态路由配置[BGP]<<<'
+set protocols static route 10.10.99.200/32 next-hop ${pe1ip1}
+set protocols static route 10.10.99.202/32 next-hop ${pe1ip1}
+set protocols static route 10.10.99.201/32 next-hop ${pe2ip1}
+set protocols static route 10.10.99.203/32 next-hop ${pe2ip1}
+set policy community-list 80 rule 10 action 'permit'
+set policy community-list 80 rule 10 description 'to_hk'
+set policy community-list 80 rule 10 regex '65000:9939'
+set policy community-list 81 rule 10 action 'permit'
+set policy community-list 81 rule 10 description 'to_ct'
+set policy community-list 81 rule 10 regex '65000:4134'
+set policy community-list 82 rule 10 action 'permit'
+set policy community-list 82 rule 10 description 'to_cnc'
+set policy community-list 82 rule 10 regex '65000:4837'
+set policy community-list 83 rule 10 action 'permit'
+set policy community-list 83 rule 10 description 'to_cn_other'
+set policy community-list 83 rule 10 regex '65000:9808'
+set policy route-map bgp-from--RSVR rule 100 action 'permit'
+set policy route-map bgp-from--RSVR rule 100 description 'to_hk'
+set policy route-map bgp-from--RSVR rule 100 match community community-list '80'
+set policy route-map bgp-from--RSVR rule 100 set ip-next-hop 2.2.2.2
+set policy route-map bgp-from--RSVR rule 200 action 'permit'
+set policy route-map bgp-from--RSVR rule 200 description 'to_ct'
+set policy route-map bgp-from--RSVR rule 200 match community community-list '81'
+set policy route-map bgp-from--RSVR rule 200 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR rule 300 action 'permit'
+set policy route-map bgp-from--RSVR rule 300 description 'to_cnc'
+set policy route-map bgp-from--RSVR rule 300 match community community-list '82'
+set policy route-map bgp-from--RSVR rule 300 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR rule 400 action 'permit'
+set policy route-map bgp-from--RSVR rule 400 description 'to_cn_other'
+set policy route-map bgp-from--RSVR rule 400 match community community-list '83'
+set policy route-map bgp-from--RSVR rule 400 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR2 rule 100 action 'permit'
+set policy route-map bgp-from--RSVR2 rule 100 description 'to_hk'
+set policy route-map bgp-from--RSVR2 rule 100 match community community-list '80'
+set policy route-map bgp-from--RSVR2 rule 100 set ip-next-hop 2.2.2.2
+set policy route-map bgp-from--RSVR2 rule 100 set local-preference '50'
+set policy route-map bgp-from--RSVR2 rule 200 action 'permit'
+set policy route-map bgp-from--RSVR2 rule 200 description 'to_ct'
+set policy route-map bgp-from--RSVR2 rule 200 match community community-list '81'
+set policy route-map bgp-from--RSVR2 rule 200 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR2 rule 200 set local-preference '50'
+set policy route-map bgp-from--RSVR2 rule 300 action 'permit'
+set policy route-map bgp-from--RSVR2 rule 300 description 'to_cnc'
+set policy route-map bgp-from--RSVR2 rule 300 match community community-list '82'
+set policy route-map bgp-from--RSVR2 rule 300 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR2 rule 300 set local-preference '50'
+set policy route-map bgp-from--RSVR2 rule 400 action 'permit'
+set policy route-map bgp-from--RSVR2 rule 400 description 'to_cn_other'
+set policy route-map bgp-from--RSVR2 rule 400 match community community-list '83'
+set policy route-map bgp-from--RSVR2 rule 400 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR2 rule 400 set local-preference '50'
+set protocols bgp 65000 neighbor 10.10.99.200 peer-group 'RSVR'
+set protocols bgp 65000 neighbor 10.10.99.201 peer-group 'RSVR'
+set protocols bgp 65000 neighbor 10.10.99.202 peer-group 'RSVR2'
+set protocols bgp 65000 neighbor 10.10.99.203 peer-group 'RSVR2'
+set protocols bgp 65000 parameters router-id ${pe1ip2}
+set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast route-map import 'bgp-from--RSVR'
+set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast soft-reconfiguration inbound
+set protocols bgp 65000 peer-group RSVR remote-as '65000'
+set protocols bgp 65000 peer-group RSVR update-source ${pe1ip2}
+set protocols bgp 65000 peer-group RSVR2 address-family ipv4-unicast route-map import 'bgp-from--RSVR2'
+set protocols bgp 65000 peer-group RSVR2 address-family ipv4-unicast soft-reconfiguration inbound
+set protocols bgp 65000 peer-group RSVR2 remote-as '65000'
+set protocols bgp 65000 peer-group RSVR2 update-source ${pe2ip2}
+set protocols bgp 65000 timers holdtime '15'
+set protocols bgp 65000 timers keepalive '60'
 echo '>>>DNS劫持<<<'
-set nat destination rule 50 inbound-interface 'eth0'
+set nat destination rule 50 inbound-interface 'br2'
 set nat destination rule 50 destination port 53
 set nat destination rule 50 protocol tcp_udp
 set nat destination rule 50 translation address '192.168.8.1'
-#
 echo '>>>本地NAT<<<'
 set nat source rule 100 outbound-interface 'eth0'
 set nat source rule 100 translation address 'masquerade'
 echo '# 海外NAT<<<'
 set nat source rule 1999 outbound-interface ${natpe1if}
+set nat source rule 1999 destination address '!192.168.0.0/16'
 set nat source rule 1999 translation address ${oversea1ip1}
 set nat source rule 2999 outbound-interface ${natpe2if}
+set nat source rule 2999 destination address '!192.168.0.0/16'
 set nat source rule 2999 translation address ${oversea2ip1}
-echo '>>>MAC 绑定 NAT<<<'
-set nat source rule 101 source address 192.168.9.101/32
-set nat source rule 101 outbound-interface ${natpe1if}
-set nat source rule 101 translation address ${oversea1ip1}
-#
-set nat source rule 201 source address 192.168.9.201/32
-set nat source rule 201 outbound-interface ${natpe2if}
-set nat source rule 201 translation address ${oversea2ip1}
 echo '# 分流DNS配置<<<'
-${smartdnsTemp}
 delete system name-server
 set system name-server 192.168.8.1
+${smartdnsTemp}
+echo 'LAN DHCP Server Range: 2-100'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 description 'dhcp_br2'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 default-router '192.168.8.1'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 lease '7200'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server '192.168.8.1'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 start '192.168.8.2'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 stop '192.168.8.100'
+
 ###AdGuardHome DNS解决客户需要自行管理DNS问题###
 add container image adguard/adguardhome
 #
@@ -1023,97 +1148,6 @@ Top：WIFI---CE---Module \n\
 Install By: ${user} \n\
 Last Change By: ${user} ${time.cn} \n\
 ################"
-
-###########
-#  测试   #
-###########
-Ping测试：
-sudo ping ${ac1ip1} -i 0.1 -c 100 -q -s 1500
-sudo ping ${ac2ip1} -i 0.1 -c 100 -q
-sudo ping ${pe1ip1} -i 0.1 -c 100 -q -s 1500
-sudo ping ${pe2ip1} -i 0.1 -c 100 -q -s 1500
-sudo ping ${natpe1ip1} -i 0.1 -c 100 -q -s 1500
-sudo ping www.yahoo.com -i 0.1 -c 100 -q -s 1500
-网站测速:
-https://www.speedtest.net
-https://fast.com
-https://www.att.com/support/speedtest
-SmartPing监控：
-阿里DNS：223.5.5.5
-谷歌DNS：8.8.8.8
-主线Pub: ${ac1pub}
-备线Pub: ${ac2pub}
-${natpe1}: ${natpe1ip1}
-##############
-如果客户需要BGP分流
-echo '>>>动态路由配置[BGP]<<<'
-set protocols static route 10.10.99.200/32 next-hop ${pe1ip1}
-set protocols static route 10.10.99.202/32 next-hop ${pe1ip1}
-set protocols static route 10.10.99.201/32 next-hop ${pe2ip1}
-set protocols static route 10.10.99.203/32 next-hop ${pe2ip1}
-set policy community-list 80 rule 10 action 'permit'
-set policy community-list 80 rule 10 description 'to_hk'
-set policy community-list 80 rule 10 regex '65000:9939'
-set policy community-list 81 rule 10 action 'permit'
-set policy community-list 81 rule 10 description 'to_ct'
-set policy community-list 81 rule 10 regex '65000:4134'
-set policy community-list 82 rule 10 action 'permit'
-set policy community-list 82 rule 10 description 'to_cnc'
-set policy community-list 82 rule 10 regex '65000:4837'
-set policy community-list 83 rule 10 action 'permit'
-set policy community-list 83 rule 10 description 'to_cn_other'
-set policy community-list 83 rule 10 regex '65000:9808'
-set policy route-map bgp-from--RSVR rule 100 action 'permit'
-set policy route-map bgp-from--RSVR rule 100 description 'to_hk'
-set policy route-map bgp-from--RSVR rule 100 match community community-list '80'
-set policy route-map bgp-from--RSVR rule 100 set ip-next-hop ${natpe1ip1}
-set policy route-map bgp-from--RSVR rule 200 action 'permit'
-set policy route-map bgp-from--RSVR rule 200 description 'to_ct'
-set policy route-map bgp-from--RSVR rule 200 match community community-list '81'
-set policy route-map bgp-from--RSVR rule 200 set ip-next-hop 1.1.1.1
-set policy route-map bgp-from--RSVR rule 300 action 'permit'
-set policy route-map bgp-from--RSVR rule 300 description 'to_cnc'
-set policy route-map bgp-from--RSVR rule 300 match community community-list '82'
-set policy route-map bgp-from--RSVR rule 300 set ip-next-hop 1.1.1.1
-set policy route-map bgp-from--RSVR rule 400 action 'permit'
-set policy route-map bgp-from--RSVR rule 400 description 'to_cn_other'
-set policy route-map bgp-from--RSVR rule 400 match community community-list '83'
-set policy route-map bgp-from--RSVR rule 400 set ip-next-hop 1.1.1.1
-set policy route-map bgp-from--RSVR2 rule 100 action 'permit'
-set policy route-map bgp-from--RSVR2 rule 100 description 'to_hk'
-set policy route-map bgp-from--RSVR2 rule 100 match community community-list '80'
-set policy route-map bgp-from--RSVR2 rule 100 set ip-next-hop ${natpe2ip1}
-set policy route-map bgp-from--RSVR2 rule 100 set local-preference '50'
-set policy route-map bgp-from--RSVR2 rule 200 action 'permit'
-set policy route-map bgp-from--RSVR2 rule 200 description 'to_ct'
-set policy route-map bgp-from--RSVR2 rule 200 match community community-list '81'
-set policy route-map bgp-from--RSVR2 rule 200 set ip-next-hop 1.1.1.1
-set policy route-map bgp-from--RSVR2 rule 200 set local-preference '50'
-set policy route-map bgp-from--RSVR2 rule 300 action 'permit'
-set policy route-map bgp-from--RSVR2 rule 300 description 'to_cnc'
-set policy route-map bgp-from--RSVR2 rule 300 match community community-list '82'
-set policy route-map bgp-from--RSVR2 rule 300 set ip-next-hop 1.1.1.1
-set policy route-map bgp-from--RSVR2 rule 300 set local-preference '50'
-set policy route-map bgp-from--RSVR2 rule 400 action 'permit'
-set policy route-map bgp-from--RSVR2 rule 400 description 'to_cn_other'
-set policy route-map bgp-from--RSVR2 rule 400 match community community-list '83'
-set policy route-map bgp-from--RSVR2 rule 400 set ip-next-hop 1.1.1.1
-set policy route-map bgp-from--RSVR2 rule 400 set local-preference '50'
-set protocols bgp 65000 neighbor 10.10.99.200 peer-group 'RSVR'
-set protocols bgp 65000 neighbor 10.10.99.201 peer-group 'RSVR'
-set protocols bgp 65000 neighbor 10.10.99.202 peer-group 'RSVR2'
-set protocols bgp 65000 neighbor 10.10.99.203 peer-group 'RSVR2'
-set protocols bgp 65000 parameters router-id ${pe1ip2}
-set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast route-map import 'bgp-from--RSVR'
-set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast soft-reconfiguration inbound
-set protocols bgp 65000 peer-group RSVR remote-as '65000'
-set protocols bgp 65000 peer-group RSVR update-source ${pe1ip2}
-set protocols bgp 65000 peer-group RSVR2 address-family ipv4-unicast route-map import 'bgp-from--RSVR2'
-set protocols bgp 65000 peer-group RSVR2 address-family ipv4-unicast soft-reconfiguration inbound
-set protocols bgp 65000 peer-group RSVR2 remote-as '65000'
-set protocols bgp 65000 peer-group RSVR2 update-source ${pe2ip2}
-set protocols bgp 65000 timers holdtime '15'
-set protocols bgp 65000 timers keepalive '60'
 `;
   let filename = `${lineid}-Fast-SD-WAN-FastIP-GREOverOpenVPN-Config-${time.ez}-By-${user}`;
   let data = {};

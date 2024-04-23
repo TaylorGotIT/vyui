@@ -307,15 +307,17 @@ delete policy
 delete track
 delete service dns
 echo '基础配置[防火墙规则，系统名称，物理接口]'
-set firewall group network-group GROUP-FNET-Whitelist network 202.104.174.178/32
-set firewall group network-group GROUP-FNET-Whitelist network 114.112.232.0/23
-set firewall group network-group GROUP-FNET-Whitelist network 114.112.236.0/22
-set firewall group network-group GROUP-FNET-Whitelist network 114.113.240.0/23
-set firewall group network-group GROUP-FNET-Whitelist network 114.113.244.0/23
-set firewall group network-group GROUP-FNET-Whitelist network 223.252.176.0/24
-set firewall group network-group GROUP-FNET-Whitelist network 10.0.0.0/8
-set firewall group network-group GROUP-FNET-Whitelist network 172.16.0.0/12
-set firewall group network-group GROUP-FNET-Whitelist network 192.168.0.0/16
+set firewall group network-group GROUP-FNET-Whitelist network '43.229.117.226/32'
+set firewall group network-group GROUP-FNET-Whitelist network '43.229.119.251/32'
+set firewall group network-group GROUP-FNET-Whitelist network '112.93.250.2/32'
+set firewall group network-group GROUP-FNET-Whitelist network '121.46.244.5/32'
+set firewall group network-group GROUP-FNET-Whitelist network '120.76.31.146/32'
+set firewall group network-group GROUP-FNET-Whitelist network '202.104.174.178/32'
+set firewall group network-group GROUP-FNET-Whitelist network '114.112.238.8/29'
+set firewall group network-group GROUP-FNET-Whitelist network '10.0.0.0/8'
+set firewall group network-group GROUP-FNET-Whitelist network '100.68.250.0/24'
+set firewall group network-group GROUP-FNET-Whitelist network '172.16.0.0/12'
+set firewall group network-group GROUP-FNET-Whitelist network '192.168.0.0/16'
 set firewall name WAN2LOCAL default-action 'accept'
 set firewall name WAN2LOCAL rule 1000 action 'accept'
 set firewall name WAN2LOCAL rule 1000 source group network-group 'GROUP-FNET-Whitelist'

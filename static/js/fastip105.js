@@ -612,6 +612,19 @@ set service ssh acl permit '113.105.190.147/32'
 set service ssh acl permit '114.112.238.8/29'
 set service ssh acl permit '114.113.245.101/32'
 set service ssh acl permit '120.76.31.146/32'
+set system flow-accounting interface eth2
+set system flow-accounting netflow engine-id '1'
+set system flow-accounting netflow server 10.100.114.12 port '9995'
+set system flow-accounting netflow timeout expiry-interval '60'
+set system flow-accounting netflow timeout flow-generic '10'
+set system flow-accounting netflow timeout icmp '300'
+set system flow-accounting netflow timeout max-active-life '604800'
+set system flow-accounting netflow timeout tcp-fin '300'
+set system flow-accounting netflow timeout tcp-generic '3600'
+set system flow-accounting netflow timeout tcp-rst '120'
+set system flow-accounting netflow timeout udp '120'
+set system flow-accounting netflow version '9'
+set system flow-accounting syslog-facility 'daemon'
 set system syslog global facility all level 'info'
 set system syslog host 192.168.237.78 facility protocols level 'debug'
 set openfalcon server-address 192.168.237.86
@@ -770,15 +783,17 @@ let fastip105fastipGreOverOpenvpn  = String.raw
 +++++++++++++++++++++++++++++++++++++++++++
 ${imageTemp}
 echo '基础配置[防火墙规则，系统名称，物理接口]'
-set firewall group network-group GROUP-FNET-Whitelist network 202.104.174.178/32
-set firewall group network-group GROUP-FNET-Whitelist network 114.112.232.0/23
-set firewall group network-group GROUP-FNET-Whitelist network 114.112.236.0/22
-set firewall group network-group GROUP-FNET-Whitelist network 114.113.240.0/23
-set firewall group network-group GROUP-FNET-Whitelist network 114.113.244.0/23
-set firewall group network-group GROUP-FNET-Whitelist network 223.252.176.0/24
-set firewall group network-group GROUP-FNET-Whitelist network 10.0.0.0/8
-set firewall group network-group GROUP-FNET-Whitelist network 172.16.0.0/12
-set firewall group network-group GROUP-FNET-Whitelist network 192.168.0.0/16
+set firewall group network-group GROUP-FNET-Whitelist network '43.229.117.226/32'
+set firewall group network-group GROUP-FNET-Whitelist network '43.229.119.251/32'
+set firewall group network-group GROUP-FNET-Whitelist network '112.93.250.2/32'
+set firewall group network-group GROUP-FNET-Whitelist network '121.46.244.5/32'
+set firewall group network-group GROUP-FNET-Whitelist network '120.76.31.146/32'
+set firewall group network-group GROUP-FNET-Whitelist network '202.104.174.178/32'
+set firewall group network-group GROUP-FNET-Whitelist network '114.112.238.8/29'
+set firewall group network-group GROUP-FNET-Whitelist network '10.0.0.0/8'
+set firewall group network-group GROUP-FNET-Whitelist network '100.68.250.0/24'
+set firewall group network-group GROUP-FNET-Whitelist network '172.16.0.0/12'
+set firewall group network-group GROUP-FNET-Whitelist network '192.168.0.0/16'
 set firewall name WAN2LOCAL default-action 'accept'
 set firewall name WAN2LOCAL rule 1000 action 'accept'
 set firewall name WAN2LOCAL rule 1000 source group network-group 'GROUP-FNET-Whitelist'
@@ -874,6 +889,8 @@ set protocols static route 192.168.237.78/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.237.78/32 next-hop ${pe2ip1} distance 5
 set protocols static route 192.168.237.86/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.237.86/32 next-hop ${pe2ip1} distance 5
+set protocols static route 10.100.114.12/32 next-hop ${pe1ip1} track to-main
+set protocols static route 10.100.114.12/32 next-hop ${pe2ip1} distance 5
 echo '5G WIFI SSID: sdwan PASSWD: 123456@sdwan'
 set interfaces wireless wlan1 address '192.168.9.1/24'
 set interfaces wireless wlan1 channel '0'
