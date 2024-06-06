@@ -981,9 +981,12 @@ set firewall name WAN2LOCAL rule 4000 action 'drop'
 set firewall name WAN2LOCAL rule 4000 destination port '1723,3124,3127,3128,3389,5000,8080,31337'
 set firewall name WAN2LOCAL rule 4000 protocol 'tcp_udp'
 set interfaces ethernet ${wan1} firewall local name 'WAN2LOCAL'
+set interfaces tunnel ${ac1if} firewall local name 'WAN2LOCAL'
+set interfaces tunnel ${ac2if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe1if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe2if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${natpe1if} firewall local name 'WAN2LOCAL'
+set interfaces tunnel ${natpe2if} firewall local name 'WAN2LOCAL'
 set system host-name ${lineid}-${cname}-${area}
 set service snmp community both-win authorization 'ro'
 set interfaces loopback lo address ${natce1lo}/32
@@ -994,10 +997,15 @@ ${greTemp}
 echo '>>>MTU TCP-MSS配置[interface] 看情况配置<<<'
 # set firewall options interface ${ac1if} adjust-mss 1300
 # set firewall options interface ${ac2if} adjust-mss 1300
+# set interfaces tunnel ${pe1if} mtu 1400
+# set interfaces tunnel ${pe1if} mtu 1400
+# set interfaces tunnel ${natpe1if} mtu 1360
+# set interfaces tunnel ${natpe2if} mtu 1360
 # set firewall options interface ${pe1if} adjust-mss 1300
 # set firewall options interface ${pe2if} adjust-mss 1300
 # set firewall options interface ${natpe1if} adjust-mss 1300
-# set interfaces tunnel ${natpe1if} mtu 1360
+# set firewall options interface ${natpe2if} adjust-mss 1300
+
 echo '>>>路由配置[Track 默认路由，对接公网路由，内网路由]<<<'
 set protocols static route 223.5.5.5/32 next-hop 1.1.1.1
 set track name to-223 failure-count 2
