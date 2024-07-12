@@ -591,21 +591,33 @@ conf
 echo '基础配置[防火墙规则，系统名称，物理接口]'
 set firewall group network-group GROUP-FNET-Whitelist network '43.229.117.226/32'
 set firewall group network-group GROUP-FNET-Whitelist network '43.229.119.251/32'
-set firewall group network-group GROUP-FNET-Whitelist network '112.93.250.2/32'
-set firewall group network-group GROUP-FNET-Whitelist network '121.46.244.5/32'
 set firewall group network-group GROUP-FNET-Whitelist network '120.76.31.146/32'
 set firewall group network-group GROUP-FNET-Whitelist network '202.104.174.178/32'
+set firewall group network-group GROUP-FNET-Whitelist network '114.112.236.97/32'
 set firewall group network-group GROUP-FNET-Whitelist network '114.112.238.8/29'
+set firewall group network-group GROUP-FNET-Whitelist network '192.168.55.250/32'
+set firewall group network-group GROUP-FNET-Whitelist network '192.168.55.10/32'
+set firewall group network-group GROUP-FNET-Whitelist network '192.168.55.11/32'
+set firewall group network-group GROUP-FNET-Whitelist network '114.113.245.99/32'
+set firewall group network-group GROUP-FNET-Whitelist network '114.113.245.100/32'
+set firewall group network-group GROUP-FNET-Whitelist network '114.113.245.101/32'
 set firewall group network-group GROUP-FNET-Whitelist network '10.0.0.0/8'
-set firewall group network-group GROUP-FNET-Whitelist network '100.68.250.0/24'
 set firewall group network-group GROUP-FNET-Whitelist network '172.16.0.0/12'
 set firewall group network-group GROUP-FNET-Whitelist network '192.168.0.0/16'
-set firewall name WAN2LOCAL default-action 'accept'
-set firewall name WAN2LOCAL rule 1000 action 'accept'
-set firewall name WAN2LOCAL rule 1000 source group network-group 'GROUP-FNET-Whitelist'
-set firewall name WAN2LOCAL rule 2000 action 'drop'
-set firewall name WAN2LOCAL rule 2000 destination port '179,2707,53,161,123,8899'
-set firewall name WAN2LOCAL rule 2000 protocol 'tcp_udp'
+set firewall group network-group GROUP-FNET-Whitelist network '100.68.250.0/24'
+set firewall group network-group GROUP-FNET-Whitelist network '224.0.0.0/4'
+
+set firewall name WAN2LOCAL default-action 'drop'
+set firewall name WAN2LOCAL rule 1005 action 'accept'
+set firewall name WAN2LOCAL rule 1005 state established 'enable'
+set firewall name WAN2LOCAL rule 1005 state related 'enable'
+set firewall name WAN2LOCAL rule 1010 action 'accept'
+set firewall name WAN2LOCAL rule 1010 source group network-group 'GROUP-FNET-Whitelist'
+set firewall name WAN2LOCAL rule 1210 action 'accept'
+set firewall name WAN2LOCAL rule 1210 protocol 'gre'
+set firewall name WAN2LOCAL rule 1220 action 'accept'
+set firewall name WAN2LOCAL rule 1220 protocol 'ipip'
+
 set interfaces ethernet ${wan1} firewall local name 'WAN2LOCAL'
 set interfaces openvpn ${ac1if} firewall local name 'WAN2LOCAL'
 set interfaces openvpn ${ac2if} firewall local name 'WAN2LOCAL'
@@ -627,7 +639,7 @@ set track name to-223 failure-count 2
 set track name to-223 success-count 2
 set track name to-223 test 10 resp-time 5
 set track name to-223 test 10 target 223.5.5.5
-set track name to-223 test 10 ttl-limit 1
+set track name to-223 test 10 ttl-limit 200
 set track name to-223 test 10 type ping
 set track name to-main failure-count 2
 set track name to-main success-count 2
