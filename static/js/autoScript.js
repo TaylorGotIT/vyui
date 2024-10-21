@@ -417,6 +417,30 @@ function getTempJS(value){
                 console.log("mpls002 未下载");
             };
             break;
+        case "fortinet_mpls001":
+            try{
+                if($.isFunction(fortinet_mpls001sub)){
+                    $("#service_dev").append(fortinet_mpls001html);
+                    console.log("fortinet_mpls001 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("fortinet_mpls001 未下载");
+            };
+            break;
+        case "sslvpn001":
+            try{
+                if($.isFunction(sslvpn001sub)){
+                    $("#service_dev").append(sslvpn001html);
+                    console.log("sslvpn001 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("sslvpn001 未下载");
+            };
+            break;
         case "dhcp032":
             try{
                 if($.isFunction(mpls002sub)){

@@ -504,7 +504,7 @@ set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
 }
 
 openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
-set interfaces openvpn ${ac1if} description AC1_${ac1}
+set interfaces openvpn ${ac1if} description 'AC1 ${ac1}'
 set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
 set interfaces openvpn ${ac1if} remote-address ${ac1ip1}
 set interfaces openvpn ${ac1if} remote-host ${ac1pub}
@@ -518,7 +518,7 @@ set interfaces openvpn ${ac1if} openvpn-option '--persist-tun'
 #set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300'
 set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
 echo 'OpenVPN 接入配置[ac2]'
-set interfaces openvpn ${ac2if} description AC2_${ac2}
+set interfaces openvpn ${ac2if} description 'AC2 ${ac2}'
 set interfaces openvpn ${ac2if} local-address ${ac2ip2} subnet-mask 255.255.255.252
 set interfaces openvpn ${ac2if} remote-address ${ac2ip1}
 set interfaces openvpn ${ac2if} remote-host ${ac2pub}
@@ -533,7 +533,7 @@ set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
 set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
 
 greTemp += `echo '>>>GRE 配置[Main]<<<'
-set interfaces tunnel ${pe1if} description PE1_${pe1}
+set interfaces tunnel ${pe1if} description 'PE1 ${pe1}'
 set interfaces tunnel ${pe1if} address ${pe1ip2}/30
 set interfaces tunnel ${pe1if} source-address ${ac1ip2}
 set interfaces tunnel ${pe1if} remote ${pe1lo}
@@ -541,7 +541,7 @@ set interfaces tunnel ${pe1if} encapsulation gre
 set interfaces tunnel ${pe1if} multicast disable
 set interfaces tunnel ${pe1if} parameters ip ttl 255
 echo '>>>GRE 配置[Backup]<<<'
-set interfaces tunnel ${pe2if} description PE2_${pe2}
+set interfaces tunnel ${pe2if} description 'PE2 ${pe2}'
 set interfaces tunnel ${pe2if} address ${pe2ip2}/30
 set interfaces tunnel ${pe2if} source-address ${ac2ip2}
 set interfaces tunnel ${pe2if} remote ${pe2lo}
@@ -549,7 +549,7 @@ set interfaces tunnel ${pe2if} encapsulation gre
 set interfaces tunnel ${pe2if} multicast disable
 set interfaces tunnel ${pe2if} parameters ip ttl 255
 echo '>>>GRE 配置[${natpe1}]<<<'
-set interfaces tunnel ${natpe1if} description ${natpe1}
+set interfaces tunnel ${natpe1if} description 'NATPE1 ${natpe1}'
 set interfaces tunnel ${natpe1if} address ${natpe1ip2}/30
 set interfaces tunnel ${natpe1if} source-address ${natce1lo}
 set interfaces tunnel ${natpe1if} remote ${natpe1lo}
@@ -557,7 +557,7 @@ set interfaces tunnel ${natpe1if} encapsulation gre
 set interfaces tunnel ${natpe1if} multicast disable
 set interfaces tunnel ${natpe1if} parameters ip ttl 255
 echo '>>>GRE 配置[${natpe2}]<<<'
-set interfaces tunnel ${natpe2if} description ${natpe2}
+set interfaces tunnel ${natpe2if} description 'NATPE2 ${natpe2}'
 set interfaces tunnel ${natpe2if} address ${natpe2ip2}/30
 set interfaces tunnel ${natpe2if} source-address ${natce2lo}
 set interfaces tunnel ${natpe2if} remote ${natpe2lo}
@@ -735,7 +735,7 @@ set service dns dnsmasq name-server ${oversea2dns}`;
     break;
     case "31":
 openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
-set interfaces openvpn ${ac1if} description AC1_${ac1}
+set interfaces openvpn ${ac1if} description 'AC1 ${ac1}'
 set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
 set interfaces openvpn ${ac1if} remote-address ${ac1ip1}
 set interfaces openvpn ${ac1if} remote-host ${ac1pub}
@@ -747,7 +747,7 @@ set interfaces openvpn ${ac1if} openvpn-option '--persist-tun'
 #set interfaces openvpn ${ac1if} openvpn-option 'tun-mtu 1420'
 set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
 echo 'OpenVPN 接入配置[ac2]'
-set interfaces openvpn ${ac2if} description AC2_${ac2}
+set interfaces openvpn ${ac2if} description 'AC2 ${ac2}'
 set interfaces openvpn ${ac2if} local-address ${ac2ip2} subnet-mask 255.255.255.252
 set interfaces openvpn ${ac2if} remote-address ${ac2ip1}
 set interfaces openvpn ${ac2if} remote-host ${ac2pub}
@@ -760,7 +760,7 @@ set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
 set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
 
 greTemp += `echo '>>>GRE 配置[Main]<<<'
-set interfaces tunnel ${pe1if} description PE1_${pe1}
+set interfaces tunnel ${pe1if} description ‘PE1 ${pe1}’
 set interfaces tunnel ${pe1if} address ${pe1ip2}/30
 set interfaces tunnel ${pe1if} local-ip ${ac1ip2}
 set interfaces tunnel ${pe1if} remote-ip ${pe1lo}
@@ -768,7 +768,7 @@ set interfaces tunnel ${pe1if} encapsulation gre
 set interfaces tunnel ${pe1if} multicast disable
 set interfaces tunnel ${pe1if} parameters ip ttl 255
 echo '>>>GRE 配置[Backup]<<<'
-set interfaces tunnel ${pe2if} description PE2_${pe2}
+set interfaces tunnel ${pe2if} description 'PE2 ${pe2}'
 set interfaces tunnel ${pe2if} address ${pe2ip2}/30
 set interfaces tunnel ${pe2if} local-ip ${ac2ip2}
 set interfaces tunnel ${pe2if} remote-ip ${pe2lo}
@@ -776,7 +776,7 @@ set interfaces tunnel ${pe2if} encapsulation gre
 set interfaces tunnel ${pe2if} multicast disable
 set interfaces tunnel ${pe2if} parameters ip ttl 255
 echo '>>>GRE 配置[${natpe1}]<<<'
-set interfaces tunnel ${natpe1if} description ${natpe1}
+set interfaces tunnel ${natpe1if} description 'NATPE1 ${natpe1}'
 set interfaces tunnel ${natpe1if} address ${natpe1ip2}/30
 set interfaces tunnel ${natpe1if} local-ip ${natce1lo}
 set interfaces tunnel ${natpe1if} remote-ip ${natpe1lo}
@@ -784,7 +784,7 @@ set interfaces tunnel ${natpe1if} encapsulation gre
 set interfaces tunnel ${natpe1if} multicast disable
 set interfaces tunnel ${natpe1if} parameters ip ttl 255
 echo '>>>GRE 配置[${natpe2}]<<<'
-set interfaces tunnel ${natpe2if} description ${natpe2}
+set interfaces tunnel ${natpe2if} description 'NATPE1 ${natpe2}'
 set interfaces tunnel ${natpe2if} address ${natpe2ip2}/30
 set interfaces tunnel ${natpe2if} local-ip ${natce2lo}
 set interfaces tunnel ${natpe2if} remote-ip ${natpe2lo}
@@ -898,10 +898,10 @@ ${greTemp}
 echo '>>>MTU TCP-MSS配置[interface] 看情况配置<<<'
 # set firewall options interface ${ac1if} adjust-mss 1300
 # set firewall options interface ${ac2if} adjust-mss 1300
-# set interfaces tunnel ${pe1if} mtu 1400
-# set interfaces tunnel ${pe1if} mtu 1400
-# set interfaces tunnel ${natpe1if} mtu 1360
-# set interfaces tunnel ${natpe2if} mtu 1360
+# set interfaces tunnel ${pe1if} mtu 1476
+# set interfaces tunnel ${pe2if} mtu 1476
+# set interfaces tunnel ${natpe1if} mtu 1452
+# set interfaces tunnel ${natpe2if} mtu 1452
 # set firewall options interface ${pe1if} adjust-mss 1300
 # set firewall options interface ${pe2if} adjust-mss 1300
 # set firewall options interface ${natpe1if} adjust-mss 1300
@@ -957,14 +957,36 @@ set protocols static route 192.168.237.86/32 next-hop ${pe2ip1} distance 5
 echo '>>>NetFlow<<<'
 set protocols static route 10.100.114.12/32 next-hop ${pe1ip1} track to-main
 set protocols static route 10.100.114.12/32 next-hop ${pe2ip1} distance 5
-echo 'Table 201 to ${natpe1}'
-set protocols static table 201 route 0.0.0.0/0 next-hop ${natpe1ip1}
-set policy local-route rule 201 set table '201'
-set policy local-route rule 201 source ${oversea1ip1}
-echo 'Table 202 to ${natpe2}'
-set protocols static table 202 route 0.0.0.0/0 next-hop ${natpe2ip1}
-set policy local-route rule 202 set table '200'
-set policy local-route rule 202 source ${oversea1ip2}
+echo '默认路由'
+set protocols static route 2.2.2.2/32 next-hop ${natpe1ip1} track to-pub1
+set protocols static route 2.2.2.2/32 next-hop ${natpe2ip1}
+set protocols static route 0.0.0.0/0 next-hop 2.2.2.2
+echo '>>>内网监控策略<<<'
+# AC1
+set protocols static table 1 route 0.0.0.0/0 next-hop ${ac1ip1}
+set policy local-route rule 1 set table 1
+set policy local-route rule 1 source ${ac1ip2}
+# AC2
+set protocols static table 2 route 0.0.0.0/0 next-hop ${ac2ip1}
+set policy local-route rule 2 set table 2
+set policy local-route rule 2 source ${ac2ip2}
+# PE1
+set protocols static table 3 route 0.0.0.0/0 next-hop ${pe1ip1}
+set policy local-route rule 3 set table 3
+set policy local-route rule 3 source ${pe1ip2}
+# PE2
+set protocols static table 4 route 0.0.0.0/0 next-hop ${pe2ip1}
+set policy local-route rule 4 set table 4
+set policy local-route rule 4 source ${pe2ip2}
+# NATPE1
+set protocols static table 5 route 0.0.0.0/0 next-hop ${natpe1ip1}
+set policy local-route rule 5 set table 5
+set policy local-route rule 5 source ${natpe1ip2}
+# NATPE2
+set protocols static table 6 route 0.0.0.0/0 next-hop ${natpe2ip1}
+set policy local-route rule 6 set table 6
+set policy local-route rule 6 source ${natpe2ip2}
+
 echo '>>>动态路由配置[BGP]<<<'
 set protocols static route 10.10.99.200/32 next-hop ${pe1ip1}
 set protocols static route 10.10.99.202/32 next-hop ${pe1ip1}

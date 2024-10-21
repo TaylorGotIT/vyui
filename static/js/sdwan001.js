@@ -478,10 +478,6 @@ ftp server enable
 ssh server permit interface all
 stelnet server enable
 aaa
- undo local-aaa-user password policy administrator
- undo local-aaa-user password policy bothwin
- local-user admin service-type terminal ssh http
- local-user bothwin password irreversible-cipher Tfe28@w%
  local-user bothwin service-type terminal ssh ftp
  local-user bothwin ftp-directory flash:
  local-user bothwin privilege level 15
@@ -516,6 +512,10 @@ ping -vpn-instance underlay_ipsecB -a ${loop2ip1} 223.5.5.5
 ##########URL开局###########
 正常开局
 ##########命令行开局#########
+#查看设备的ESN
+display esn
+#把设备ESN输入到中控设备上
+#
 system-view
 ip vpn-instance underlay_1
  ipv4-family
@@ -536,10 +536,7 @@ ping -vpn-instance underlay_1 -a ${loop1ip2} ${controller1ip}
  agile controller host ${controller1ip} port 10020 vpn-instance underlay_1
 quit
 save
-#保存配置 Y
-#查看设备的ESN
-display esn
-#把设备ESN输入到中控设备上
+#立即保存配置 Y
 #查看中控注册状态
 display agile-controller status
 ############线上更改脚本信息#############
@@ -548,36 +545,38 @@ display agile-controller status
 脚本配置：
 ##...以下内容需添加到ops_execute函数中
 def ops_execute(ops):
-    #注释：配置变更代码块：
-    result, n11, n21 = ops.cli.execute(handle, "ike peer PEER名称")
-    result, n11, n21 = ops.cli.execute(handle, "undo remote-address 旧对接",choice)
-    result, n11, n21 = ops.cli.execute(handle, "remote-address vpn-instance underlay_ipsecA 新对接")
+    # 主线修改对接
+    result, n11, n21 = ops.cli.execute(handle, "ike peer main")
+    result, n11, n21 = ops.cli.execute(handle, "undo remote-address ${pe1pub}",choice)
+    result, n11, n21 = ops.cli.execute(handle, "remote-address vpn-instance underlay_ipsecA 新对接IP")
     result, n11, n21 = ops.cli.execute(handle, "quit")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 新对接 255.255.255.255 本地网关")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 新对接IP 255.255.255.255 本地网关")
+    result, n11, n21 = ops.cli.execute(handle, "ops")
+    result, n11, n21 = ops.cli.execute(handle, "undo environment ipsec_main ${pe1pub}")
+    result, n11, n21 = ops.cli.execute(handle, "environment ipsec_main 新对接IP")
+    result, n11, n21 = ops.cli.execute(handle, "quit")
+    # 备线修改对接
+    result, n11, n21 = ops.cli.execute(handle, "ike peer back")
+    result, n11, n21 = ops.cli.execute(handle, "undo remote-address ${pe2pub}",choice)
+    result, n11, n21 = ops.cli.execute(handle, "remote-address vpn-instance underlay_ipsecA 新对接IP")
+    result, n11, n21 = ops.cli.execute(handle, "quit")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 新对接IP 255.255.255.255 本地网关")
+    result, n11, n21 = ops.cli.execute(handle, "ops")
+    result, n11, n21 = ops.cli.execute(handle, "undo environment ipsec_backup ${pe2pub}")
+    result, n11, n21 = ops.cli.execute(handle, "environment ipsec_backup 新对接IP")
+    result, n11, n21 = ops.cli.execute(handle, "quit")
 3、重新安装脚本
 system-view
 ops
  undo script-assistant python ${lineid}.py
- undo environment ipsec_main ${pe1pub}
- undo environment ipsec_backup ${pe2pub}
- undo script-assistant python ipsec_main.py
- undo script-assistant python ipsec_backup.py
  quit
  quit
 ops uninstall file ${lineid}.py
-ops uninstall file ipsec_main.py
-ops uninstall file ipsec_backup.py
 #重新加载
 ops install file ${lineid}.py
-ops install file ipsec_main.py
-ops install file ipsec_backup.py
 system-view
 ops
  script-assistant python ${lineid}.py
- environment ipsec_main 新对接IP
- environment ipsec_backup 新对接IP
- script-assistant python ipsec_main.py
- script-assistant python ipsec_backup.py
 #
 如卸载和加载脚本都没有报错，则表示配置变更成功。
 `;

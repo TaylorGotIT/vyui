@@ -471,7 +471,7 @@ set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
 }
 //OpenVPN接口模板
 openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
-set interfaces openvpn ${ac1if} description AC1_${ac1}
+set interfaces openvpn ${ac1if} description 'AC1 ${ac1}'
 set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
 set interfaces openvpn ${ac1if} remote-address ${ac1ip1}
 set interfaces openvpn ${ac1if} remote-host ${ac1pub}
@@ -485,7 +485,7 @@ set interfaces openvpn ${ac1if} openvpn-option '--persist-tun'
 #set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300'
 set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
 echo 'OpenVPN 接入配置[ac2]'
-set interfaces openvpn ${ac2if} description AC2_${ac2}
+set interfaces openvpn ${ac2if} description 'AC2 ${ac2}'
 set interfaces openvpn ${ac2if} local-address ${ac2ip2} subnet-mask 255.255.255.252
 set interfaces openvpn ${ac2if} remote-address ${ac2ip1}
 set interfaces openvpn ${ac2if} remote-host ${ac2pub}
@@ -500,7 +500,7 @@ set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
 set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
 
 greTemp += `echo '>>>GRE 配置[Main]<<<'
-set interfaces tunnel ${pe1if} description PE1_${pe1}
+set interfaces tunnel ${pe1if} description 'PE1 ${pe1}'
 set interfaces tunnel ${pe1if} address ${pe1ip2}/30
 set interfaces tunnel ${pe1if} source-address ${ac1ip2}
 set interfaces tunnel ${pe1if} remote ${pe1lo}
@@ -508,7 +508,7 @@ set interfaces tunnel ${pe1if} encapsulation gre
 set interfaces tunnel ${pe1if} multicast disable
 set interfaces tunnel ${pe1if} parameters ip ttl 255
 echo '>>>GRE 配置[Backup]<<<'
-set interfaces tunnel ${pe2if} description PE2_${pe2}
+set interfaces tunnel ${pe2if} description 'PE2 ${pe2}'
 set interfaces tunnel ${pe2if} address ${pe2ip2}/30
 set interfaces tunnel ${pe2if} source-address ${ac2ip2}
 set interfaces tunnel ${pe2if} remote ${pe2lo}
@@ -516,7 +516,7 @@ set interfaces tunnel ${pe2if} encapsulation gre
 set interfaces tunnel ${pe2if} multicast disable
 set interfaces tunnel ${pe2if} parameters ip ttl 255
 echo '>>>GRE 配置[${natpe1}]<<<'
-set interfaces tunnel ${natpe1if} description ${natpe1}
+set interfaces tunnel ${natpe1if} description 'NATPE1 ${natpe1}'
 set interfaces tunnel ${natpe1if} address ${natpe1ip2}/30
 set interfaces tunnel ${natpe1if} source-address ${natce1lo}
 set interfaces tunnel ${natpe1if} remote ${natpe1lo}
@@ -729,7 +729,7 @@ set protocols static interface-route 1.1.1.1/32 next-hop-interface pppoe1`;
 }
 //OpenVPN接口模板
 openvpnTemp += `echo 'OpenVPN 接入配置[ac1]'
-set interfaces openvpn ${ac1if} description AC1_${ac1}
+set interfaces openvpn ${ac1if} description 'AC1 ${ac1}'
 set interfaces openvpn ${ac1if} local-address ${ac1ip2} subnet-mask 255.255.255.252
 set interfaces openvpn ${ac1if} remote-address ${ac1ip1}
 set interfaces openvpn ${ac1if} remote-host ${ac1pub}
@@ -743,7 +743,7 @@ set interfaces openvpn ${ac1if} openvpn-option '--persist-tun'
 #set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300'
 set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
 echo 'OpenVPN 接入配置[ac2]'
-set interfaces openvpn ${ac2if} description AC2_${ac2}
+set interfaces openvpn ${ac2if} description 'AC2 ${ac2}'
 set interfaces openvpn ${ac2if} local-address ${ac2ip2} subnet-mask 255.255.255.252
 set interfaces openvpn ${ac2if} remote-address ${ac2ip1}
 set interfaces openvpn ${ac2if} remote-host ${ac2pub}
@@ -758,7 +758,7 @@ set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
 set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
 
 greTemp += `echo '>>>GRE 配置[Main]<<<'
-set interfaces tunnel ${pe1if} description PE1_${pe1}
+set interfaces tunnel ${pe1if} description 'PE1 ${pe1}'
 set interfaces tunnel ${pe1if} address ${pe1ip2}/30
 set interfaces tunnel ${pe1if} local ${ac1ip2}
 set interfaces tunnel ${pe1if} remote ${pe1lo}
@@ -766,7 +766,7 @@ set interfaces tunnel ${pe1if} encapsulation gre
 set interfaces tunnel ${pe1if} multicast disable
 set interfaces tunnel ${pe1if} parameters ip ttl 255
 echo '>>>GRE 配置[Backup]<<<'
-set interfaces tunnel ${pe2if} description PE2_${pe2}
+set interfaces tunnel ${pe2if} description 'PE2 ${pe2}'
 set interfaces tunnel ${pe2if} address ${pe2ip2}/30
 set interfaces tunnel ${pe2if} local ${ac2ip2}
 set interfaces tunnel ${pe2if} remote ${pe2lo}
@@ -774,7 +774,7 @@ set interfaces tunnel ${pe2if} encapsulation gre
 set interfaces tunnel ${pe2if} multicast disable
 set interfaces tunnel ${pe2if} parameters ip ttl 255
 echo '>>>GRE 配置[${natpe1}]<<<'
-set interfaces tunnel ${natpe1if} description ${natpe1}
+set interfaces tunnel ${natpe1if} description 'NATPE1 ${natpe1}'
 set interfaces tunnel ${natpe1if} address ${natpe1ip2}/30
 set interfaces tunnel ${natpe1if} local ${natce1lo}
 set interfaces tunnel ${natpe1if} remote ${natpe1lo}
@@ -800,12 +800,6 @@ set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 lease
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 dns-server 192.168.8.1
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 start '192.168.8.2'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 stop '192.168.8.200'
-echo 'WIFI DHCP Server Range: 2-200'
-set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 default-router '192.168.9.1'
-set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 lease '7200'
-set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 dns-server 192.168.9.1
-set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 range 0 start '192.168.9.2'
-set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 range 0 stop '192.168.9.200'
 `;
     break;
     case "31":
@@ -938,12 +932,6 @@ set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 lease
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 dns-server 192.168.8.1
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 start '192.168.8.2'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 stop '192.168.8.200'
-echo 'WIFI DHCP Server Range: 2-200'
-set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 default-router '192.168.9.1'
-set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 lease '7200'
-set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 dns-server 192.168.9.1
-set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 range 0 start '192.168.9.2'
-set service dhcp-server shared-network-name dhcp_wlan0 subnet 192.168.9.0/24 range 0 stop '192.168.9.200'
 `;
     break;
   };
@@ -992,7 +980,6 @@ set interfaces tunnel ${ac2if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe1if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe2if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${natpe1if} firewall local name 'WAN2LOCAL'
-set interfaces tunnel ${natpe2if} firewall local name 'WAN2LOCAL'
 set system host-name ${lineid}-${cname}-${area}
 set service snmp community both-win authorization 'ro'
 set interfaces loopback lo address ${natce1lo}/32
@@ -1001,16 +988,14 @@ ${wanTemp}
 ${openvpnTemp}
 ${greTemp}
 echo '>>>MTU TCP-MSS配置[interface] 看情况配置<<<'
-# set firewall options interface ${ac1if} adjust-mss 1300
-# set firewall options interface ${ac2if} adjust-mss 1300
-# set interfaces tunnel ${pe1if} mtu 1400
-# set interfaces tunnel ${pe1if} mtu 1400
-# set interfaces tunnel ${natpe1if} mtu 1360
-# set interfaces tunnel ${natpe2if} mtu 1360
-# set firewall options interface ${pe1if} adjust-mss 1300
-# set firewall options interface ${pe2if} adjust-mss 1300
-# set firewall options interface ${natpe1if} adjust-mss 1300
-# set firewall options interface ${natpe2if} adjust-mss 1300
+set firewall options interface ${ac1if} adjust-mss 1300
+set firewall options interface ${ac2if} adjust-mss 1300
+set interfaces tunnel ${pe1if} mtu 1476
+set interfaces tunnel ${pe2if} mtu 1476
+set interfaces tunnel ${natpe1if} mtu 1452
+set firewall options interface ${pe1if} adjust-mss 1300
+set firewall options interface ${pe2if} adjust-mss 1300
+set firewall options interface ${natpe1if} adjust-mss 1300
 
 echo '>>>路由配置[Track 默认路由，对接公网路由，内网路由]<<<'
 set protocols static route 223.5.5.5/32 next-hop 1.1.1.1
@@ -1039,6 +1024,7 @@ set protocols static route ${oversea1dns}/32 next-hop ${natpe1ip1}
 set protocols static route ${oversea2dns}/32 next-hop ${natpe1ip1}
 set protocols static route 114.113.245.99/32 next-hop ${pe1ip1}
 set protocols static route 114.113.245.100/32 next-hop ${pe2ip1}
+set protocols static route 192.168.55.10/32 next-hop ${natpe1ip1}
 set protocols static route 192.168.55.125/32 next-hop ${pe1ip1} track to-main
 set protocols static route 192.168.55.125/32 next-hop ${pe2ip1} distance 5
 set protocols static route 192.168.55.250/32 next-hop ${pe1ip1} track to-main
@@ -1052,9 +1038,29 @@ set protocols static route 10.100.114.12/32 next-hop ${pe1ip1} track to-main
 set protocols static route 10.100.114.12/32 next-hop ${pe2ip1} distance 5
 echo '>>>全局海外时写默认路由<<<'
 set protocols static route 0.0.0.0/0 next-hop ${natpe1ip1}
-
+echo '>>>内网监控策略<<<'
+# AC1
+set protocols static table 1 route 0.0.0.0/0 next-hop ${ac1ip1}
+set policy local-route rule 1 set table 1
+set policy local-route rule 1 source ${ac1ip2}
+# AC2
+set protocols static table 2 route 0.0.0.0/0 next-hop ${ac2ip1}
+set policy local-route rule 2 set table 2
+set policy local-route rule 2 source ${ac2ip2}
+# PE1
+set protocols static table 3 route 0.0.0.0/0 next-hop ${pe1ip1}
+set policy local-route rule 3 set table 3
+set policy local-route rule 3 source ${pe1ip2}
+# PE2
+set protocols static table 4 route 0.0.0.0/0 next-hop ${pe2ip1}
+set policy local-route rule 4 set table 4
+set policy local-route rule 4 source ${pe2ip2}
+# NATPE1
+set protocols static table 5 route 0.0.0.0/0 next-hop ${natpe1ip1}
+set policy local-route rule 5 set table 5
+set policy local-route rule 5 source ${natpe1ip2}
 echo '5G WIFI SSID: sdwan PASSWD: 123456@sdwan'
-set interfaces wireless wlan1 address '192.168.9.1/24'
+set interfaces bridge br2 member interface wlan1
 set interfaces wireless wlan1 channel '0'
 set interfaces wireless wlan1 country-code 'cn'
 set interfaces wireless wlan1 dhcp-options client-id 'sdwan'

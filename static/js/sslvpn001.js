@@ -1,7 +1,7 @@
 /* MPLS 组网 FnetOS */
 
-const mpls001_version = 1;
-const mpls001html = `<table border="1">
+const slvpn001_version = 1;
+const slvpn001html = `<table border="1">
 <tr>
 <td>LineID</td>
 <td><input id="lineid_input"></td>
@@ -32,7 +32,7 @@ const mpls001html = `<table border="1">
 <option value="CT" selected="selected">[CT]</option>
 <option value="CU">[CU]</option>
 <option value="CM">[CM]</option></select></td>
-<td><select id="wan1_type_select" onchange=mpls001setWan(this.value)>
+<td><select id="wan1_type_select" onchange=slvpn001setWan(this.value)>
 <option value="dhcp" selected="selected">WAN Type[ DHCP ]</option>
 <option value="static">WAN Type[ Static ]</option>
 <option value="pppoe">WAN Type[ PPPoE ]</option></select></td></tr>
@@ -113,10 +113,10 @@ const mpls001html = `<table border="1">
 <td><input id="bgp_server4_input" placeholder="BGP Server4" value="10.10.99.203"></td>
 </tr>
 </table>
-<button type="button" onclick="mpls001sub('/config')">提交配置信息(Submit Config Info)</button>
+<button type="button" onclick="slvpn001sub('/config')">提交配置信息(Submit Config Info)</button>
 `;
 
-function mpls001getList() {
+function slvpn001getList() {
 //空格全角分号去除
     let str = $("#config_textarea").val().replaceAll(' ','').replaceAll('：',':').replaceAll(';','');
     if(str.length>32){
@@ -211,11 +211,11 @@ function mpls001getList() {
   };
 };
 
-$("#service_dev").append(mpls001html);
+$("#service_dev").append(slvpn001html);
 
-mpls001getList()
+slvpn001getList()
 
-function mpls001setWan(value){
+function slvpn001setWan(value){
     let html='';
     wan_input_tr = '#wan1_input_tr';
     switch(value){
@@ -235,7 +235,7 @@ function mpls001setWan(value){
     };
 }
 
-function mpls001sub(url){
+function slvpn001sub(url){
   let user = $("#user_input").val();
   let time=getTime(new Date());
   let wan1 = $("#wan1_select").val();
@@ -765,7 +765,7 @@ set service dns forwarding name-server ${oversea2dns}`;
     break;
   };
 
-let mpls001MPLSGreOverOpenvpn  = String.raw
+let slvpn001MPLSGreOverOpenvpn  = String.raw
 `#Fnet MPLS with GRE Over OpenVPN Template.
 #操作人员：${user}
 #时间：${time.cn}
@@ -998,8 +998,8 @@ SN: E1X16225005xxxxxxxx \n\
 `;
   let filename = `${lineid}-MPLS-GREOverOpenVPN-Config-${time.ez}-By-${user}`;
   let data = {};
-  console.log(mpls001MPLSGreOverOpenvpn);
-  downloadConfig(filename, mpls001MPLSGreOverOpenvpn);
+  console.log(slvpn001MPLSGreOverOpenvpn);
+  downloadConfig(filename, slvpn001MPLSGreOverOpenvpn);
   let type = 'post'
   let datatype = 'json';
   ajaxHandler(url,data,datatype,type);
