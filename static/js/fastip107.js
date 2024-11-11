@@ -366,6 +366,7 @@ function fastip107sub(url){
   let oversea2ip = $("#natpe2_oversea_input").val();
   let oversea1ips = oversea1ip.split(',');
   let oversea2ips = oversea2ip.split(',');
+
 console.log(oversea1ips);
 let oversea1ip1 = '';
 let oversea1ip2 = '';
@@ -885,12 +886,12 @@ set openfalcon server-address 192.168.237.86
 set openfalcon endpoint-name ${lineid}-${cname}-${area}
 set interfaces loopback lo address ${natce1lo}/32
 set interfaces loopback lo address ${natce2lo}/32
-set interfaces loopback lo address ${oversea1ip1}/32
-set interfaces loopback lo address ${oversea1ip2}/32
-set interfaces loopback lo address ${oversea1ip3}/32
-set interfaces loopback lo address ${oversea2ip1}/32
-set interfaces loopback lo address ${oversea2ip2}/32
-set interfaces loopback lo address ${oversea2ip3}/32
+set interfaces dummy dum101 address ${oversea1ip1}/32
+set interfaces dummy dum102 address ${oversea1ip2}/32
+set interfaces dummy dum103 address ${oversea1ip3}/32
+set interfaces dummy dum201 address ${oversea2ip1}/32
+set interfaces dummy dum202 address ${oversea2ip2}/32
+set interfaces dummy dum203 address ${oversea2ip3}/32
 set interfaces loopback lo description ${oversea1ip}${oversea2ip}
 ${wanTemp}
 ${openvpnTemp}
