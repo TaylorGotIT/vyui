@@ -677,10 +677,11 @@ set interfaces openvpn ${ac2if} firewall local name 'WAN2LOCAL'
 set system host-name ${lineid}-${cnameEN}-${area}
 set service smartping password both-win
 set service snmp community both-win authorization 'ro'
-set interfaces loopback lo address ${ce1lo}/32
-set interfaces loopback lo address ${ce2lo}/32
-set interfaces loopback lo address ${oversea1ip1}/32
-set interfaces loopback lo description ${ce1lo},${oversea1ips}
+set interfaces dummy dum0 address ${ce1lo}/32
+set interfaces dummy dum0 address ${ce2lo}/32
+set interfaces dummy dum0 description 'bgp-update-source'
+set interfaces dummy dum1 address ${oversea1ip1}/32
+set interfaces dummy dum1 description 'hkip-${oversea1ip1}'
 ${wan1Temp}
 ${wan2Temp}
 ${openvpnTemp}

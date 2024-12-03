@@ -831,6 +831,8 @@ ${wan1Temp}
 ${openvpnTemp}
 ${greTemp}
 echo '# MTU TCP-MSS配置[interface]'
+set interfaces tunnel ${pe1if} mtu 1476
+set interfaces tunnel ${pe2if} mtu 1476
 set firewall options interface ${ac1if} adjust-mss '1300'
 set firewall options interface ${ac2if} adjust-mss '1300'
 set firewall options interface tun${pe1ifNum} adjust-mss '1300'
@@ -907,6 +909,14 @@ set system flow-accounting netflow timeout tcp-rst '120'
 set system flow-accounting netflow timeout udp '300'
 set system flow-accounting netflow version '9'
 set system flow-accounting syslog-facility 'daemon'
+echo '# OUT带宽锁'
+set traffic-policy shaper OUT-10M bandwidth '10mbit'
+set traffic-policy shaper OUT-10M default bandwidth '20%'
+set traffic-policy shaper OUT-10M default burst '100k'
+set traffic-policy shaper OUT-10M default ceiling '100%'
+set traffic-policy shaper OUT-10M default queue-type 'fair-queue'
+set interfaces tunnel ${pe1if} traffic-policy out OUT-10M
+set interfaces tunnel ${pe2if} traffic-policy out OUT-10M
 ####################
 #如果客户需要BGP分流 #
 ####################
