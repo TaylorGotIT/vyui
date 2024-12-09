@@ -884,8 +884,8 @@ set system syslog global facility all level 'info'
 set system syslog host 192.168.237.78 facility protocols level 'debug'
 set openfalcon server-address 192.168.237.86
 set openfalcon endpoint-name ${lineid}-${cname}-${area}
-set interfaces dummy dum1 address ${natce1lo}/32
-set interfaces dummy dum2 address ${natce2lo}/32
+set interfaces loopback lo address ${natce1lo}/32
+set interfaces loopback lo address ${natce2lo}/32
 set interfaces dummy dum101 address ${oversea1ip1}/32
 set interfaces dummy dum102 address ${oversea1ip2}/32
 set interfaces dummy dum103 address ${oversea1ip3}/32

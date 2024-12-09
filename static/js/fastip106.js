@@ -983,7 +983,7 @@ set interfaces tunnel ${natpe1if} firewall local name 'WAN2LOCAL'
 set system host-name ${lineid}-${cname}-${area}
 set service snmp community both-win authorization 'ro'
 set interfaces loopback lo address ${natce1lo}/32
-set interfaces loopback lo address ${oversea1ip1}/32
+set interfaces dummy dum100 address ${oversea1ip1}/32
 ${wanTemp}
 ${openvpnTemp}
 ${greTemp}
