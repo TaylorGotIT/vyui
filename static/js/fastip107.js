@@ -675,7 +675,7 @@ set interfaces openvpn ${ac1if} openvpn-option '--nobind'
 set interfaces openvpn ${ac1if} openvpn-option '--ping 10'
 set interfaces openvpn ${ac1if} openvpn-option '--ping-restart 60'
 set interfaces openvpn ${ac1if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300'
+set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300'
 set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
 echo 'OpenVPN 接入配置[ac2]'
 set interfaces openvpn ${ac2if} description AC2_${ac2}
@@ -689,7 +689,7 @@ set interfaces openvpn ${ac2if} openvpn-option '--nobind'
 set interfaces openvpn ${ac2if} openvpn-option '--ping 10'
 set interfaces openvpn ${ac2if} openvpn-option '--ping-restart 60'
 set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300'
+set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300'
 set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
 
 greTemp += `echo '>>>GRE 配置[Main]<<<'
@@ -872,20 +872,7 @@ set system conntrack timeout tcp last-ack '30'
 set system conntrack timeout tcp syn-recv '60'
 set system conntrack timeout tcp syn-sent '120'
 set system conntrack timeout tcp time-wait '120'
-echo '>>>NetFlow<<<'
-set system flow-accounting interface eth2
-set system flow-accounting netflow engine-id '1'
-set system flow-accounting netflow server 10.100.114.12 port '9995'
-set system flow-accounting netflow timeout expiry-interval '60'
-set system flow-accounting netflow timeout flow-generic '10'
-set system flow-accounting netflow timeout icmp '300'
-set system flow-accounting netflow timeout max-active-life '604800'
-set system flow-accounting netflow timeout tcp-fin '300'
-set system flow-accounting netflow timeout tcp-generic '3600'
-set system flow-accounting netflow timeout tcp-rst '120'
-set system flow-accounting netflow timeout udp '120'
-set system flow-accounting netflow version '9'
-set system flow-accounting syslog-facility 'daemon'
+echo '# Portal配置'
 set system syslog global facility all level 'info'
 set system syslog host 192.168.237.78 facility protocols level 'debug'
 set openfalcon server-address 192.168.237.86
@@ -926,13 +913,13 @@ set track name to-main test 10 resp-time 5
 set track name to-main test 10 target ${pe1ip1}
 set track name to-main test 10 ttl-limit 1
 set track name to-main test 10 type ping
-set protocols static route 1.0.0.1/32 next-hop ${natpe1ip1}
-set track name to-pub1 failure-count 2
-set track name to-pub1 success-count 2
-set track name to-pub1 test 10 resp-time 5
-set track name to-pub1 test 10 target 1.0.0.1
-set track name to-pub1 test 10 ttl-limit 200
-set track name to-pub1 test 10 type ping
+set protocols static route 100.100.100.1/32 next-hop ${natpe1ip1}
+set track name tooutbound1 failure-count 2
+set track name tooutbound1 success-count 2
+set track name tooutbound1 test 10 resp-time 5
+set track name tooutbound1 test 10 target 100.100.100.1
+set track name tooutbound1 test 10 ttl-limit 200
+set track name tooutbound1 test 10 type ping
 echo '>>>静态路由配置[Static]<<<'
 set protocols static route ${ac1pub}/32 next-hop 1.1.1.1
 set protocols static route ${ac2pub}/32 next-hop 1.1.1.1
@@ -944,7 +931,7 @@ set protocols static route ${natpe1lo}/32 next-hop ${pe2ip1} distance 5
 set protocols static route ${natpe2lo}/32 next-hop ${pe1ip1} track to-main
 set protocols static route ${natpe2lo}/32 next-hop ${pe2ip1} distance 5
 echo '>>>海外双出口路由<<<'
-set protocols static route 2.2.2.2/32 next-hop ${natpe1ip1} track to-pub1
+set protocols static route 2.2.2.2/32 next-hop ${natpe1ip1} track tooutbound1
 set protocols static route 2.2.2.2/32 next-hop ${natpe2ip1} distance 5
 set protocols static table 200 route 0.0.0.0/0 next-hop 2.2.2.2
 echo '>>>监控系统路由<<<'
@@ -964,7 +951,7 @@ echo '>>>NetFlow<<<'
 set protocols static route 10.100.114.12/32 next-hop ${pe1ip1} track to-main
 set protocols static route 10.100.114.12/32 next-hop ${pe2ip1} distance 5
 echo '默认路由'
-set protocols static route 2.2.2.2/32 next-hop ${natpe1ip1} track to-pub1
+set protocols static route 2.2.2.2/32 next-hop ${natpe1ip1} track tooutbound1
 set protocols static route 2.2.2.2/32 next-hop ${natpe2ip1}
 set protocols static route 0.0.0.0/0 next-hop 2.2.2.2
 echo '>>>内网监控策略<<<'
@@ -1087,6 +1074,20 @@ set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 lease
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server '192.168.8.1'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 start '192.168.8.2'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 stop '192.168.8.100'
+echo '>>>NetFlow<<<'
+set system flow-accounting interface eth2
+set system flow-accounting netflow engine-id '1'
+set system flow-accounting netflow server 10.100.114.12 port '9995'
+set system flow-accounting netflow timeout expiry-interval '60'
+set system flow-accounting netflow timeout flow-generic '10'
+set system flow-accounting netflow timeout icmp '300'
+set system flow-accounting netflow timeout max-active-life '604800'
+set system flow-accounting netflow timeout tcp-fin '300'
+set system flow-accounting netflow timeout tcp-generic '3600'
+set system flow-accounting netflow timeout tcp-rst '120'
+set system flow-accounting netflow timeout udp '120'
+set system flow-accounting netflow version '9'
+set system flow-accounting syslog-facility 'daemon'
 
 ###AdGuardHome DNS解决客户需要自行管理DNS问题###
 add container image adguard/adguardhome

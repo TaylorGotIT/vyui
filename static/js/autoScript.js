@@ -280,6 +280,19 @@ function getTempJS(value){
                 console.log("fastip107 未下载");
             };
             break;
+        case "fastip108":
+            try{
+                if($.isFunction(fastip108sub)){
+                    $("#service_dev").append(fastip108html);
+                    fastip107getList();
+                    console.log("fastip108 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("fastip108 未下载");
+            };
+            break;
         case "fastip201":
             try{
                 if($.isFunction(fastip201sub)){
@@ -427,6 +440,18 @@ function getTempJS(value){
                 js_path = "/static/js/"+ value + ".js";
                 $.getScript(js_path, function(){});
                 console.log("fortinet_mpls001 未下载");
+            };
+            break;
+        case "usg_fastip001":
+            try{
+                if($.isFunction(fortinet_mpls001sub)){
+                    $("#service_dev").append(usg_fastip001html);
+                    console.log("usg_fastip001 已下载");
+                };
+            }catch(e){
+                js_path = "/static/js/"+ value + ".js";
+                $.getScript(js_path, function(){});
+                console.log("usg_fastip001 未下载");
             };
             break;
         case "sslvpn001":
