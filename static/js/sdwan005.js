@@ -483,6 +483,9 @@ ftp server enable
 ssh server permit interface all
 stelnet server enable
 aaa
+ undo local-aaa-user password policy administrator
+ password history record number 0
+ password expire 0
  local-user bothwin service-type terminal ssh ftp
  local-user bothwin ftp-directory flash:
  local-user bothwin privilege level 15

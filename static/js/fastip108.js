@@ -439,11 +439,23 @@ rm /config/.initagentd.status
 delete interfaces ethernet
 delete interface openvpn
 delete interface tunnel
+delete interface dummy
 delete interface loopback lo
+delete firewall options interface
+delete vpn
+delete container
 delete nat
 delete protocols
 delete policy
+delete track
+delete service dns
 set interfaces ethernet eth0 address dhcp
+set interfaces bridge br2 address '192.168.8.1/24'
+set interfaces bridge br2 member interface eth1
+set interfaces bridge br2 member interface eth2
+set interfaces bridge br2 member interface eth3
+set interfaces bridge br2 member interface eth4
+set interfaces bridge br2 member interface eth5
 commit
 exit
 curl http://202.104.174.189:18080/epochos/ | grep vyos-epoch | awk -F '"' '{print "http://192.168.75.15/epochos/"$2}' | sed -n '$p' > img_list
@@ -526,7 +538,7 @@ set interfaces openvpn ${ac1if} openvpn-option '--nobind'
 set interfaces openvpn ${ac1if} openvpn-option '--ping 10'
 set interfaces openvpn ${ac1if} openvpn-option '--ping-restart 60'
 set interfaces openvpn ${ac1if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300'
+set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300'
 set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
 echo 'OpenVPN 接入配置[ac2]'
 set interfaces openvpn ${ac2if} description 'AC2 ${ac2}'
@@ -540,7 +552,7 @@ set interfaces openvpn ${ac2if} openvpn-option '--nobind'
 set interfaces openvpn ${ac2if} openvpn-option '--ping 10'
 set interfaces openvpn ${ac2if} openvpn-option '--ping-restart 60'
 set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300'
+set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300'
 set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
 
 greTemp += `echo '>>>GRE 配置[Main]<<<'
@@ -587,7 +599,6 @@ set service dns forwarding domainlist CN file '/opt/cn.txt'
 set service dns forwarding domainlist CN recursion-desired
 set service dns forwarding domainlist CN server ${local1dns}
 set service dns forwarding domainlist CN server ${local2dns}
-set service dns forwarding domainlist CN server '114.114.114.114'
 set service dns forwarding domainlist HK file '/opt/oversea.txt'
 set service dns forwarding domainlist HK recursion-desired
 set service dns forwarding domainlist HK server ${oversea1dns}
@@ -600,6 +611,7 @@ set service dns forwarding name-server ${oversea2dns}`;
 imageTemp += `echo '# 系统降级到3.2.17'
 conf
 delete system host-name
+delete interfaces dummy
 delete interfaces bridge
 delete interfaces ethernet
 delete interface openvpn
@@ -616,6 +628,7 @@ delete service dns
 delete service dhcp-server
 delete system name-server
 delete system flow-accounting
+delete vpn
 set inter eth eth0 add dhcp
 commit
 exit
@@ -685,7 +698,7 @@ set interfaces openvpn ${ac1if} openvpn-option '--nobind'
 set interfaces openvpn ${ac1if} openvpn-option '--ping 10'
 set interfaces openvpn ${ac1if} openvpn-option '--ping-restart 60'
 set interfaces openvpn ${ac1if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300'
+set interfaces openvpn ${ac1if} openvpn-option '--fragment 1300'
 set interfaces openvpn ${ac1if} shared-secret-key-file '/config/auth/openvpn.secret'
 echo 'OpenVPN 接入配置[ac2]'
 set interfaces openvpn ${ac2if} description AC2_${ac2}
@@ -699,7 +712,7 @@ set interfaces openvpn ${ac2if} openvpn-option '--nobind'
 set interfaces openvpn ${ac2if} openvpn-option '--ping 10'
 set interfaces openvpn ${ac2if} openvpn-option '--ping-restart 60'
 set interfaces openvpn ${ac2if} openvpn-option '--persist-tun'
-#set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300'
+set interfaces openvpn ${ac2if} openvpn-option '--fragment 1300'
 set interfaces openvpn ${ac2if} shared-secret-key-file '/config/auth/openvpn.secret'`;
 
 greTemp += `echo '>>>GRE 配置[Main]<<<'
@@ -855,8 +868,8 @@ set firewall name WAN2LOCAL rule 1220 action 'accept'
 set firewall name WAN2LOCAL rule 1220 protocol 'ipip'
 
 set interfaces ethernet ${wan1} firewall local name 'WAN2LOCAL'
-set interfaces tunnel ${ac1if} firewall local name 'WAN2LOCAL'
-set interfaces tunnel ${ac2if} firewall local name 'WAN2LOCAL'
+set interfaces openvpn ${ac1if} firewall local name 'WAN2LOCAL'
+set interfaces openvpn ${ac2if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe1if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe2if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${natpe1if} firewall local name 'WAN2LOCAL'
@@ -923,13 +936,6 @@ set track name to-main test 10 resp-time 5
 set track name to-main test 10 target ${pe1ip1}
 set track name to-main test 10 ttl-limit 1
 set track name to-main test 10 type ping
-set protocols static route 100.100.100.1/32 next-hop ${natpe1ip1}
-set track name tooutbound1 failure-count 2
-set track name tooutbound1 success-count 2
-set track name tooutbound1 test 10 resp-time 5
-set track name tooutbound1 test 10 target 100.100.100.1
-set track name tooutbound1 test 10 ttl-limit 200
-set track name tooutbound1 test 10 type ping
 echo '>>>静态路由配置[Static]<<<'
 set protocols static route ${ac1pub}/32 next-hop 1.1.1.1
 set protocols static route ${ac2pub}/32 next-hop 1.1.1.1
@@ -940,10 +946,6 @@ set protocols static route ${natpe1lo}/32 next-hop ${pe1ip1} track to-main
 set protocols static route ${natpe1lo}/32 next-hop ${pe2ip1} distance 5
 set protocols static route ${natpe2lo}/32 next-hop ${pe1ip1} track to-main
 set protocols static route ${natpe2lo}/32 next-hop ${pe2ip1} distance 5
-echo '>>>海外双出口路由<<<'
-set protocols static route 2.2.2.2/32 next-hop ${natpe1ip1} track tooutbound1
-set protocols static route 2.2.2.2/32 next-hop ${natpe2ip1} distance 5
-set protocols static table 200 route 0.0.0.0/0 next-hop 2.2.2.2
 echo '>>>监控系统路由<<<'
 set protocols static route 114.113.245.99/32 next-hop ${pe1ip1}
 set protocols static route 114.113.245.100/32 next-hop ${pe2ip1}
@@ -960,32 +962,36 @@ set protocols static route 192.168.237.86/32 next-hop ${pe2ip1} distance 5
 echo '>>>NetFlow<<<'
 set protocols static route 10.100.114.12/32 next-hop ${pe1ip1} track to-main
 set protocols static route 10.100.114.12/32 next-hop ${pe2ip1} distance 5
-echo '默认路由'
-set protocols static route 2.2.2.2/32 next-hop ${natpe1ip1} track tooutbound1
-set protocols static route 2.2.2.2/32 next-hop ${natpe2ip1}
-set protocols static route 0.0.0.0/0 next-hop 2.2.2.2
 echo '>>>内网监控策略<<<'
 # NATPE1
 set protocols static table 1 route 0.0.0.0/0 next-hop ${natpe1ip1}
 set policy local-route rule 1 set table 1
 set policy local-route rule 1 source ${natpe1ip2}
-set policy local-route rule 1 destination 114.113.245.99/32
-set policy local-route rule 1 destination 192.168.55.10/32
 # NATPE2
 set protocols static table 2 route 0.0.0.0/0 next-hop ${natpe2ip1}
 set policy local-route rule 2 set table 2
 set policy local-route rule 2 source ${natpe2ip2}
-set policy local-route rule 2 destination 114.113.245.99/32
-set policy local-route rule 2 destination 192.168.55.10/32
-
+#
+echo '>>>海外双出口路由<<<'
+#set protocols static route 100.100.100.1/32 next-hop ${natpe1ip1}
+#set track name tooutbound1 failure-count 2
+#set track name tooutbound1 success-count 2
+#set track name tooutbound1 test 10 resp-time 5
+#set track name tooutbound1 test 10 target 100.100.100.1
+#set track name tooutbound1 test 10 ttl-limit 200
+#set track name tooutbound1 test 10 type ping
+#set protocols static route 2.2.2.2/32 next-hop ${natpe1ip1} track tooutbound1
+#set protocols static route 2.2.2.2/32 next-hop ${natpe2ip1} distance 5
+#set protocols static table 200 route 0.0.0.0/0 next-hop 2.2.2.2
+#
 echo '>>>动态路由配置[BGP]<<<'
 set protocols static route ${bgp1server1}/32 next-hop ${natpe1ip1}
 set protocols static route ${bgp1server1}/32 blackhole distance 5
 set protocols static route ${bgp1server2}/32 next-hop ${natpe1ip1}
 set protocols static route ${bgp1server2}/32 blackhole distance 5
-set protocols static route ${bgp1server3}/32 next-hop ${natpe1ip1}
+set protocols static route ${bgp1server3}/32 next-hop ${natpe2ip1}
 set protocols static route ${bgp1server3}/32 blackhole distance 5
-set protocols static route ${bgp1server4}/32 next-hop ${natpe1ip1}
+set protocols static route ${bgp1server4}/32 next-hop ${natpe2ip1}
 set protocols static route ${bgp1server4}/32 blackhole distance 5
 set policy community-list 80 rule 10 action 'permit'
 set policy community-list 80 rule 10 description 'to_hk'
@@ -999,6 +1005,9 @@ set policy community-list 82 rule 10 regex '65000:4837'
 set policy community-list 83 rule 10 action 'permit'
 set policy community-list 83 rule 10 description 'to_cn_other'
 set policy community-list 83 rule 10 regex '65000:9808'
+set policy community-list 91 rule 10 action 'permit'
+set policy community-list 91 rule 10 description 'to_office365'
+set policy community-list 91 rule 10 regex '65000:9009'
 set policy route-map bgp-from--RSVR rule 100 action 'permit'
 set policy route-map bgp-from--RSVR rule 100 description 'to_hk'
 set policy route-map bgp-from--RSVR rule 100 match community community-list '80'
@@ -1015,6 +1024,10 @@ set policy route-map bgp-from--RSVR rule 400 action 'permit'
 set policy route-map bgp-from--RSVR rule 400 description 'to_cn_other'
 set policy route-map bgp-from--RSVR rule 400 match community community-list '83'
 set policy route-map bgp-from--RSVR rule 400 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR rule 500 action 'permit'
+set policy route-map bgp-from--RSVR rule 500 description 'to_office365'
+set policy route-map bgp-from--RSVR rule 500 match community community-list 91
+set policy route-map bgp-from--RSVR rule 500 set ip-next-hop 1.1.1.1
 set policy route-map bgp-from--RSVR rule 1000 action 'deny'
 set policy route-map bgp-from--RSVR rule 1000 description 'block_route'
 set policy route-map bgp-from--RSVR2 rule 100 action 'permit'
@@ -1037,21 +1050,26 @@ set policy route-map bgp-from--RSVR2 rule 400 description 'to_cn_other'
 set policy route-map bgp-from--RSVR2 rule 400 match community community-list '83'
 set policy route-map bgp-from--RSVR2 rule 400 set ip-next-hop 1.1.1.1
 set policy route-map bgp-from--RSVR2 rule 400 set local-preference '50'
+set policy route-map bgp-from--RSVR2 rule 500 action 'permit'
+set policy route-map bgp-from--RSVR2 rule 500 description 'to_office365'
+set policy route-map bgp-from--RSVR2 rule 500 match community community-list 91
+set policy route-map bgp-from--RSVR2 rule 500 set ip-next-hop 1.1.1.1
+set policy route-map bgp-from--RSVR2 rule 500 set local-preference '50'
 set policy route-map bgp-from--RSVR2 rule 1000 action 'deny'
 set policy route-map bgp-from--RSVR2 rule 1000 description 'block_route'
 set protocols bgp 65000 neighbor ${bgp1server1} peer-group 'RSVR'
 set protocols bgp 65000 neighbor ${bgp1server2} peer-group 'RSVR'
 set protocols bgp 65000 neighbor ${bgp1server3} peer-group 'RSVR2'
 set protocols bgp 65000 neighbor ${bgp1server4} peer-group 'RSVR2'
-set protocols bgp 65000 parameters router-id ${natpe1ip2}
+set protocols bgp 65000 parameters router-id ${oversea1ip1}
 set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast route-map import 'bgp-from--RSVR'
 set protocols bgp 65000 peer-group RSVR address-family ipv4-unicast soft-reconfiguration inbound
 set protocols bgp 65000 peer-group RSVR remote-as '65000'
-set protocols bgp 65000 peer-group RSVR update-source ${natpe1ip2}
+set protocols bgp 65000 peer-group RSVR update-source ${oversea1ip1}
 set protocols bgp 65000 peer-group RSVR2 address-family ipv4-unicast route-map import 'bgp-from--RSVR2'
 set protocols bgp 65000 peer-group RSVR2 address-family ipv4-unicast soft-reconfiguration inbound
 set protocols bgp 65000 peer-group RSVR2 remote-as '65000'
-set protocols bgp 65000 peer-group RSVR2 update-source ${natpe2ip2}
+set protocols bgp 65000 peer-group RSVR2 update-source ${oversea2ip1}
 set protocols bgp 65000 timers holdtime '15'
 set protocols bgp 65000 timers keepalive '60'
 echo '>>>DNS劫持<<<'
@@ -1063,12 +1081,34 @@ echo '>>>本地NAT<<<'
 set nat source rule 100 outbound-interface 'eth0'
 set nat source rule 100 translation address 'masquerade'
 echo '# 海外NAT<<<'
-set nat source rule 1999 outbound-interface ${natpe1if}
-set nat source rule 1999 destination address '!192.168.0.0/16'
-set nat source rule 1999 translation address ${oversea1ip1}
-set nat source rule 2999 outbound-interface ${natpe2if}
-set nat source rule 2999 destination address '!192.168.0.0/16'
-set nat source rule 2999 translation address ${oversea2ip1}
+set nat source rule 1001 outbound-interface ${natpe1if}
+set nat source rule 1001 source address 192.168.0.0/16
+set nat source rule 1001 translation address ${oversea1ip1}
+set nat source rule 2001 outbound-interface ${natpe2if}
+set nat source rule 2001 source address 192.168.0.0/16
+set nat source rule 2001 translation address ${oversea2ip1}
+#
+set nat source rule 1991 outbound-interface ${natpe1if}
+set nat source rule 1991 destination address ${oversea1dns}
+set nat source rule 1991 translation address ${oversea1ip1}
+set nat source rule 2991 outbound-interface ${natpe2if}
+set nat source rule 2991 destination address ${oversea1dns}
+set nat source rule 2991 translation address ${oversea2ip1}
+#
+set nat source rule 1992 outbound-interface ${natpe1if}
+set nat source rule 1992 destination address ${oversea2dns}
+set nat source rule 1992 translation address ${oversea1ip1}
+set nat source rule 2992 outbound-interface ${natpe2if}
+set nat source rule 2992 destination address ${oversea2dns}
+set nat source rule 2992 translation address ${oversea2ip1}
+#
+#set nat source rule 1999 outbound-interface ${natpe1if}
+#set nat source rule 1999 source address ${natpe1ip2}
+#set nat source rule 1999 translation address ${oversea1ip1}
+#set nat source rule 2999 outbound-interface ${natpe2if}
+#set nat source rule 2999 source address ${natpe2ip2}
+#set nat source rule 2999 translation address ${oversea2ip1}
+#
 echo '# 分流DNS配置<<<'
 delete system name-server
 set system name-server 192.168.8.1
@@ -1079,7 +1119,7 @@ set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 defau
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 lease '7200'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 name-server '192.168.8.1'
 set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 start '192.168.8.2'
-set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 stop '192.168.8.100'
+set service dhcp-server shared-network-name dhcp_br2 subnet 192.168.8.0/24 range 0 stop '192.168.8.200'
 echo '>>>NetFlow<<<'
 set system flow-accounting interface br2
 set system flow-accounting netflow engine-id '1'

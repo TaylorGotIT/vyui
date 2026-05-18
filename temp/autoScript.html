@@ -14,6 +14,20 @@
     <textarea id="config_textarea" rows="8" cols="48" placeholder="输入NOC分配的配置信息"></textarea><br>
     <select id="service_select" onchange="getTempJS(this.value)">
             <option value="">请下拉选中一个服务模板[ 默认为空 ]</option>
+            <option value="usg_fastip002" class="on">FastIP 华为乾坤防火墙 HK 虚拟接口IPsec [ huawei ] New!!!</option>
+            <option value="usg_fastip003" class="on">FastIP 华为乾坤防火墙 非HK 虚拟接口IPsec [ huawei ] New!!!</option>
+            <option value="usg_fastip004" class="on">FastIP 华为乾坤防火墙 非HK 无备份单出口 [ huawei ] New!!!</option>
+            <option value="usg_fastip005" class="on">FastIP 华为乾坤防火墙 非HK 自环接口IPsec [ huawei ] New!!!</option>
+            <option value="usg_fastip001" class="on">FastIP 华为乾坤防火墙 HK 传统物理接口IPsec [ huawei ]</option>
+
+            <option value="usg_mpls001" class="on">MPLS 华为乾坤防火墙 传统组网 [ huawei ] New!!!</option>
+
+            <option value="usg_mpls002" class="on">MPLS 华为乾坤防火墙 SD-WAN自环组网 [ huawei ] New!!!</option>
+
+            <option value="fastip106" class="on">FastIP 单出口 单个二次GRE GRE Over OpenVPN 单运营商[ fnetos ]</option>
+            <option value="fastip108" class="on">FastIP 海外主备双出口 公网BGP Server 两个二次GRE GRE Over OpenVPN 单运营商[ fnetos ]</option>
+            <option value="fastip109" class="on">FastIP 海外主备双出口 公网BGP Server Gre Over IPsec 单运营商[ fnetos ]</option>
+
             <option value="fastip001" class="on">FastIP 单运营商[ fnetos ]</option>
             <option value="fastip002" class="on">FastIP 双运营商[ fnetos ]</option>
             <option value="fastip005" class="on">FastIP 单运营商 公网GRE [ fnetos ]</option>
@@ -22,19 +36,23 @@
             <option value="fastip101" class="on">FastIP 假组网 单运营商[ fnetos ]</option>
             <option value="fastip102" class="on">FastIP 假组网 双运营商[ fnetos ]</option>
             <option value="fastip103" class="on">FastIP 单出口 GRE Over OpenVPN 单运营商[ fnetos ]</option>
-            <option value="fastip106" class="on">FastIP 单出口 单个二次GRE GRE Over OpenVPN 单运营商[ fnetos ]</option>
+
             <option value="fastip105" class="on">FastIP 多出口 两个二次GRE GRE Over OpenVPN 单运营商[ fnetos ]</option>
             <option value="fastip107" class="on">FastIP 海外主备双出口 两个二次GRE GRE Over OpenVPN 单运营商[ fnetos ]</option>
-            <option value="fastip108" class="on">FastIP 海外主备双出口 公网BGP Server 两个二次GRE GRE Over OpenVPN 单运营商[ fnetos ]</option>
+
             <option value="fastip301" class="on">FastIP 假组网模式[ centos7 gre]</option>
             <option value="fastip302" class="on">FastIP 假组网模式[ centos7 gre over openvpn]</option>
+            <option value="fastip303" class="on">FastIP 假组网模式[ centos7 openvpn]</option>
             <option value="fastip201" class="on">FastIP Tiktok单区域 单运营商[ huawei ]</option>
             <option value="sdwan001" class="on">华为SD-WAN子接口自环 单运营商[huawei]</option>
             <option value="sdwan005" class="on">华为SD-WAN子接口自环 单营商 dhcp接入[huawei]</option>
             <option value="sdwan002" class="on">华为SD-WAN子接口自环 双运营商[huawei]</option>
+            <option value="sdwan003" class="on">华为SD-WAN子接口自环 双机[huawei]</option>
             <option value="mpls001" class="on">组网 旁挂模式[ fnetos ]</option>
             <option value="fortinet_mpls001" class="on">飞塔防火墙 MPLS 组网[ fortinet ]</option>
-            <option value="usg_fastip001" class="on">华为乾坤防火墙 FastIP [ huawei ]</option>
+            <option value="fortinet_fastip001" class="on">飞塔防火墙 FastIP 新IPsec[ fortinet ]</option>
+
+
             <option value="sslvpn001" class="on">SSLVPN[ fnetos ]</option>
 
             <option value="fastip004" class="off">FastIP 双运营商[ huawei ]</option>
@@ -44,7 +62,7 @@
             <option value="fastip106" class="off">FastIP Tiktok多区域 双运营商[ fnetos ]</option>
             <option value="fastip203" class="off">FastIP 云主机模式[ centos7 fastip]</option>
             <option value="fastip105" class="off">FastIP 白名单模式[ fnetos whitelist]</option>
-            <option value="sdwan003" class="off">华为SD-WAN子接口自环 双机[huawei]</option>
+
             <option value="mpls002" class="off">组网 + FastIP 旁挂模式[ fnetos ]</option>
     </select>
 

@@ -459,15 +459,16 @@ interface ${wan1}
  ip binding vpn-instance ipsec1
  ip address ${wan1ip}
 quit
-ip route-static vpn-instance ipsec1 0.0.0.0 0 192.168.1.1 preference 222
-ftp server permit interface GigabitEthernet 0/0/0
+ip route-static vpn-instance ipsec1 0.0.0.0 0 ${wan1gw} preference 222
+set default ftp-directory flash:
+ftp server permit interface Vlanif1
 ftp server enable
 ssh server permit interface all
 stelnet server enable
 aaa
  undo local-aaa-user password policy administrator
- local-user admin service-type terminal ssh http
- local-user bothwin password irreversible-cipher Tfe28@w%
+ password history record number 0
+ password expire 0
  local-user bothwin service-type terminal ssh ftp
  local-user bothwin ftp-directory flash:
  local-user bothwin privilege level 15

@@ -845,8 +845,8 @@ set firewall name WAN2LOCAL rule 1220 action 'accept'
 set firewall name WAN2LOCAL rule 1220 protocol 'ipip'
 
 set interfaces ethernet ${wan1} firewall local name 'WAN2LOCAL'
-set interfaces tunnel ${ac1if} firewall local name 'WAN2LOCAL'
-set interfaces tunnel ${ac2if} firewall local name 'WAN2LOCAL'
+set interfaces openvpn ${ac1if} firewall local name 'WAN2LOCAL'
+set interfaces openvpn ${ac2if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe1if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${pe2if} firewall local name 'WAN2LOCAL'
 set interfaces tunnel ${natpe1if} firewall local name 'WAN2LOCAL'
@@ -1057,11 +1057,30 @@ echo '>>>本地NAT<<<'
 set nat source rule 100 outbound-interface 'eth0'
 set nat source rule 100 translation address 'masquerade'
 echo '# 海外NAT<<<'
+set nat source rule 1001 outbound-interface ${natpe1if}
+set nat source rule 1001 source address 192.168.0.0/16
+set nat source rule 1001 translation address ${oversea1ip1}
+set nat source rule 2001 outbound-interface ${natpe2if}
+set nat source rule 2001 source address 192.168.0.0/16
+set nat source rule 2001 translation address ${oversea2ip1}
+#
+set nat source rule 1991 outbound-interface ${natpe1if}
+set nat source rule 1991 destination address '10.0.0.0/8'
+set nat source rule 1991 exclude
+set nat source rule 2991 outbound-interface ${natpe2if}
+set nat source rule 2991 destination address '10.0.0.0/8'
+set nat source rule 2991 exclude
+#
+set nat source rule 1992 outbound-interface ${natpe1if}
+set nat source rule 1992 destination address '192.168.0.0/16'
+set nat source rule 1992 exclude
+set nat source rule 2992 outbound-interface ${natpe2if}
+set nat source rule 2992 destination address '192.168.0.0/16'
+set nat source rule 2992 exclude
+#
 set nat source rule 1999 outbound-interface ${natpe1if}
-set nat source rule 1999 destination address '!192.168.0.0/16'
 set nat source rule 1999 translation address ${oversea1ip1}
 set nat source rule 2999 outbound-interface ${natpe2if}
-set nat source rule 2999 destination address '!192.168.0.0/16'
 set nat source rule 2999 translation address ${oversea2ip1}
 echo '# 分流DNS配置<<<'
 delete system name-server
@@ -1088,95 +1107,7 @@ set system flow-accounting netflow timeout tcp-rst '120'
 set system flow-accounting netflow timeout udp '120'
 set system flow-accounting netflow version '9'
 set system flow-accounting syslog-facility 'daemon'
-
-###AdGuardHome DNS解决客户需要自行管理DNS问题###
-add container image adguard/adguardhome
 #
-sudo mkdir /opt/adguardhome
-#
-config
-set container name AdGuardHome image 'docker.io/adguard/adguardhome:latest'
-set container name AdGuardHome allow-host-networks
-set container name AdGuardHome volume dir destination '/opt/adguardhome/conf'
-set container name AdGuardHome volume dir source '/opt/adguardhome'
-commit
-save
-exit
-show container log AdGuardHome
-# 方案1：黑名单 仅控制海外域名解析
-# 分流DNS(192.168.8.1)--->国内域名---223.5.5.5&223.6.6.6
-#                    --->海外域名---AdGuardHome(127.0.0.1)---Web管理黑白名单
-set service dns forwarding allow-from '0.0.0.0/0'
-set service dns forwarding cache-size '10000'
-set service dns forwarding dnssec 'off'
-set service dns forwarding domainlist CN file '/opt/cn.txt'
-set service dns forwarding domainlist CN recursion-desired
-set service dns forwarding domainlist CN server 223.5.5.5
-set service dns forwarding domainlist CN server 223.6.6.6
-set service dns forwarding listen-address 192.168.8.1
-set service dns forwarding name-server 127.0.0.1
-
-##############
-# 已阻止服务
-###############
-    ids:
-	  - facebook
-      - hulu
-	  - imgur
-      - instagram
-      - line
-	  - netflix
-	  - spotify
-	  - snapchat
-      - telegram
-      - tumblr
-      - twitter
-	  - twitch
-	  - viber
-      - whatsapp
-#自定义黑名单
-#ChatGPT
-||openai.com^
-#v2ray vxray clash等代理关闭 VPN软件
-||v2ray.com^
-||ssr.tools^
-||nordvpn.com^
-||openvpn.net^
-#视频 直播 图片类
-||fc2.com^
-||pinterest.com^
-#即时通讯类
-||indiatimes.com^
-||mewe.com^
-# 宗教 政治类 必禁止
-||jw.org^
-||falundafa.org^
-||dalailama.com^
-||freetibet.org^
-||tibet.net^
-||cnd.org^
-||aamacau.com^
-||dpp.org.tw^
-||citizenpowerforchina.org^
-||gov.tw^
-||discuss.com.hk^
-||mingpao.com^
-||lihkg.com^
-||flipboard.com^
-||theepochtimes.com^
-||epochtimes.com^
-||hkgolden.com^
-||ntdtv.com^
-||hrw.org^
-||cn.theaustralian.com.au^
-||theinitium.com^
-||amnesty.org^
-||radioaustralia.net.au^
-||pincong.rocks^
-||xsden.info^
-||xsden.org^
-||rsf.org^
-
 echo '# 登录消息[banner]'
 set system login banner post-login "################ \n\
 SN: E1X16225005xxxxxxxx \n\

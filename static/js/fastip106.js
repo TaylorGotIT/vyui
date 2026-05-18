@@ -653,6 +653,11 @@ set system conntrack timeout tcp last-ack '30'
 set system conntrack timeout tcp syn-recv '60'
 set system conntrack timeout tcp syn-sent '120'
 set system conntrack timeout tcp time-wait '120'
+echo '# Portal配置'
+set system syslog global facility all level 'info'
+set system syslog host 192.168.237.78 facility protocols level 'debug'
+set openfalcon server-address 192.168.237.86
+set openfalcon endpoint-name ${lineid}-${cname}-${area}
 echo '>>>NetFlow<<<'
 set system flow-accounting interface eth2
 set system flow-accounting netflow engine-id '1'
@@ -1098,12 +1103,21 @@ echo '>>>本地NAT<<<'
 set nat source rule 100 outbound-interface 'eth0'
 set nat source rule 100 translation address 'masquerade'
 echo '# 海外NAT'
+set nat source rule 1001 outbound-interface ${natpe1if}
+set nat source rule 1001 source address 192.168.0.0/16
+set nat source rule 1001 translation address ${oversea1ip1}
+#
+set nat source rule 1991 outbound-interface ${natpe1if}
+set nat source rule 1991 destination address '10.0.0.0/8'
+set nat source rule 1991 exclude
+#
+set nat source rule 1992 outbound-interface ${natpe1if}
+set nat source rule 1992 destination address '192.168.0.0/16'
+set nat source rule 1992 exclude
+#
 set nat source rule 1999 outbound-interface ${natpe1if}
 set nat source rule 1999 translation address ${oversea1ip1}
-echo '# MAC 绑定 多IP时绑定<<<'
-# set nat source rule 101 source address 192.168.9.101/32
-# set nat source rule 101 outbound-interface ${natpe1if}
-# set nat source rule 101 translation address ${oversea1ip1}
+#
 ##############
 如果客户需要BGP分流
 echo '>>>动态路由配置[BGP]<<<'

@@ -252,7 +252,6 @@ function sdwan001sub(url){
 `#Fnet Huawei SD-WAN MPLS with GRE Over Ipsec Template.
 #Operator: ${user}
 #${time.cn}
-#version >= V300R019C13SPC200
 # coding=utf-8
 import ops
 import sys
@@ -262,6 +261,7 @@ def ops_condition(ops):
     value, descri_str = ops.iclog.subscribe(tag="startup", moduName="DEV", infoAlias="ENTUP", logInfo="register success")
     print('Script has being installed')
     return 0
+
 
 def ops_execute(ops):
     handle, err_desp = ops.cli.open()
@@ -327,7 +327,7 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "ike-peer backup")
     result, n11, n21 = ops.cli.execute(handle, "proposal ipsectran1")
     result, n11, n21 = ops.cli.execute(handle, "quit")
-    #loop interface
+    # loop interface
     result, n11, n21 = ops.cli.execute(handle, "interface ${loop1if}")
     result, n11, n21 = ops.cli.execute(handle, "undo portswitch")
     result, n11, n21 = ops.cli.execute(handle, "interface ${loop1if}.100")
@@ -473,13 +473,16 @@ get ${lineid}.py
 # local-user admin password irreversible-cipher admin@huawei.com
 
 【2】本地FTP
-ftp server permit interface GigabitEthernet 0/0/0
+set default ftp-directory flash:
+ftp server permit interface Vlanif1
 ftp server enable
 ssh server permit interface all
 stelnet server enable
 aaa
+ undo local-aaa-user password policy administrator
+ password history record number 0
+ password expire 0
  local-user bothwin service-type terminal ssh ftp
- local-user bothwin ftp-directory flash:
  local-user bothwin privilege level 15
  quit
  quit

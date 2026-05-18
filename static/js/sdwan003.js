@@ -241,7 +241,7 @@ function sdwan003sub(url){
   let ce2lo = $("#ce2_lo_input").val();
 
 /* CPE1 MPLS Main Config */
-  let sdwan003mplsGreOverIPsec1  =
+  let sdwan003mplsGreOverunderlay_ipsecA  =
 `#Fnet Huawei SD-WAN MPLS with GRE Over Ipsec Template.
 #Operator: ${user}
 #${time.cn}
@@ -261,42 +261,39 @@ def ops_execute(ops):
     print(err_desp)
     choice={" Continue?":"Y"}
     result, n11, n21 = ops.cli.execute(handle, "system-view")
-    result, n11, n21 = ops.cli.execute(handle, "ip vpn-instance ipsec1")
-    result, n11, n21 = ops.cli.execute(handle, "ipv4-family")
-    result, n11, n21 = ops.cli.execute(handle, "quit")
-    result, n11, n21 = ops.cli.execute(handle, "ip vpn-instance ipsec2")
+    result, n11, n21 = ops.cli.execute(handle, "ip vpn-instance underlay_ipsecA")
     result, n11, n21 = ops.cli.execute(handle, "ipv4-family")
     result, n11, n21 = ops.cli.execute(handle, "quit")
     result, n11, n21 = ops.cli.execute(handle, "acl number 3333")
-    result, n11, n21 = ops.cli.execute(handle, "rule 1 permit ip vpn-instance ipsec2 source ${ce2lo} 0 destination ${pe2lo} 0")
+    result, n11, n21 = ops.cli.execute(handle, "rule 1 permit ip vpn-instance underlay_ipsecA source ${ce2lo} 0 destination ${pe2lo} 0")
     result, n11, n21 = ops.cli.execute(handle, "acl number 3999")
     result, n11, n21 = ops.cli.execute(handle, "rule 10 permit ip source 100.64.0.0 0.0.255.255")
     result, n11, n21 = ops.cli.execute(handle, "quit")
     result, n11, n21 = ops.cli.execute(handle, "ipsec proposal ipsectran1")
-    result, n11, n21 = ops.cli.execute(handle, "esp authentication-algorithm sha1")
-    result, n11, n21 = ops.cli.execute(handle, "esp encryption-algorithm 3des")
+    result, n11, n21 = ops.cli.execute(handle, "esp authentication-algorithm sha1", choice)
+    result, n11, n21 = ops.cli.execute(handle, "esp encryption-algorithm 3des", choice)
     result, n11, n21 = ops.cli.execute(handle, "ike proposal 10")
-    result, n11, n21 = ops.cli.execute(handle, "encryption-algorithm 3des")
-    result, n11, n21 = ops.cli.execute(handle, "dh group2")
-    result, n11, n21 = ops.cli.execute(handle, "authentication-algorithm sha1")
-    result, n11, n21 = ops.cli.execute(handle, "sa duration 28800")
+    result, n11, n21 = ops.cli.execute(handle, "encryption-algorithm 3des", choice)
+    result, n11, n21 = ops.cli.execute(handle, "dh group2", choice)
+    result, n11, n21 = ops.cli.execute(handle, "authentication-algorithm sha1", choice)
     result, n11, n21 = ops.cli.execute(handle, "authentication-method pre-share")
-    result, n11, n21 = ops.cli.execute(handle, "integrity-algorithm hmac-sha1-96")
-    result, n11, n21 = ops.cli.execute(handle, "prf hmac-sha1")
+    result, n11, n21 = ops.cli.execute(handle, "integrity-algorithm hmac-sha2-256")
+    result, n11, n21 = ops.cli.execute(handle, "prf hmac-sha2-256")
     result, n11, n21 = ops.cli.execute(handle, "ike peer main")
-    result, n11, n21 = ops.cli.execute(handle, "undo version 2")
-    result, n11, n21 = ops.cli.execute(handle, "pre-shared-key cipher ${pe1psk}")
+    result, n11, n21 = ops.cli.execute(handle, "undo version 1")
+    result, n11, n21 = ops.cli.execute(handle, "version 2")
+    result, n11, n21 = ops.cli.execute(handle, "pre-shared-key cipher both-win")
     result, n11, n21 = ops.cli.execute(handle, "ike-proposal 10")
     result, n11, n21 = ops.cli.execute(handle, "dpd retransmit-interval 30")
     result, n11, n21 = ops.cli.execute(handle, "dpd packet receive if-related enable")
-    result, n11, n21 = ops.cli.execute(handle, "remote-address vpn-instance ipsec2 ${pe1pub}")
+    result, n11, n21 = ops.cli.execute(handle, "remote-address vpn-instance underlay_ipsecB ${pe1pub}")
     result, n11, n21 = ops.cli.execute(handle, "rsa encryption-padding oaep")
     result, n11, n21 = ops.cli.execute(handle, "rsa signature-padding pss")
     result, n11, n21 = ops.cli.execute(handle, "undo local-id-preference certificate enable")
     result, n11, n21 = ops.cli.execute(handle, "ikev2 authentication sign-hash sha2-256")
     result, n11, n21 = ops.cli.execute(handle, "ipsec policy S2S-IPSEC 10 isakmp")
     result, n11, n21 = ops.cli.execute(handle, "security acl 3333")
-    result, n11, n21 = ops.cli.execute(handle, "pfs dh-group2")
+    result, n11, n21 = ops.cli.execute(handle, "pfs dh-group2", choice)
     result, n11, n21 = ops.cli.execute(handle, "ike-peer main")
     result, n11, n21 = ops.cli.execute(handle, "proposal ipsectran1")
     result, n11, n21 = ops.cli.execute(handle, "quit")
@@ -306,48 +303,49 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "interface ${loop1if}.100")
     result, n11, n21 = ops.cli.execute(handle, "description mpls-wan1")
     result, n11, n21 = ops.cli.execute(handle, "dot1q termination vid 100")
-    result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance ipsec1")
+    result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance underlay_ipsecA")
     result, n11, n21 = ops.cli.execute(handle, "ip address ${loop1ip1} 30")
+    #wan interface
     result, n11, n21 = ops.cli.execute(handle, "interface ${wan1}")
     result, n11, n21 = ops.cli.execute(handle, "description to-wan1")
-    result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance ipsec1")
+    result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance underlay_ipsecA")
     result, n11, n21 = ops.cli.execute(handle, "ip address ${wan1ip}")
     result, n11, n21 = ops.cli.execute(handle, "nat outbound 3999 ")
     result, n11, n21 = ops.cli.execute(handle, "ipsec policy S2S-IPSEC")
     # lo1
     result, n11, n21 = ops.cli.execute(handle, "interface LoopBack1")
-    result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance ipsec1")
+    result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance underlay_ipsecA")
     result, n11, n21 = ops.cli.execute(handle, "ip address ${ce1lo} 32")
     # tun1
     result, n11, n21 = ops.cli.execute(handle, "interface Tunnel0/0/1000")
     result, n11, n21 = ops.cli.execute(handle, "description 'pri-to-${pe1}-${pe1if}-by-${wan1}'")
-    result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance ipsec1")
+    result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance underlay_ipsecA")
     result, n11, n21 = ops.cli.execute(handle, "tcp adjust-mss 1300")
     result, n11, n21 = ops.cli.execute(handle, "ip address ${pe1ip2} 30")
     result, n11, n21 = ops.cli.execute(handle, "tunnel-protocol gre")
     result, n11, n21 = ops.cli.execute(handle, "source LoopBack1")
-    result, n11, n21 = ops.cli.execute(handle, "destination vpn-instance ipsec1 ${pe1lo}")
+    result, n11, n21 = ops.cli.execute(handle, "destination vpn-instance underlay_ipsecA ${pe1lo}")
     result, n11, n21 = ops.cli.execute(handle, "quit")
     # nqa
     result, n11, n21 = ops.cli.execute(handle, "nqa event 1 log")
-    result, n11, n21 = ops.cli.execute(handle, "nqa test-instance admin ipsecmain")
+    result, n11, n21 = ops.cli.execute(handle, "nqa test-instance admin ipsec_main")
     result, n11, n21 = ops.cli.execute(handle, "test-type icmp")
     result, n11, n21 = ops.cli.execute(handle, "destination-address ipv4 ${pe1lo}")
     result, n11, n21 = ops.cli.execute(handle, "source-address ipv4 ${ce1lo}")
     result, n11, n21 = ops.cli.execute(handle, "frequency 30")
     result, n11, n21 = ops.cli.execute(handle, "probe-count 6")
-    result, n11, n21 = ops.cli.execute(handle, "vpn-instance ipsec1")
+    result, n11, n21 = ops.cli.execute(handle, "vpn-instance underlay_ipsecA")
     result, n11, n21 = ops.cli.execute(handle, "alarm 1 lost-packet-ratio absolute rising-threshold 100 1")
     result, n11, n21 = ops.cli.execute(handle, "start now")
     result, n11, n21 = ops.cli.execute(handle, "quit")
     # static route
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance ipsec1 0.0.0.0 0 ${wan1gw}")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance ipsec1 ${pe1lo} 32 ${wan1gw} description pe1lo")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance ipsec1 ${pe1pub} 32 ${wan1gw} description pe1pub")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance ipsec1 100.64.0.0 16 ${pe1ip1} description mpls1")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance ipsec1 100.65.0.0 16 ${pe1ip1} description mpls2")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance ipsec1 114.113.245.99 32 ${pe1ip1} description monitor1")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance ipsec1 192.168.55.250 32 ${pe1ip1} description jumpServer")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 0.0.0.0 0 ${wan1gw}")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA ${pe1lo} 32 ${wan1gw} description pe1lo")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA ${pe1pub} 32 ${wan1gw} description pe1pub")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 100.64.0.0 16 ${pe1ip1} description mpls1")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 100.65.0.0 16 ${pe1ip1} description mpls2")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 114.113.245.99 32 ${pe1ip1} description monitor1")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 192.168.55.250 32 ${pe1ip1} description jumpServer")
     ops.syslog("ops:add_tunnel is success", "critical", "syslog")
     ops.cli.close(handle)
     return 0
@@ -357,42 +355,34 @@ let sdwan003helpText1 = `##########中控配置###########
 name:       mpls_main
 tn:         mpls_main
 rd:         mpls
-vrf:        underlay_1
+vrf:        underlay_mpls
 interface:  ${loop2if}.100
 ip address: ${loop1ip2}/30
 gateway:    ${loop1ip1}
 
 ##########初始化开局脚本#####
-ip vpn-instance ipsec1
- ipv4-family
-quit
-quit
 interface ${wan1}
  undo portswitch
- ip binding vpn-instance ipsec1
- ip address ${wan1ip}
-quit
-ip route-static vpn-instance ipsec1 0.0.0.0 0 192.168.1.1 preference 222
-ftp server permit interface GigabitEthernet 0/0/0
+ ip address dhcp
+ quit
+#
+ftp server permit interface Vlanif1
 ftp server enable
 ssh server permit interface all
 stelnet server enable
 aaa
  undo local-aaa-user password policy administrator
- local-user admin service-type terminal ssh http
- local-user bothwin password irreversible-cipher Tfe28@w%
- local-user bothwin service-type terminal ssh ftp
+ password history record number 0
+ password expire 0
  local-user bothwin ftp-directory flash:
  local-user bothwin privilege level 15
-# 确认 Y
-# 还原初始密码
-local-user admin password irreversible-cipher admin@huawei.com
-quit
-quit
+ local-user bothwin service-type terminal ssh ftp
+ quit
+ quit
 #####上传 ${lineid}.py 开局脚本及ipsec自动重置脚本#####
 【1】公网FTP
 登录公司公网FTP，上传文件到自己的文件夹，路由器通过公网获取开局脚本。
-ftp 59.36.7.222 vpn-instance ipsec1
+ftp 59.36.7.222 vpn-instance underlay_ipsecA
 dir
 get ${lineid}.py
 
@@ -401,7 +391,7 @@ get ${lineid}.py
 # windows文件浏览页面输入访问路径：ftp://192.168.1.1/
 # 认证登录后 上传${lineid}.py ipsec_main.py ipsec_backup.py
 #关闭ftp
-undo ftp server permit interface GigabitEthernet 0/0/0
+undo ftp server permit interface Vlanif1
 undo ftp server enable
 # 安装python脚本：
 ops install file ${lineid}.py
@@ -420,28 +410,27 @@ reboot
 #不保存配置到下次启动     N
 #确认重启   Y
 #重启后Ping测试
-ping -vpn-instance ipsec1 -a ${ce1lo} ${pe1lo}
-ping -vpn-instance ipsec1 ${pe1ip1}
-ping -vpn-instance ipsec1 -a ${loop1ip1} 223.5.5.5
+ping -vpn-instance underlay_ipsecA -a ${ce1lo} ${pe1lo}
+ping -vpn-instance underlay_ipsecA ${pe1ip1}
+ping -vpn-instance underlay_ipsecA -a ${loop1ip1} 223.5.5.5
 ##########命令行开局#########
 system-view
-ip vpn-instance underlay_1
+ip vpn-instance underlay_mpls
  ipv4-family
- quit
- quit
+#
 interface ${loop2if}
  undo portswitch
 #
 interface ${loop2if}.100
  dot1q termination vid 100
- ip binding vpn-instance underlay_1
+ ip binding vpn-instance underlay_mpls
  ip address ${loop1ip2} 30
 #
-ip route-static vpn-instance underlay_1 ${controller1ip} 32 ${loop2if}.100 ${loop1ip1} tag 4400 description agile-controller
+ip route-static vpn-instance underlay_mpls ${controller1ip} 32 ${loop2if}.100 ${loop1ip1} tag 4400 description agile-controller
 #Pinc测试
-ping -vpn-instance underlay_1 -a ${loop1ip2} ${controller1ip}
+ping -vpn-instance underlay_mpls -a ${loop1ip2} ${controller1ip}
 #确认OK后，命令行开局
- agile controller host ${controller1ip} port 10020 vpn-instance underlay_1
+ agile controller host ${controller1ip} port 10020 vpn-instance underlay_mpls
 quit
 save
 #保存配置 Y
@@ -485,7 +474,7 @@ ops
 `;
 
 /* CPE2 MPLS Backup Config */
-let sdwan003mplsGreOverIPsec2  =
+let sdwan003mplsGreOverunderlay_ipsecB  =
 `#Fnet Huawei SD-WAN MPLS with GRE Over Ipsec Template.
 #Operator: ${user}
 #${time.cn}
@@ -505,11 +494,11 @@ def ops_execute(ops):
     print(err_desp)
     choice={" Continue?":"Y"}
     result, n11, n21 = ops.cli.execute(handle, "system-view")
-    result, n11, n21 = ops.cli.execute(handle, "ip vpn-instance ipsec2")
+    result, n11, n21 = ops.cli.execute(handle, "ip vpn-instance underlay_ipsecB")
     result, n11, n21 = ops.cli.execute(handle, "ipv4-family")
     result, n11, n21 = ops.cli.execute(handle, "quit")
     result, n11, n21 = ops.cli.execute(handle, "acl number 3334")
-    result, n11, n21 = ops.cli.execute(handle, "rule 1 permit ip vpn-instance ipsec2 source ${ce2lo} 0 destination ${pe2lo} 0")
+    result, n11, n21 = ops.cli.execute(handle, "rule 1 permit ip vpn-instance underlay_ipsecB source ${ce2lo} 0 destination ${pe2lo} 0")
     result, n11, n21 = ops.cli.execute(handle, "acl number 3999")
     result, n11, n21 = ops.cli.execute(handle, "rule 20 permit ip source 100.65.0.0 0.0.255.255")
     result, n11, n21 = ops.cli.execute(handle, "quit")
@@ -530,7 +519,7 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "ike-proposal 10")
     result, n11, n21 = ops.cli.execute(handle, "dpd retransmit-interval 30")
     result, n11, n21 = ops.cli.execute(handle, "dpd packet receive if-related enable")
-    result, n11, n21 = ops.cli.execute(handle, "remote-address vpn-instance ipsec2 ${pe2pub}")
+    result, n11, n21 = ops.cli.execute(handle, "remote-address vpn-instance underlay_ipsecB ${pe2pub}")
     result, n11, n21 = ops.cli.execute(handle, "rsa encryption-padding oaep")
     result, n11, n21 = ops.cli.execute(handle, "rsa signature-padding pss")
     result, n11, n21 = ops.cli.execute(handle, "undo local-id-preference certificate enable")
@@ -547,27 +536,27 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "interface ${loop1if}.200")
     result, n11, n21 = ops.cli.execute(handle, "description mpls-wan2")
     result, n11, n21 = ops.cli.execute(handle, "dot1q termination vid 200")
-    result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance ipsec2")
+    result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance underlay_ipsecB")
     result, n11, n21 = ops.cli.execute(handle, "ip address ${loop2ip1} 30")
     result, n11, n21 = ops.cli.execute(handle, "interface ${wan1}")
     result, n11, n21 = ops.cli.execute(handle, "description to-wan1")
-    result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance ipsec2")
+    result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance underlay_ipsecB")
     result, n11, n21 = ops.cli.execute(handle, "ip address ${wan1ip}")
     result, n11, n21 = ops.cli.execute(handle, "nat outbound 3999 ")
     result, n11, n21 = ops.cli.execute(handle, "ipsec policy S2S-IPSEC")
     # lo2
     result, n11, n21 = ops.cli.execute(handle, "interface LoopBack2")
-    result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance ipsec2")
+    result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance underlay_ipsecB")
     result, n11, n21 = ops.cli.execute(handle, "ip address ${ce2lo} 32")
     # tun2
     result, n11, n21 = ops.cli.execute(handle, "interface Tunnel0/0/1001")
     result, n11, n21 = ops.cli.execute(handle, "description 'bak-to-${pe2}-${pe2if}-by-${wan1}'")
-    result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance ipsec2")
+    result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance underlay_ipsecB")
     result, n11, n21 = ops.cli.execute(handle, "tcp adjust-mss 1300")
     result, n11, n21 = ops.cli.execute(handle, "ip address ${pe2ip2} 30")
     result, n11, n21 = ops.cli.execute(handle, "tunnel-protocol gre")
     result, n11, n21 = ops.cli.execute(handle, "source LoopBack2")
-    result, n11, n21 = ops.cli.execute(handle, "destination vpn-instance ipsec2 ${pe2lo}")
+    result, n11, n21 = ops.cli.execute(handle, "destination vpn-instance underlay_ipsecB ${pe2lo}")
     result, n11, n21 = ops.cli.execute(handle, "quit")
     # nqa
     result, n11, n21 = ops.cli.execute(handle, "nqa test-instance admin ipsecbackup")
@@ -576,18 +565,18 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "source-address ipv4 ${ce2lo}")
     result, n11, n21 = ops.cli.execute(handle, "frequency 30")
     result, n11, n21 = ops.cli.execute(handle, "probe-count 6")
-    result, n11, n21 = ops.cli.execute(handle, "vpn-instance ipsec2")
+    result, n11, n21 = ops.cli.execute(handle, "vpn-instance underlay_ipsecB")
     result, n11, n21 = ops.cli.execute(handle, "alarm 1 lost-packet-ratio absolute rising-threshold 100 1")
     result, n11, n21 = ops.cli.execute(handle, "start now")
     result, n11, n21 = ops.cli.execute(handle, "quit")
     # static route
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance ipsec2 0.0.0.0 0 ${wan1gw}")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance ipsec2 ${pe2lo} 32 ${wan1gw} description pe2lo")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance ipsec2 ${pe2pub} 32 ${wan1gw} description pe2pub")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance ipsec2 100.64.0.0 16 ${pe2ip1} description mpls1")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance ipsec2 100.65.0.0 16 ${pe2ip1} description mpls2")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance ipsec2 114.113.245.100 32 ${pe2ip1} description monitor2")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance ipsec2 192.168.55.250 32 ${pe2ip1} description jumpServer")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 0.0.0.0 0 ${wan1gw}")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB ${pe2lo} 32 ${wan1gw} description pe2lo")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB ${pe2pub} 32 ${wan1gw} description pe2pub")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 100.64.0.0 16 ${pe2ip1} description mpls1")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 100.65.0.0 16 ${pe2ip1} description mpls2")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 114.113.245.100 32 ${pe2ip1} description monitor2")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 192.168.55.250 32 ${pe2ip1} description jumpServer")
     ops.syslog("ops:add_tunnel is success", "critical", "syslog")
     ops.cli.close(handle)
     return 0
@@ -603,24 +592,24 @@ ip address: ${loop2ip2}/30
 gateway:    ${loop2ip1}
 
 ##########初始化开局脚本#####
-ip vpn-instance ipsec2
+ip vpn-instance underlay_ipsecB
  ipv4-family
 quit
 quit
 interface ${wan1}
  undo portswitch
- ip binding vpn-instance ipsec2
+ ip binding vpn-instance underlay_ipsecB
  ip address ${wan1ip}
 quit
-ip route-static vpn-instance ipsec2 0.0.0.0 0 192.168.1.1 preference 222
-ftp server permit interface GigabitEthernet 0/0/0
+ip route-static vpn-instance underlay_ipsecB 0.0.0.0 0 192.168.1.1 preference 222
+ftp server permit interface Vlanif1
 ftp server enable
 ssh server permit interface all
 stelnet server enable
 aaa
  undo local-aaa-user password policy administrator
- local-user admin service-type terminal ssh http
- local-user bothwin password irreversible-cipher Tfe28@w%
+ password history record number 0
+ password expire 0
  local-user bothwin service-type terminal ssh ftp
  local-user bothwin ftp-directory flash:
  local-user bothwin privilege level 15
@@ -632,16 +621,16 @@ quit
 #####上传 ${line2}.py 开局脚本及ipsec自动重置脚本#####
 【1】公网FTP
 登录公司公网FTP，上传文件到自己的文件夹，路由器通过公网获取开局脚本。
-ftp 59.36.7.222 vpn-instance ipsec2
+ftp 59.36.7.222 vpn-instance underlay_ipsecB
 dir
 get ${line2}.py
 
 【2】本地FTP
 # 电脑网口 192.168.1.100/24 连接华为SD-WAN路由器 G0/0/0
 # windows文件浏览页面输入访问路径：ftp://192.168.1.1/
-# 认证登录后 上传${line2}.py ipsec_main.py ipsec_backup.py
+# 认证登录后 上传${line2}.py  ipsec_backup.py
 #关闭ftp
-undo ftp server permit interface GigabitEthernet 0/0/0
+undo ftp server permit interface Vlanif1
 undo ftp server enable
 # 安装python脚本：
 ops install file ${line2}.py
@@ -660,12 +649,12 @@ reboot
 #不保存配置到下次启动     N
 #确认重启   Y
 #重启后Ping测试
-ping -vpn-instance ipsec2 -a ${ce2lo} ${pe2lo}
-ping -vpn-instance ipsec2 ${pe2ip1}
-ping -vpn-instance ipsec2 -a ${loop2ip1} 223.5.5.5
+ping -vpn-instance underlay_ipsecB -a ${ce2lo} ${pe2lo}
+ping -vpn-instance underlay_ipsecB ${pe2ip1}
+ping -vpn-instance underlay_ipsecB -a ${loop2ip1} 223.5.5.5
 ##########命令行开局#########
 system-view
-ip vpn-instance underlay_1
+ip vpn-instance underlay_mpls1
  ipv4-family
  quit
  quit
@@ -674,14 +663,14 @@ interface ${loop2if}
 #
 interface ${loop2if}.200
  dot1q termination vid 200
- ip binding vpn-instance underlay_1
+ ip binding vpn-instance underlay_mpls1
  ip address ${loop2ip2} 30
 #
-ip route-static vpn-instance underlay_1 ${controller1ip} 32 ${loop2if}.200 ${loop2ip1} tag 4400 description agile-controller
+ip route-static vpn-instance underlay_mpls1 ${controller1ip} 32 ${loop2if}.200 ${loop2ip1} tag 4400 description agile-controller
 #Pinc测试
-ping -vpn-instance underlay_1 -a ${loop2ip2} ${controller1ip}
+ping -vpn-instance underlay_mpls1 -a ${loop2ip2} ${controller1ip}
 #确认OK后，命令行开局
- agile controller host ${controller1ip} port 10020 vpn-instance underlay_1
+ agile controller host ${controller1ip} port 10020 vpn-instance underlay_mpls1
 quit
 save
 #保存配置 Y
@@ -727,8 +716,8 @@ let scriptName1 = `${line1}.py`;
 let helpTextName1 = `HelpText-Main-${time.ez}`;
 let scriptName2 = `${line2}.py`;
 let helpTextName2 = `HelpText-Backup-${time.ez}`;
-downloadConfig(scriptName1, sdwan003mplsGreOverIPsec1);
+downloadConfig(scriptName1, sdwan003mplsGreOverunderlay_ipsecA);
 downloadConfig(helpTextName1, sdwan003helpText1);
-downloadConfig(scriptName2, sdwan003mplsGreOverIPsec2);
+downloadConfig(scriptName2, sdwan003mplsGreOverunderlay_ipsecB);
 downloadConfig(helpTextName2, sdwan003helpText2);
 };

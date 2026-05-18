@@ -1,4 +1,4 @@
-/* MPLS 组网 FnetOS */
+/* Fast IP SSLVPN HK出口  */
 
 const slvpn001_version = 1;
 const slvpn001html = `<table border="1">
