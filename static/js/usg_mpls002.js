@@ -452,9 +452,6 @@ log type traffic-report enable
 asset threat-insight enable
 asset monitor-host ip 192.168.0.0 mask 16
 #
-country CN
-Y
-#
 undo configuration exclusive by-user-name huawei
 #
 update schedule ips-sdb daily 03:00
@@ -490,6 +487,10 @@ web-manager enable port 8443
 web-manager http forward enable
 web-manager server-source all-interface
 Y
+web-manager acl 3999
+#
+user-interface con 0
+ authentication-mode aaa
 #
 #VPN实例创建
 ip vpn-instance underlay_ipsecA
@@ -520,12 +521,12 @@ interface GE ${loop1_if}.200
  dot1q termination vid 200
 #
 #配置主备Tun CE对接IP
-interface LoopBack1
+interface LoopBack1000
  description Main-IPsec-lo
  ip binding vpn-instance underlay_ipsecA
  ip address ${ce1lo} 32
 #
-interface LoopBack2
+interface LoopBack1001
  description Back-IPsec-lo
  ip binding vpn-instance underlay_ipsecB
  ip address ${ce2lo} 32
@@ -605,21 +606,21 @@ interface Tunnel1
  ip address unnumbered interface ${wan1}
  tunnel-protocol ipsec
  ipsec policy IPsecPolicy1
- service-manage ping permit
+ service-manage all permit
 #
 interface Tunnel2
  description IPsec-Back-Tunnnel2-${pe2}
  ip address unnumbered interface ${wan1}
  tunnel-protocol ipsec
  ipsec policy IPsecPolicy2
- service-manage ping permit
+ service-manage all permit
 #
 interface Tunnel1000
  description Main-to-NATPE1-${pe1}-${pe1if}
  mtu 1400
  ip address ${pe1ip2} 30
  tunnel-protocol gre
- source LoopBack1
+ source LoopBack1000
  destination ${pe1lo}
  service-manage all permit
 #
@@ -628,7 +629,7 @@ interface Tunnel2000
  mtu 1400
  ip address ${pe2ip2} 30
  tunnel-protocol gre
- source LoopBack2
+ source LoopBack1001
  destination ${pe2lo}
  service-manage all permit
 #

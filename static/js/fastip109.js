@@ -681,6 +681,7 @@ set service dns forwarding domainlist HK recursion-desired
 set service dns forwarding domainlist HK server ${dns1ip}
 set service dns forwarding domainlist HK server ${dns2ip}
 set service dns forwarding listen-address 0.0.0.0
+set service dns forwarding recursion-desired
 set service dns forwarding name-server ${dns1ip}
 set service dns forwarding name-server ${dns2ip}
 #

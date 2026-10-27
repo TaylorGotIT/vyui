@@ -428,19 +428,11 @@ asset monitor-host ip 10.0.0.0 mask 8
 asset monitor-host ip 172.16.0.0 mask 12
 asset monitor-host ip 192.168.0.0 mask 16
 #
-country CN
-Y
-#
 undo configuration exclusive by-user-name huawei
 #
 update schedule ips-sdb daily 03:00
 update schedule av-sdb daily 03:00
 update schedule sa-sdb daily 03:00
-#
-web-manager enable port 8443
-web-manager http forward enable
-web-manager server-source all-interface
-Y
 #
 #配置账号登录设备权限默认开ssh登录
 aaa
@@ -451,15 +443,6 @@ aaa
  local-user bothwin privilege level 3
  Y
  local-user bothwin service-type terminal telnet http ssh
- Y
-#
-# 客户账号可不添加
-aaa
- local-user ${lineid} password irreversible-cipher ${lineid}@Zxc
- local-user ${lineid} password-force-change disable
- local-user ${lineid} privilege level 3
- Y
- local-user ${lineid} service-type http
  Y
 #
 #配置tacacs认证登录
@@ -495,17 +478,23 @@ user-interface vty 0 15
  authentication-mode aaa
  protocol inbound ssh
 #
+web-manager enable port 8443
+web-manager http forward enable
+web-manager server-source all-interface
+Y
+web-manager acl 3999
+#
 user-interface con 0
  authentication-mode aaa
 #
 ${wan_route_temp}
 #
 #配置主备Tun CE对接IP
-interface LoopBack1
+interface LoopBack1000
  description Main-IPsec-lo
  ip address ${ce1lo} 32
 #
-interface LoopBack2
+interface LoopBack1001
  description Back-IPsec-lo
  ip address ${ce2lo} 32
 #
@@ -585,19 +574,21 @@ interface Tunnel10
  ip address unnumbered interface ${wan1}
  tunnel-protocol ipsec
  ipsec policy IPsecPolicy10
+ service-manage all permit
 #
 interface Tunnel20
  description IPsec-Back-Tunnel20-${pe2}
  ip address unnumbered interface ${wan1}
  tunnel-protocol ipsec
  ipsec policy IPsecPolicy20
+ service-manage all permit
 #
 interface Tunnel1010
  description Main-to-NATPE1-${pe1}-${pe1if}
  mtu 1400
  ip address ${pe1ip2} 30
  tunnel-protocol gre
- source LoopBack1
+ source LoopBack1000
  destination ${pe1lo}
  service-manage all permit
 #
@@ -606,7 +597,7 @@ interface Tunnel2010
  mtu 1400
  ip address ${pe2ip2} 30
  tunnel-protocol gre
- source LoopBack2
+ source LoopBack1001
  destination ${pe2lo}
  service-manage all permit
 #
@@ -861,6 +852,15 @@ condition alarm feature ipsec name hwIPSecTunnelStop DstIP eq ${ac2pub}
 # 保存配置
 quit
 save
+#
+# 客户账号可不添加
+aaa
+ local-user ${lineid}@default password irreversible-cipher ${lineid}@Zxc
+ local-user ${lineid}@default password-force-change disable
+ local-user ${lineid}@default privilege level 3
+ Y
+ local-user ${lineid}@default service-type http
+ Y
 #
 #SD-Card格式化
 >sys  #进入系统视图

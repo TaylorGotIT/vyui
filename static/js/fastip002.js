@@ -464,6 +464,7 @@ set service dns forwarding domainlist HK recursion-desired
 set service dns forwarding domainlist HK server ${oversea1dns}
 set service dns forwarding domainlist HK server ${oversea2dns}
 set service dns forwarding listen-address 0.0.0.0
+set service dns forwarding recursion-desired
 set service dns forwarding name-server ${oversea1dns}
 set service dns forwarding name-server ${oversea2dns}`;
     break;
@@ -803,7 +804,7 @@ set protocols bgp 65000 timers keepalive '60'
 #set protocols bgp 65000 neighbor ${bgp1server4} peer-group 'RSVR2'
 echo '>>>DNS劫持<<<'
 set nat destination rule 50 destination port 53
-set nat destination rule 50 inbound-interface ${wan1}
+set nat destination rule 50 inbound-interface br2
 set nat destination rule 50 protocol tcp_udp
 set nat destination rule 50 translation address 127.0.0.1
 echo '>>>本地NAT<<<'

@@ -533,6 +533,7 @@ set service dns forwarding domainlist HK recursion-desired
 set service dns forwarding domainlist HK server ${oversea1dns}
 set service dns forwarding domainlist HK server ${oversea2dns}
 set service dns forwarding listen-address 0.0.0.0
+set service dns forwarding recursion-desired
 set service dns forwarding name-server ${oversea1dns}
 set service dns forwarding name-server ${oversea2dns}`;
     break;
@@ -922,7 +923,7 @@ set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 ran
 set service dhcp-server shared-network-name dhcp_wlan1 subnet 192.168.9.0/24 range 0 stop '192.168.9.200'
 echo '>>>DNS劫持<<<'
 set nat destination rule 50 destination port 53
-set nat destination rule 50 inbound-interface ${wan1}
+set nat destination rule 50 inbound-interface br2
 set nat destination rule 50 protocol tcp_udp
 set nat destination rule 50 translation address 192.168.8.1
 echo '>>>本地NAT<<<'

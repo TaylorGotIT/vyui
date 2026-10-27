@@ -402,6 +402,7 @@ set service dns forwarding domainlist HK recursion-desired
 set service dns forwarding domainlist HK server ${oversea1dns}
 set service dns forwarding domainlist HK server ${oversea2dns}
 set service dns forwarding listen-address 0.0.0.0
+set service dns forwarding recursion-desired
 set service dns forwarding name-server ${oversea1dns}
 set service dns forwarding name-server ${oversea2dns}`;
     break;

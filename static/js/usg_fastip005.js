@@ -116,8 +116,8 @@ const usg_fastip004html = `<table border="1">
 </tr>
 <tr>
 <td style="text-align: center;">BGP Server</td>
-<td><input id="bgp1server_input" value='103.252.19.25,43.229.117.226'></td>
-<td><input id="bgp2server_input" value='103.252.19.99,43.229.119.251'></td>
+<td><input id="bgp1server_input" value='103.252.18.206,103.252.19.206'></td>
+<td><input id="bgp2server_input" value='43.229.117.207,43.229.119.206'></td>
 </tr>
 
 
@@ -432,19 +432,11 @@ asset monitor-host ip 10.0.0.0 mask 8
 asset monitor-host ip 172.16.0.0 mask 12
 asset monitor-host ip 192.168.0.0 mask 16
 #
-country CN
-Y
-#
 undo configuration exclusive by-user-name huawei
 #
 update schedule ips-sdb daily 03:00
 update schedule av-sdb daily 03:00
 update schedule sa-sdb daily 03:00
-#
-web-manager enable port 8443
-web-manager http forward enable
-web-manager server-source all-interface
-Y
 #
 #配置账号登录设备权限默认开ssh登录
 aaa
@@ -461,15 +453,6 @@ aaa
  local-user bothwin@default privilege level 3
  Y
  local-user bothwin@default service-type terminal telnet http ssh
- Y
-#
-# 客户账号可不添加
-aaa
- local-user ${lineid} password irreversible-cipher ${lineid}@Zxc
- local-user ${lineid} password-force-change disable
- local-user ${lineid} privilege level 3
- Y
- local-user ${lineid} service-type http
  Y
 #
 #配置tacacs认证登录
@@ -525,6 +508,12 @@ user-interface vty 0 15
  acl 3999 inbound
  authentication-mode aaa
  protocol inbound ssh
+#
+web-manager enable port 8443
+web-manager http forward enable
+web-manager server-source all-interface
+Y
+web-manager acl 3999
 #
 user-interface con 0
  authentication-mode aaa
@@ -699,12 +688,14 @@ interface Tunnel1
  ip address unnumbered interface GE0/0/6.1000
  tunnel-protocol ipsec
  ipsec policy IPsecPolicy1
+ service-manage all permit
 #
 interface Tunnel2
  description IPsec-Back-Tunnnel2-${ac2}
  ip address unnumbered interface GE0/0/6.2000
  tunnel-protocol ipsec
  ipsec policy IPsecPolicy2
+ service-manage all permit
 #
 interface Tunnel1000
  description Main-to-NATPE1-${pe1}-${pe1if}
@@ -855,7 +846,9 @@ ip route-static ${bgp1server1} 32 NULL0 preference 65 description BGPserver1
 ip route-static ${bgp1server2} 32 ${pe1ip1} description BGPserver2
 ip route-static ${bgp1server2} 32 NULL0 preference 65 description BGPserver2
 ip route-static ${bgp2server1} 32 ${pe2ip1} description BGPserver3
+ip route-static ${bgp2server1} 32 NULL0 preference 65 description BGPserver3
 ip route-static ${bgp2server2} 32 ${pe2ip1} description BGPserver4
+ip route-static ${bgp2server2} 32 NULL0 preference 65 description BGPserver4
 #
 ip community-filter 80 index 10 permit 65000:9939
 ip community-filter 81 index 10 permit 65000:4134
@@ -889,6 +882,7 @@ route-policy bgp-from--RSVR2 permit node 100
  description to-HK
  if-match community-filter 80
  apply ip-address next-hop ${pe2ip1}
+ apply local-preference 50
 #
 route-policy bgp-from--RSVR2 permit node 200
  description to-internet
@@ -981,6 +975,8 @@ nat-policy
   source-zone local
   egress-interface ${wan1}
   source-address address-set LoopBack1_IP
+  service dns
+  service dns-tcp
   action source-nat easy-ip
 #
 nat-policy
@@ -1129,6 +1125,15 @@ condition alarm feature ipsec name hwIPSecTunnelStop DstIP eq ${ac2pub}
 # 保存配置
 quit
 save
+#
+# 客户账号可不添加
+aaa
+ local-user ${lineid}@default password irreversible-cipher ${lineid}@Zxc
+ local-user ${lineid}@default password-force-change disable
+ local-user ${lineid}@default privilege level 3
+ Y
+ local-user ${lineid}@default service-type http
+ Y
 #
 #SD-Card格式化
 >sys  #进入系统视图

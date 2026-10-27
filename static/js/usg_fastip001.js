@@ -406,15 +406,6 @@ aaa
  local-user bothwin@default service-type terminal telnet http ssh
  Y
 #
-# 客户账号可不添加
-aaa
- local-user ${lineid} password irreversible-cipher ${lineid}@Zxc
- local-user ${lineid} password-force-change disable
- local-user ${lineid} privilege level 3
- Y
- local-user ${lineid} service-type http
- Y
-#
 #配置tacacs认证登录
  hwtacacs-server template fnetlink_tacacs
  hwtacacs-server timer response-timeout 2
@@ -470,9 +461,6 @@ update schedule ips-sdb daily 03:00
 update schedule av-sdb daily 03:00
 update schedule sa-sdb daily 03:00
 #
-country CN
-Y
-#
 #设置acl白名单登录设备
 acl number 3999
  rule 5 permit ip source 202.104.174.178 0
@@ -501,6 +489,11 @@ user-interface vty 0 15
 web-manager enable port 8443
 web-manager http forward enable
 web-manager server-source all-interface
+Y
+web-manager acl 3999
+#
+user-interface con 0
+ authentication-mode aaa
 #
 #配置允许ssh登录设备
 stelnet server enable
@@ -770,7 +763,9 @@ ip route-static ${bgp1server1} 32 NULL0 preference 65 description BGPserver1
 ip route-static ${bgp1server2} 32 ${pe1ip1} description BGPserver2
 ip route-static ${bgp1server2} 32 NULL0 preference 65 description BGPserver2
 ip route-static ${bgp2server1} 32 ${pe2ip1} description BGPserver3
+ip route-static ${bgp2server1} 32 NULL0 preference 65 description BGPserver3
 ip route-static ${bgp2server2} 32 ${pe2ip1} description BGPserver4
+ip route-static ${bgp2server2} 32 NULL0 preference 65 description BGPserver4
 #
 #配置bgp community
 ip community-filter 80 index 10 permit 65000:9939
@@ -805,6 +800,7 @@ route-policy bgp-from--RSVR2 permit node 100
  description to-HK
  if-match community-filter 80
  apply ip-address next-hop ${pe2ip1}
+ apply local-preference 50
 #
 route-policy bgp-from--RSVR2 permit node 200
  description to-internet
@@ -1039,6 +1035,15 @@ condition alarm feature ipsec name hwIPSecTunnelStop DstIP eq ${pe1pub}
 # 保存配置
 quit
 save
+#
+# 客户账号可不添加
+aaa
+ local-user ${lineid}@default password irreversible-cipher ${lineid}@Zxc
+ local-user ${lineid}@default password-force-change disable
+ local-user ${lineid}@default privilege level 3
+ Y
+ local-user ${lineid}@default service-type http
+ Y
 #SD-Card格式化
 >sys  #进入系统视图
 ]diagnose  #进入调试视图

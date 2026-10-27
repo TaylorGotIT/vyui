@@ -249,13 +249,11 @@ function sdwan001sub(url){
   let ce2lo = $("#ce2_lo_input").val();
 
   let sdwan001mplsGreOverIPsec  =
-`#Fnet Huawei SD-WAN MPLS with GRE Over Ipsec Template.
-#Operator: ${user}
-#${time.cn}
-# coding=utf-8
+`# coding=utf-8
 import ops
 import sys
 import os
+
 
 def ops_condition(ops):
     value, descri_str = ops.iclog.subscribe(tag="startup", moduName="DEV", infoAlias="ENTUP", logInfo="register success")
@@ -266,7 +264,7 @@ def ops_condition(ops):
 def ops_execute(ops):
     handle, err_desp = ops.cli.open()
     print(err_desp)
-    choice={" Continue?":"Y"}
+    choice = {" Continue?": "Y"}
     result, n11, n21 = ops.cli.execute(handle, "system-view")
     result, n11, n21 = ops.cli.execute(handle, "ip vpn-instance underlay_ipsecA")
     result, n11, n21 = ops.cli.execute(handle, "ipv4-family")
@@ -279,8 +277,8 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "acl number 3334")
     result, n11, n21 = ops.cli.execute(handle, "rule 1 permit ip vpn-instance underlay_ipsecA source ${ce2lo} 0 destination ${pe2lo} 0")
     result, n11, n21 = ops.cli.execute(handle, "acl number 3999")
-    result, n11, n21 = ops.cli.execute(handle, "rule 10 permit ip source 100.64.0.0 0.0.255.255")
-    result, n11, n21 = ops.cli.execute(handle, "rule 20 permit ip source 100.65.0.0 0.0.255.255")
+    result, n11, n21 = ops.cli.execute(handle, "rule 10 permit ip source 100.71.0.0 0.0.255.255")
+    result, n11, n21 = ops.cli.execute(handle, "rule 20 permit ip source 100.72.0.0 0.0.255.255")
     result, n11, n21 = ops.cli.execute(handle, "quit")
     result, n11, n21 = ops.cli.execute(handle, "ipsec proposal ipsectran1")
     result, n11, n21 = ops.cli.execute(handle, "esp authentication-algorithm sha1", choice)
@@ -347,29 +345,31 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "ip address ${wan1ip}")
     result, n11, n21 = ops.cli.execute(handle, "nat outbound 3999 ")
     result, n11, n21 = ops.cli.execute(handle, "ipsec policy S2S-IPSEC")
-    # lo1 lo2
-    result, n11, n21 = ops.cli.execute(handle, "interface LoopBack1")
+    # lo1000 lo1001
+    result, n11, n21 = ops.cli.execute(handle, "interface LoopBack1000")
     result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance underlay_ipsecA")
     result, n11, n21 = ops.cli.execute(handle, "ip address ${ce1lo} 32")
-    result, n11, n21 = ops.cli.execute(handle, "interface LoopBack2")
+    result, n11, n21 = ops.cli.execute(handle, "interface LoopBack1001")
     result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance underlay_ipsecA")
     result, n11, n21 = ops.cli.execute(handle, "ip address ${ce2lo} 32")
-    # tun1 tun2
+    # tun1000 tun1001
     result, n11, n21 = ops.cli.execute(handle, "interface Tunnel0/0/1000")
     result, n11, n21 = ops.cli.execute(handle, "description 'pri-to-${pe1}-${pe1if}-by-${wan1}'")
     result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance underlay_ipsecA")
+    result, n11, n21 = ops.cli.execute(handle, "mtu 1476")
     result, n11, n21 = ops.cli.execute(handle, "tcp adjust-mss 1300")
     result, n11, n21 = ops.cli.execute(handle, "ip address ${pe1ip2} 30")
     result, n11, n21 = ops.cli.execute(handle, "tunnel-protocol gre")
-    result, n11, n21 = ops.cli.execute(handle, "source LoopBack1")
+    result, n11, n21 = ops.cli.execute(handle, "source LoopBack1000")
     result, n11, n21 = ops.cli.execute(handle, "destination vpn-instance underlay_ipsecA ${pe1lo}")
     result, n11, n21 = ops.cli.execute(handle, "interface Tunnel0/0/1001")
     result, n11, n21 = ops.cli.execute(handle, "description 'bak-to-${pe2}-${pe2if}-by-${wan1}'")
     result, n11, n21 = ops.cli.execute(handle, "ip binding vpn-instance underlay_ipsecB")
+    result, n11, n21 = ops.cli.execute(handle, "mtu 1476")
     result, n11, n21 = ops.cli.execute(handle, "tcp adjust-mss 1300")
     result, n11, n21 = ops.cli.execute(handle, "ip address ${pe2ip2} 30")
     result, n11, n21 = ops.cli.execute(handle, "tunnel-protocol gre")
-    result, n11, n21 = ops.cli.execute(handle, "source LoopBack2")
+    result, n11, n21 = ops.cli.execute(handle, "source LoopBack1001")
     result, n11, n21 = ops.cli.execute(handle, "destination vpn-instance underlay_ipsecA ${pe2lo}")
     result, n11, n21 = ops.cli.execute(handle, "quit")
     # nqa
@@ -401,14 +401,12 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA ${pe2lo} 32 ${wan1gw} description pe2lo")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA ${pe1pub} 32 ${wan1gw} description pe1pub")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA ${pe2pub} 32 ${wan1gw} description pe2pub")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 100.64.0.0 16 ${pe1ip1} description mpls1")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 100.65.0.0 16 ${pe1ip1} description mpls2")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 100.64.0.0 10 ${pe1ip1} description mpls1")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 114.113.245.99 32 ${pe1ip1} description monitor1")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA 192.168.55.250 32 ${pe1ip1} description jumpServer")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecA ${loop2ip} 30 vpn-instance underlay_ipsecB description underlay_ipsecA-to-underlay_ipsecB")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 0.0.0.0 0 vpn-instance underlay_ipsecA ${wan1gw}")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 100.64.0.0 16 ${pe2ip1} description mpls1")
-    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 100.65.0.0 16 ${pe2ip1} description mpls2")
+    result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 100.64.0.0 10 ${pe2ip1} description mpls2")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 114.113.245.100 32 ${pe2ip1} description monitor2")
     result, n11, n21 = ops.cli.execute(handle, "ip route-static vpn-instance underlay_ipsecB 192.168.55.250 32 ${pe2ip1} description jumpServer")
     # ops
@@ -421,24 +419,37 @@ def ops_execute(ops):
     ops.syslog("ops:add_tunnel is success", "critical", "syslog")
     ops.cli.close(handle)
     return 0
+
 `;
 let sdwan001helpText = `##########中控配置###########
-快速开局先填写一条线路，开局后再填写。
-name:       mpls_main
-tn:         mpls_main
-rd:         mpls
-vrf:        underlay_1
-interface:  ${loop2if}.100
-ip address: ${loop1ip2}/30
-gateway:    ${loop1ip1}
+ZTP模式：DHCP option   多子接口：开启
 
-name:       mpls_backup
-tn:         mpls_backup
-rd:         mpls1
-vrf:        underlay_2
-interface:  ${loop2if}.200
-ip address: ${loop2ip2}/30
-gateway:    ${loop2ip1}
+链路名称：   Internet_IPsec
+传输网:     Internet
+路由域:     Internet
+VN实例：    underlay_ipsecA
+interface:  ${wan1}
+ip address: ${wan1ip}
+gateway:    ${wan1gw}
+IPv4 Overlay隧道：关闭
+
+链路名称：  MPLS_Main
+传输网：    MPLS
+路由域：    MPLS
+VN实例：   underlay_mpls1
+interface：  ${loop2if}.100
+ip address： ${loop1ip2}/30
+gateway:    ${loop1ip1}
+IPv4 Overlay隧道：开启
+
+链路名称：   MPLS_Back
+传输网:     MPLS
+路由域:     MPLS
+VN实例：    underlay_mpls2
+interface： ${loop2if}.200
+ip address：${loop2ip2}/30
+gateway：   ${loop2ip1}
+IPv4 Overlay隧道：开启
 
 ##########初始化开局脚本#####
 ！！！R22 开机进入命令行会要求创建新用户，直接创建bothwin即可。
@@ -453,11 +464,9 @@ aaa
  local-user bothwin ftp-directory flash:
  local-user bothwin privilege level 15
  quit
- quit
 #
 ip vpn-instance underlay_ipsecA
  ipv4-family
-quit
 quit
 interface ${wan1}
  undo portswitch
@@ -467,7 +476,10 @@ quit
 ip route-static vpn-instance underlay_ipsecA 0.0.0.0 0 ${wan1} preference 222
 登录公司公网FTP，上传文件到自己的文件夹，路由器通过公网获取开局脚本。
 ftp 59.36.7.222 vpn-instance underlay_ipsecA
-dir
+账号：psalesftp  / Tfe28@w%
+passive 设置为主动模式，当网络延迟高，无法正常下载时可以打开
+cd Taylorg
+ls
 get ${lineid}.py
 # 还原初始密码 R22不用
 # local-user admin password irreversible-cipher admin@huawei.com
@@ -520,7 +532,7 @@ display esn
 #把设备ESN输入到中控设备上
 #
 system-view
-ip vpn-instance underlay_1
+ip vpn-instance underlay_mpls1
  ipv4-family
  quit
  quit
@@ -529,14 +541,14 @@ interface ${loop2if}
 #
 interface ${loop2if}.100
  dot1q termination vid 100
- ip binding vpn-instance underlay_1
+ ip binding vpn-instance underlay_mpls1
  ip address ${loop1ip2} 30
 #
-ip route-static vpn-instance underlay_1 ${controller1ip} 32 ${loop2if}.100 ${loop1ip1} tag 4400 description agile-controller
+ip route-static vpn-instance underlay_mpls1 ${controller1ip} 32 ${loop2if}.100 ${loop1ip1} tag 4400 description agile-controller
 #Pinc测试
-ping -vpn-instance underlay_1 -a ${loop1ip2} ${controller1ip}
+ping -vpn-instance underlay_mpls1 -a ${loop1ip2} ${controller1ip}
 #确认OK后，命令行开局
- agile controller host ${controller1ip} port 10020 vpn-instance underlay_1
+ agile controller host ${controller1ip} port 10020 vpn-instance underlay_mpls1
 quit
 save
 #立即保存配置 Y
@@ -569,6 +581,7 @@ def ops_execute(ops):
     result, n11, n21 = ops.cli.execute(handle, "environment ipsec_backup 新对接IP")
     result, n11, n21 = ops.cli.execute(handle, "quit")
 3、重新安装脚本
+!!!配置不能直接改，必须先undo再添加
 system-view
 ops
  undo script-assistant python ${lineid}.py
